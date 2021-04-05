@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta name="generator" content="Hugo 0.82.0" />
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-16x16.png" />
+<link rel="manifest" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/site.webmanifest" />
+<link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/safari-pinned-tab.svg" color="#8aa2d3" />
+<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon.ico" />
+<meta name="theme-color" content="#ffffff" />
+
+
+<title>从DVWA看Command Injection(命令注入） - Phoenix-Pl’s Blog</title>
+
+
+<meta name="author" content="DSRKafuU" />
+
+
+<meta name="description" content="A minimal Hugo theme with nice theme color." />
+
+
+<meta name="keywords" content="DVWA" />
+
+
+<meta property="og:title" content="从DVWA看Command Injection(命令注入）" />
+<meta name="twitter:title" content="从DVWA看Command Injection(命令注入）" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Phoenix-Pl.github.io/post/dvwa%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5/" /><meta property="og:description" content="漏洞产生的原因 在web程序中，因为业务功能需求要通过web前端传递参数到后台服务器上执行（特别是一些网络设备的web管理界面），但由于开发人员没有对输入进行严格的过滤，导致漏洞攻击者可以通过提交恶意构" />
+<meta name="twitter:description" content="漏洞产生的原因 在web程序中，因为业务功能需求要通过web前端传递参数到后台服务器上执行（特别是一些网络设备的web管理界面），但由于开发人员没有对输入进行严格的过滤，导致漏洞攻击者可以通过提交恶意构" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://Phoenix-Pl.github.io/img/og.png" /><meta property="article:published_time" content="2020-05-11T00:00:00+00:00" /><meta property="article:modified_time" content="2020-05-11T00:00:00+00:00" />
+
+
+<style>
+    @media (prefers-color-scheme: dark) {
+        body[data-theme='auto'] img {
+            filter: brightness(60%);
+        }
+    }
+
+    body[data-theme='dark'] img {
+        filter: brightness(60%);
+    }
+</style>
+
+
+
+<link rel="stylesheet" href="https://Phoenix-Pl.github.io/assets/css/fuji.min.css" />
+
+
+
+
+
+</head>
+
+<body data-theme="auto">
+    <script data-cfasync="false">
+  
+  var fujiThemeData = localStorage.getItem('fuji_data-theme');
+  
+  if (!fujiThemeData) {
+    localStorage.setItem('fuji_data-theme', 'auto');
+  } else {
+    
+    if (fujiThemeData !== 'auto') {
+      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
+    }
+  }
+</script>
+    <header>
+    <div class="container-lg clearfix">
+        <div class="col-12 header">
+            <a class="title-main" href="https://Phoenix-Pl.github.io/">Phoenix-Pl’s Blog</a>
+            
+            <span class="title-sub">书山有路勤为径，学海无涯苦作舟</span>
+            
+        </div>
+    </div>
+</header>
+
+    <main>
+        <div class="container-lg clearfix">
+            
+            <div class="col-12 col-md-9 float-left content">
+                
+<article>
+    
+    <h2 class="post-item post-title">
+        <a href="https://Phoenix-Pl.github.io/post/dvwa%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5/">从DVWA看Command Injection(命令注入）</a>
+    </h2>
+    <div class="post-item post-meta">
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-05-11</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;2694 字</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/dvwa">DVWA</a>&nbsp;</span>
+
+    </div>
+    
+    <div class="post-content markdown-body">
+        <h2 id="漏洞产生的原因">漏洞产生的原因</h2>
+<p>在web程序中，因为业务功能需求要<strong>通过web前端传递参数到后台服务器上执行</strong>（特别是一些网络设备的web管理界面），但由于开发人员<strong>没有对输入进行严格的过滤</strong>，导致漏洞攻击者可以通过提交<strong>恶意构造的参数破坏命令语句结构</strong>，<strong>从而达到执行恶意命令的目的</strong>。<strong>PHP命令注入攻击漏洞</strong>是PHP应用程序中常见的脚本漏洞之一，国内著名的Web应用程序Discuz!、DedeCMS等都曾经存在过该类型漏洞。</p>
+<h2 id="漏洞危害">漏洞危害</h2>
+<p>如果web应用使用的是root权限则该漏洞可以导致攻击者在服务器上执行任意命令。</p>
+<h2 id="先解决个小问题">先解决个小问题</h2>
+<p>打开题目，提示 <code>Enter an IP address</code></p>
+<p>这里我们输入 <code>127.0.0.1</code> 试一下</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020112707543716.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>发现这里都是乱码，可能是因为DVWA是<strong>在windows下部署的原因，底层系统是中文GBK编码所致。</strong></p>
+<p>通过查阅资料得知在 <strong>&hellip;/DVWA/dvwa/includes目录下，有个dvwaPage.inc.php文件</strong></p>
+<p>打开查找 <code>Content-Type</code>, 进行修改，将全部的<code>charset=UTF-8</code>改为 <code>charset=GBK</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201127081141947.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>问题解决~</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201127081258916.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h2 id="解题篇">解题篇</h2>
+<h3 id="low">Low</h3>
+<p><strong>代码及分析</strong></p>
+<pre><code class="language-php">&lt;?php
+
+if( isset( $_POST[ 'Submit' ]  ) ) {
+    // Get input  //判断是否点了提交按钮
+    $target = $_REQUEST[ 'ip' ];
+    //把输入的信息放在target变量中
+    // Determine OS and execute the ping command.
+    if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
+        //判断是否是window系统
+        
+        // Windows
+        $cmd = shell_exec( 'ping  ' . $target );
+    }
+    else {
+        //判断是否是Linux系统
+        // Linux
+        $cmd = shell_exec( 'ping  -c 4 ' . $target );
+    }
+
+    // Feedback for the end user
+    echo &quot;&lt;pre&gt;{$cmd}&lt;/pre&gt;&quot;;
+}
+
+?&gt; 
+</code></pre>
+<p>函数解释：</p>
+<ul>
+<li>
+<p>php_uname() 返回运行 PHP 的系统的有关信息</p>
+<pre><code class="language-powershell">'a'：此为默认。包含序列 &quot;s n r v m&quot; 里的所有模式。   's'：操作系统名称。例如： FreeBSD。    
+'n'：主机名。例如： localhost.example.com。    
+'r'：版本名称，例如： 5.1.2-RELEASE。    
+'v'：版本信息。操作系统之间有很大的不同。    
+'m'：机器类型。例如：i386。
+</code></pre>
+</li>
+<li>
+<p>shell_exec(cmd) 让php网页程序可以执行一些操作系统的命令（==命令执行漏洞主要是因为这个函数==）如果不对用户输入的命令进行过滤，那么理论上就可以执行任意系统命令，也就相当于直接获得了系统级的shell</p>
+</li>
+<li>
+<p>stristr()</p>
+</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201127120728425.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里先 ping 一下<code>127.0.0.1</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201127191047878.png" alt="在这里插入图片描述" />
+</p>
+<p>发现可以，那能不能执行以下别的命令呢，这里我们尝试一下<code>net user</code> 命令</p>
+<p>发现报错了</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201127192943203.png" alt="在这里插入图片描述" />
+</p>
+<p>如果我们只能ping个IP 也起不到什么作用，怎么才能执行其他的命令呢？</p>
+<p>这个时候就该上知识点了，我们可以使用 <code>|</code>  <code>&amp;</code>  <code>||</code>  <code>&amp;&amp;</code>   这四种符合拼接命令进行执行</p>
+<p>允许同时执行多条命令的符号</p>
+<ul>
+<li>&ldquo;|&quot;：前面命令输出结果作为后面命令的输入内容</li>
+<li>&ldquo;&amp;&quot;：前面命令执行后接着执行后面的命令</li>
+<li>&ldquo;&amp;&amp;&quot;：前面命令执行成功了才执行后面的命令</li>
+</ul>
+<p><strong>以上三种连接符在windows和linux环境下都指支持</strong></p>
+<ul>
+<li>
+<p>&ldquo;||&quot;：前面命令执行失败的时候才执行后面的命令（==支持windows==）</p>
+</li>
+<li>
+<p>Linux系统还可以使用分号(;)同时执行多条命令</p>
+</li>
+<li>
+<p>还可以使用重定向(&gt;)在服务器中生成文件，或是使用(&lt;)从事先准备好的文件读入命令等</p>
+</li>
+</ul>
+<pre><code class="language-powershell">例如：
+ping 127.0.0.1 | ipconfig
+ping 127.0.0.1 &amp; ipconfig
+ping 127.0.0.1 || ipconfig
+ping 127.0.0.1 &amp;&amp; ipconfig
+
+</code></pre>
+<blockquote>
+<p>几个cmd命令</p>
+<p>查看用户：net user</p>
+<p>添加用户：net user name password/add</p>
+<pre><code>              name:用户名
+
+              password:密码
+</code></pre>
+<p>提升为管理员：net localgroup administrators/add</p>
+<p>查看管理员用户：net localgroup administrators</p>
+<p>删除用户：net user name/delete</p>
+<p>获取ip、DNS：ipconfig</p>
+<p>whoami：查看目前的身份</p>
+</blockquote>
+<p>回到题目</p>
+<p>输入<code>127.0.0.1 &amp;&amp; ipconfig</code>,成功回显：</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201127200644395.png" alt="在这里插入图片描述" />
+</p>
+<p>写个木马进来，<code>127.0.0.1 &amp;&amp; echo &quot;&lt;?php phpinfo();?&gt;&quot;&gt;c:\shell.php</code></p>
+<p>写入成功</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201127201137113.png" alt="在这里插入图片描述" />
+</p>
+<h3 id="medium">Medium</h3>
+<p>先贴一下代码</p>
+<pre><code class="language-php">&lt;?php
+
+if( isset( $_POST[ 'Submit' ]  ) ) {
+    // Get input
+    $target = $_REQUEST[ 'ip' ];
+
+    // Set blacklist
+    $substitutions = array(
+        '&amp;&amp;' =&gt; '',
+        ';'  =&gt; '',
+    );
+
+    // Remove any of the charactars in the array (blacklist).
+    $target = str_replace( array_keys( $substitutions ), $substitutions, $target );
+
+    // Determine OS and execute the ping command.
+    if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
+        // Windows
+        $cmd = shell_exec( 'ping  ' . $target );
+    }
+    else {
+        // *nix
+        $cmd = shell_exec( 'ping  -c 4 ' . $target );
+    }
+
+    // Feedback for the end user
+    echo &quot;&lt;pre&gt;{$cmd}&lt;/pre&gt;&quot;;
+}
+
+?&gt; 
+</code></pre>
+<p>这里设置了黑名单<code>&amp;&amp;</code> 和 <code>;</code>，替换为空</p>
+<p>可以使用双写绕过<code>127.0.0.1&amp;;&amp; ipconfig</code></p>
+<p>当然也可以使用没有被过滤的<code>&amp;</code>、<code>||</code>、<code>|</code></p>
+<h3 id="high">High</h3>
+<p>贴一下代码</p>
+<pre><code class="language-php">&lt;?php
+
+if( isset( $_POST[ 'Submit' ]  ) ) {
+    // Get input
+    $target = trim($_REQUEST[ 'ip' ]);
+
+    // Set blacklist
+    $substitutions = array(
+        '&amp;'  =&gt; '',
+        ';'  =&gt; '',
+        '| ' =&gt; '',
+        '-'  =&gt; '',
+        '$'  =&gt; '',
+        '('  =&gt; '',
+        ')'  =&gt; '',
+        '`'  =&gt; '',
+        '||' =&gt; '',
+    );
+
+    // Remove any of the charactars in the array (blacklist).
+    $target = str_replace( array_keys( $substitutions ), $substitutions, $target );
+
+    // Determine OS and execute the ping command.
+    if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
+        // Windows
+        $cmd = shell_exec( 'ping  ' . $target );
+    }
+    else {
+        // *nix
+        $cmd = shell_exec( 'ping  -c 4 ' . $target );
+    }
+
+    // Feedback for the end user
+    echo &quot;&lt;pre&gt;{$cmd}&lt;/pre&gt;&quot;;
+}
+
+?&gt; 
+</code></pre>
+<p>不难看出，这个难度就是黑名单中有了更多禁止的内容。这种过滤都是基于规则，而只要是规则，都有漏洞可循。</p>
+<p>比如：过滤名单里有<code>| </code>,<strong>后面有一个空格</strong>，那这样就直接可以借助<code>|</code>进行绕过。其余的比如加上<code>&amp;|</code>这类的都是基于<code>|</code>不在黑名单里才可以实现，在这里就不一一赘述。</p>
+<p>PS：值得一提的是 当我输入 <code>127.0.0.1 || whoami</code>时竟然执行了，进行调试后发现并非是<code>||</code>没有被过滤，而是根据黑名单数组的顺序，优先过滤的是<code>| </code>，结果就剩下来<code> |</code>，则可以执行，说到底还是基于<code>|</code>没过滤</p>
+<h3 id="impossible">Impossible</h3>
+<pre><code class="language-php">&lt;?php
+
+if( isset( $_POST[ 'Submit' ]  ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Get input
+    $target = $_REQUEST[ 'ip' ];
+    $target = stripslashes( $target );
+
+    // Split the IP into 4 octects
+    $octet = explode( &quot;.&quot;, $target );
+    
+
+    // Check IF each octet is an integer
+    if( ( is_numeric( $octet[0] ) ) &amp;&amp; ( is_numeric( $octet[1] ) ) &amp;&amp; ( is_numeric( $octet[2] ) ) &amp;&amp; ( is_numeric( $octet[3] ) ) &amp;&amp; ( sizeof( $octet ) == 4 ) ) {
+        // If all 4 octets are int's put the IP back together.
+       
+        $target = $octet[0] . '.' . $octet[1] . '.' . $octet[2] . '.' . $octet[3];
+
+        // Determine OS and execute the ping command.
+        if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
+            // Windows
+            $cmd = shell_exec( 'ping  ' . $target );
+        }
+        else {
+            // *nix
+            $cmd = shell_exec( 'ping  -c 4 ' . $target );
+        }
+
+        // Feedback for the end user
+        echo &quot;&lt;pre&gt;{$cmd}&lt;/pre&gt;&quot;;
+    }
+    else {
+        // Ops. Let the user name theres a mistake
+        echo '&lt;pre&gt;ERROR: You have entered an invalid IP.&lt;/pre&gt;';
+    }
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;
+</code></pre>
+<p>代码分析：</p>
+<p>这里首先采用了token令牌机制，用户每次提交表单时都附带提交一个token值，服务器将提交的token值与session或cookie中存储的token值进行比较，相同则通过请求，不同则过滤请求</p>
+<p><code>$octet = explode( &quot;.&quot;, $target );</code></p>
+<p>通过explode函数以<code>.</code>为分割符将<code>$target</code>变量中的IP地址进行分割，分割后会得到一个数组，并赋值给变量<code>$octet</code></p>
+<p><code>if( ( is_numeric( $octet[0] ) ) &amp;&amp; ( is_numeric( $octet[1] ) ) &amp;&amp; ( is_numeric( $octet[2] ) ) &amp;&amp; ( is_numeric( $octet[3] ) ) &amp;&amp; ( sizeof( $octet ) == 4 ) )</code></p>
+<p>用<code>is_numeric</code>函数依次判断<code>$octet</code>数组中的每个值是否是数字型数据，并且还使用sizeof函数判断<code>$octet</code>数组中元素是否是4个</p>
+<h2 id="防御">防御</h2>
+<ul>
+<li>
+<p>对传入的数据进行严格过滤，定义白名单，只允许输入IP地址</p>
+<ul>
+<li>
+<p>EscapeShellCmd()函数</p>
+<p>把字符串中可能瞒过Shell而去执行另外一个命令的字符转义，如管道符（|）、分号（；）、重定向（&gt;）、从文件读入（&lt;）等</p>
+</li>
+<li>
+<p>EscapeShellArg()函数</p>
+<p>在给定的字符串两边加上单引号，并把字符串中的单引号转义，这样这个字符串就可以安全地作为命令的参数</p>
+</li>
+<li>
+<p>可以修改low级别网页文件dvwa\vulnerabilities\exec\source\low.php进行测试</p>
+</li>
+<li>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201127205705784.png" alt="在这里插入图片描述" />
+</p>
+</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201127210134859.png" alt="在这里插入图片描述" />
+</p>
+<p>发现报错了</p>
+</li>
+<li>
+<p>对后台对应用的权限进行控制（比如可以给PHP建立独立的账号，控制PHP的启动权限）Linux可以</p>
+</li>
+</ul>
+
+    </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>除特殊注明部分，本站内容采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a> 进行许可。</p>
+    </blockquote>
+</div>
+
+
+
+            </div>
+            <aside class="col-12 col-md-3 float-left sidebar">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/Phoenix-Pl" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/dvwa/">DVWA</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3><nav id="TableOfContents">
+  <ul>
+    <li><a href="#漏洞产生的原因">漏洞产生的原因</a></li>
+    <li><a href="#漏洞危害">漏洞危害</a></li>
+    <li><a href="#先解决个小问题">先解决个小问题</a></li>
+    <li><a href="#解题篇">解题篇</a>
+      <ul>
+        <li><a href="#low">Low</a></li>
+        <li><a href="#medium">Medium</a></li>
+        <li><a href="#high">High</a></li>
+        <li><a href="#impossible">Impossible</a></li>
+      </ul>
+    </li>
+    <li><a href="#防御">防御</a></li>
+  </ul>
+</nav></div>
+</aside>
+        </div>
+        <div class="btn">
+    <div class="btn-menu" id="btn-menu">
+        <i class="iconfont icon-grid-sharp"></i>
+    </div>
+    <div class="btn-toggle-mode">
+        <i class="iconfont icon-contrast-sharp"></i>
+    </div>
+    <div class="btn-scroll-top">
+        <i class="iconfont icon-chevron-up-circle-sharp"></i>
+    </div>
+</div>
+<aside class="sidebar-mobile" style="display: none;">
+  <div class="sidebar-wrapper">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/Phoenix-Pl" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/dvwa/">DVWA</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    
+    
+    
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#漏洞产生的原因">漏洞产生的原因</a></li>
+    <li><a href="#漏洞危害">漏洞危害</a></li>
+    <li><a href="#先解决个小问题">先解决个小问题</a></li>
+    <li><a href="#解题篇">解题篇</a>
+      <ul>
+        <li><a href="#low">Low</a></li>
+        <li><a href="#medium">Medium</a></li>
+        <li><a href="#high">High</a></li>
+        <li><a href="#impossible">Impossible</a></li>
+      </ul>
+    </li>
+    <li><a href="#防御">防御</a></li>
+  </ul>
+</nav>
+    </div>
+    
+    
+  </div>
+</aside>
+    </main>
+
+    <footer>
+    <div class="container-lg clearfix">
+        <div class="col-12 footer">
+            
+            <span>&copy; 2020-2021
+                <a href="https://Phoenix-Pl.github.io/">DSRKafuU</a>
+                 | <a href="https://github.com/itsme/my_blog">Source code</a> 
+                | 基于 <a href="https://github.com/amzrk2/hugo-theme-fuji/"
+                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
+                                                    target="_blank">Hugo</a> 构建
+            </span>
+        </div>
+    </div>
+</footer>
+
+    
+<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+
+
+<script defer src="/assets/js/fuji.min.js"></script>
+
+
+</body>
+
+</html>

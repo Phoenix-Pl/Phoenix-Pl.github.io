@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta name="generator" content="Hugo 0.82.0" />
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-16x16.png" />
+<link rel="manifest" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/site.webmanifest" />
+<link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/safari-pinned-tab.svg" color="#8aa2d3" />
+<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon.ico" />
+<meta name="theme-color" content="#ffffff" />
+
+
+<title>从DVWA看Brute Force(暴力破解) - Phoenix-Pl’s Blog</title>
+
+
+<meta name="author" content="DSRKafuU" />
+
+
+<meta name="description" content="A minimal Hugo theme with nice theme color." />
+
+
+<meta name="keywords" content="DVWA" />
+
+
+<meta property="og:title" content="从DVWA看Brute Force(暴力破解)" />
+<meta name="twitter:title" content="从DVWA看Brute Force(暴力破解)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Phoenix-Pl.github.io/post/dvwa%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3/" /><meta property="og:description" content="Brute Force 前置知识 Brute Force，即暴力（破解），是指黑客利用密码字典，使用穷举法猜解出用户口令，是现在最为广泛使用的攻击手法之一，如2014年轰动全国的12306“撞库”事件，实质就是暴力破解攻击。 暴力破解" />
+<meta name="twitter:description" content="Brute Force 前置知识 Brute Force，即暴力（破解），是指黑客利用密码字典，使用穷举法猜解出用户口令，是现在最为广泛使用的攻击手法之一，如2014年轰动全国的12306“撞库”事件，实质就是暴力破解攻击。 暴力破解" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://Phoenix-Pl.github.io/img/og.png" /><meta property="article:published_time" content="2020-05-11T00:00:00+00:00" /><meta property="article:modified_time" content="2020-05-11T00:00:00+00:00" />
+
+
+<style>
+    @media (prefers-color-scheme: dark) {
+        body[data-theme='auto'] img {
+            filter: brightness(60%);
+        }
+    }
+
+    body[data-theme='dark'] img {
+        filter: brightness(60%);
+    }
+</style>
+
+
+
+<link rel="stylesheet" href="https://Phoenix-Pl.github.io/assets/css/fuji.min.css" />
+
+
+
+
+
+</head>
+
+<body data-theme="auto">
+    <script data-cfasync="false">
+  
+  var fujiThemeData = localStorage.getItem('fuji_data-theme');
+  
+  if (!fujiThemeData) {
+    localStorage.setItem('fuji_data-theme', 'auto');
+  } else {
+    
+    if (fujiThemeData !== 'auto') {
+      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
+    }
+  }
+</script>
+    <header>
+    <div class="container-lg clearfix">
+        <div class="col-12 header">
+            <a class="title-main" href="https://Phoenix-Pl.github.io/">Phoenix-Pl’s Blog</a>
+            
+            <span class="title-sub">书山有路勤为径，学海无涯苦作舟</span>
+            
+        </div>
+    </div>
+</header>
+
+    <main>
+        <div class="container-lg clearfix">
+            
+            <div class="col-12 col-md-9 float-left content">
+                
+<article>
+    
+    <h2 class="post-item post-title">
+        <a href="https://Phoenix-Pl.github.io/post/dvwa%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3/">从DVWA看Brute Force(暴力破解)</a>
+    </h2>
+    <div class="post-item post-meta">
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-05-11</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;8962 字</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/dvwa">DVWA</a>&nbsp;</span>
+
+    </div>
+    
+    <div class="post-content markdown-body">
+        <blockquote>
+<h2 id="brute-force"><strong>Brute Force</strong></h2>
+</blockquote>
+<h3 id="前置知识">前置知识</h3>
+<p>Brute Force，即暴力（破解），是指黑客利用密码字典，使用穷举法猜解出用户口令，是现在最为广泛使用的攻击手法之一，如2014年轰动全国的12306“撞库”事件，实质就是暴力破解攻击。</p>
+<p>暴力破解可分为两种，一种是针对性的密码爆破，另外一种是扩展性的密码喷洒。</p>
+<p>1、密码爆破：密码爆破一般很熟悉，即针对单个账号或用户，用密码字典来不断的尝试，直到试出正确的密码，破解出来的时间和密码的复杂度及长度及破解设备有一定的关系。</p>
+<p>常用的字典文件主要有以下类型：</p>
+<ul>
+<li>常用的账号密码，例如top100密码字典、top500用户名字典等</li>
+<li>互联网上被拖库后的账号密码，比如当年csdn泄露的600w用户信息</li>
+<li>使用工具软件按照指定的规则进行排列算法生成的字典，比如生日字典等</li>
+</ul>
+<p>2、密码喷洒：密码喷洒和密码爆破相反，也可以叫反向密码爆破，即用指定的一个密码来批量的试取用户，在信息搜集阶段获取了大量的账号信息或者系统的用户，然后以固定的一个密码去不断的尝试这些用户。</p>
+<p>这里需要用到 <code>burp suite</code> 的<code>intruder</code>模块</p>
+<p>这里先介绍一下这个模块</p>
+<p>这里的话借鉴大佬的博客写的十分详细：<a href="https://blog.csdn.net/xj28555/article/details/106983125?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522160606092719724842906480%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&amp;request_id=160606092719724842906480&amp;biz_id=0&amp;utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-2-106983125.first_rank_ecpm_v3_pc_rank_v2&amp;utm_term=burpsuite&#43;intruder&amp;spm=1018.2118.3001.4449" target="_blank">点击</a></p>
+<p><strong>一、简介</strong></p>
+<p>Burp Intruder是一个强大的工具，用于自动对Web应用程序自定义的攻击，Burp Intruder  是高度可配置的，并被用来在广范围内进行自动化攻击。你可以使用 Burp Intruder  方便地执行许多任务，包括枚举标识符，获取有用数据，漏洞模糊测试。合适的攻击类型取决于应用程序的情况，可能包括：缺陷测试：SQL  注入，跨站点脚本，缓冲区溢出，路径遍历；暴力攻击认证系统；枚举；操纵参数；拖出隐藏的内容和功能；会话令牌测序和会话劫持；数据挖掘；并发攻击；应用层的拒绝服务式攻击。</p>
+<p><strong>Burp Intruder主要有四个模块组成:</strong></p>
+<p>1、Target 用于配置目标服务器进行攻击的详细信息。
+2、Positions  设置Payloads的插入点以及攻击类型（攻击模式）
+3、Payloads  设置payload，配置字典
+4、Opetions  此选项卡包含了request headers，request engine，attack results ，grep match，grep_extrack，grep  payloads和redirections。你可以发动攻击之前，在主要Intruder的UI上编辑这些选项，大部分设置也可以在攻击时对已在运行的窗口进行修改。</p>
+<p><strong>1：Target</strong> <strong>目标选项(Target tab)</strong></p>
+<p>这个选项是用来配置目标服务器的细节：</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201123222704845.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>配置这些详细信息的最简单方法是选择要在<strong>Burp Suite</strong>中攻击任何地方的请求，并在上下文菜单上选择“<strong>Send to Intruder</strong>”选项。这将把所选的请求发送到<strong>Intruder</strong>中的新选项卡，并自动填充目标和位置选项卡。</p>
+<p>这里的话说一下<code>SSL</code></p>
+<p>SSL(Secure Socket Layer 安全套接层)是基于HTTPS下的一个协议加密层, 简而言之，它是一项标准技术，可确保互联网连接安全，保护两个系统之间发送的任何敏感数据，防止网络犯罪分子读取和修改任何传输信息，包括个人资料。两个系统可能是指服务器和客户端（例如，浏览器和购物网站），或两个服务器之间</p>
+<p><strong>2：Positions 位置选项(Positions tab)</strong></p>
+<p>这个选项是用来配置在攻击里产生的所有 HTTP 请求的模板：</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201123222756114.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>攻击类型&quot;Attack type&quot;</strong></p>
+<ul>
+<li>Sniper：狙击手，可以指定多个变量同时进行破解，但是只设置一个字典文件，将指定的变量挨个用字典内容进行替换（常用）</li>
+<li>Batteringram：攻城锤，可以指定多个变量，但仍只设置一个字典文件，将所有的变量一起用字典文件内容进行替换</li>
+<li>Ptichfork：草叉子，可以指定多个变量，但需要为每个变量分别设置一个字典文件，然后用对应的字典内容对变量<strong>同时</strong>进行替换</li>
+<li>Cluster bomb：集数炸弹，指定多个变量，并为每个变量设置一个字典文件，然后用字典内容组合对变量进行替换（常用）</li>
+</ul>
+<p>每对标记 ‘ § ’ 指示一个<strong>Payload</strong>位置。一对标记可以选择性地将模板请求中的一些文本括在它们之间。当有效载荷位置被分配了<strong>Payload</strong>时，标记和任何包含的文本都将被<strong>Payload</strong>替换。当有效载荷位置没有指定的<strong>Payload</strong>时，标记将被移除，但所附文本保持不变。
+为了简化配置，<strong>Intruder模块</strong>会自动突出显示每对有效负载标记以及它们之间的任何封闭文本。您可以手动或自动放置有效负载标记。当您从<strong>Burp Suite</strong>中的其他模块向<strong>Intruder模块</strong>发送请求时，会猜测您可能想要放置有效负载的位置，并相应地设置有效负载标记。</p>
+<p>你可以使用选项上的按钮来控制位置上的标记：</p>
+<ul>
+<li>
+<p>add § — 在当前光标位置插入一个位置标记。</p>
+</li>
+<li>
+<p>clear § — 删除整个模板或选中的部分模板里的位置标记。</p>
+</li>
+<li>
+<p>auto § — 这会对放置标记的位置做一个猜测，放哪里会有用，然后就把标记放到相应位置。这是一个为攻击常规漏洞(SQL 注入)快速标记出合适位置的有用的功能，然后人工标记是为自定义攻击的。</p>
+</li>
+<li>
+<p>refresh — 如果需要，可以刷新编辑器里有颜色的代码。</p>
+</li>
+<li>
+<p>clear — 删除整个编辑器内容。</p>
+</li>
+</ul>
+<p><strong>这里详细讲一下这四种攻击方式：</strong></p>
+<p>这里转载自：<a href="https://www.cnblogs.com/Kevin-1967/p/7762661.html" target="_blank">点击</a></p>
+<p>假设有用户名和密码两个 position，词典如下：
+user1，user2，usre3
+pass1，pass2，pass3</p>
+<p><strong>Sniper（狙击手模式）</strong></p>
+<p>狙击手模式使用<code>1</code>组payload集合，它一次只使用一个payload位置
+需要字典：1个 【payloadset部分只能选择1】
+变量数量：不限
+加载顺序：将字典依次填入所有变量中，下图设置了两个变量，所以Position会有两个</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124072729120.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>Battering ram (攻城锤模式)</strong></p>
+<p>需要字典：1个 【payloadset部分只能选择1】</p>
+<p>变量数量：不限</p>
+<p>加载顺序：将字典同时填入所有变量中，下图设置了两个变量，两个变量分别依次被填入了user1，user2，user3</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124072805202.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>Pitchfork（草叉子模式）</strong></p>
+<p>允许使用<code>多组</code>payload组合，在每个标记位置上遍历所有payload组合
+需要字典：N个 【payloadset可以选择N个】
+变量数量：N个【需要和字段数量相同】
+加载顺序：字典和变量分别对应，同时填入对应变量中，下图设置了两个变量，变量1依次被填入了user1，user2，user3，变量2依次被填入了pass1，pass2，pass3，user字典和pass字典一一对应</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124073121383.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124073220227.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124073352259.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>Cluster Bomb（集束炸弹模式）</strong></p>
+<p>集束炸弹模式跟草叉模式不同的地方在于，集束炸弹模式会对payload组进行笛卡尔积
+需要字典：N个 【payloadset可以选择N个】
+变量数量：N个【需要和字段数量相同】
+加载顺序：字典和变量分别对应，分别填入对应变量中，下图设置了两个变量，变量1依次被填入了user1，user2，user3  变量2首先被填入了pass1，然后是pass2，最后是pass3，user字典和pass字典分别对应，payload数量是 user字典数 X  pass字段数</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124073631112.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>3：Payloads 有效负荷选项(Payloads tab)</strong></p>
+<p>这个选项是用来配置一个或多个有效负荷的集合。如果定义了”cluster bomb”和”pitchfork”攻击类型，然后必须为每定义的有效负荷位置(最多8个)配置一个单独的有效负荷。使用”payload set”下拉菜单选择要配置的有效负荷。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201123225218735.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>选项1：Payload Sets</strong></p>
+<p><strong>载荷类型&quot;Payload type&quot;</strong></p>
+<p>常用的有下面四种</p>
+<ul>
+<li>Simple list：可以手动添加字典列表，也可以导入Burpsuite自带的字典，或者导入自定义的字典。</li>
+<li>Runtimely file：只能加载自定义的字典</li>
+<li>Number：设定一个数值范围，从范围内依次或随机取值进行测试</li>
+<li>Brute forcer：自己定义字符范围来生成字典文件</li>
+</ul>
+<p><strong>选项2：Payload Opetions[Simple list]</strong> 该选项会根据选项1中Payload type的设置而改变</p>
+<ul>
+<li>Paste 粘贴，就很容易理解，比方说你复制<code>123456</code>,然后点击Paste 就被粘贴了上去</li>
+<li>Load 载入 就是载入你本地的字典</li>
+<li>Remove 删除 就是删除你选中的某个字典</li>
+<li>Clear 清理 清空所有字典（无论你粘贴的还是载入的）</li>
+<li>Add 自己编写一个字典</li>
+<li>Add from list  这个模块下会有很多选项，其实就是burp自身提供的字典</li>
+</ul>
+<p>这里的话再说一下<code>Number</code>载荷 （<strong>这个模块的话，sql注入盲注可以使用，猜字段数</strong>)</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201123231933460.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>（说实话下面的暂时还没有用到过，小声BB）</p>
+<p><strong>选项3：Payload Processing</strong> 对生成的Payload进行编码、加密、截取等操作</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201123232116790.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>选项4：Payload Encoding</strong>  你可以配置哪些有效载荷中的字符应该是URL编码的HTTP请求中的安全传输。任何已配置的URL编码最后应用，任何有效载荷处理规则执行之后。  这是推荐使用此设置进行最终URL编码，而不是一个有效载荷处理规则，因为可以用来有效载荷的grep选项来检查响应为呼应有效载荷的最终URL编码应用之前。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201123232205363.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>4：Opetions  选项卡(Options tab)</strong> 此选项卡包含了request  headers，request engine，attack results ，grep match，grep_extrack，grep  payloads和redirections。你可以发动攻击之前，在主要Intruder的UI上编辑这些选项，大部分设置也可以在攻击时对已在运行的窗口进行修改。</p>
+<p><strong>选项1：Request Headers 这些设置控制在Intruder是否更新配置请求头。</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201123232634285.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>如果选中‘update Content-Length header’框，Burp Intruder 会使用每个请求的 HTTP  主体长度的正确值，添加或更新这个请求里 HTTP 消息头的内容长度。这个功能对一些需要把可变长度的有效载荷插入到 HTTP  请求模板主体的攻击是很有必要的。这个 HTTP 规范和大多数 web 服务器一样，需要使用消息头内容长度来指定 HTTP  主体长度的正确值。如果没有指定正确值，目标服务器会返回一个错误，也可能返回一个未完成的请求，也可能无限期地等待接收请求里的进一步数据。</p>
+<p>如果选中‘set Connection: close’框，则 Burp Intruder 会添加或更新 HTTP 消息头的连接来请求在每个请求后已关闭的连接。在多数情况下，这个选项会让攻击执行得更快。</p>
+<p><strong>选项2：Request Engine 设置发送请求的线程、超时重试等。</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201123232915197.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>选项3：Attack Results 设置攻击结果的显示。</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124000700342.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>选项4：Grep – Match 在响应中找出存在指定的内容的一项。</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/202011232333284.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>注：可以将其他的匹配项<code>clear</code> 然后将错误的提示信息 ==(比方说&quot;error&quot;)== 写入<code>Add</code>中，告诉<strong>Burp Suite</strong>,出现error就是错误的</p>
+<p>在爆破过程中，提示error的字典后面会有✔</p>
+<p>如果没有提示的话，就不要设置这个部分了，我们可以根据字段的长度进行判断</p>
+<p><strong>选项5：Grep – Extract 通过正则提取返回信息中的内容。</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201123233429944.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>选项6：Grep – Payloads  这些设置可以用于包含已提交的有效负载的反射的标志结果项目。如果启用了此选项，BurpSuite会添加包含一个复选框指示当前负载的值在每个响应发现新的结果列。</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201123233538323.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>选项7：Redirections 重定向响应，控制Burp在进行攻击时如何处理重定向。</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201123233726816.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="解题部分">解题部分</h3>
+<h4 id="low">Low</h4>
+<p>看一下题目，发现是个登录框</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124074643691.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>如果抛开这个题目要求的话，看到登录框，我们还能想到的就是可能可以使用==SQL注入==</p>
+<p>这里先贴一下代码：</p>
+<pre><code class="language-php">&lt;?php
+
+if( isset( $_GET[ 'Login' ] ) ) {
+    // Get username
+    $user = $_GET[ 'username' ];
+
+    // Get password
+    $pass = $_GET[ 'password' ];
+    $pass = md5( $pass );
+
+    // Check the database
+    $query  = &quot;SELECT * FROM `users` WHERE user = '$user' AND password = '$pass';&quot;;
+    $result = mysqli_query($GLOBALS[&quot;___mysqli_ston&quot;],  $query ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_error($GLOBALS[&quot;___mysqli_ston&quot;]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+    if( $result &amp;&amp; mysqli_num_rows( $result ) == 1 ) {
+        // Get users details
+        $row    = mysqli_fetch_assoc( $result );
+        $avatar = $row[&quot;avatar&quot;];
+
+        // Login successful
+        echo &quot;&lt;p&gt;Welcome to the password protected area {$user}&lt;/p&gt;&quot;;
+        echo &quot;&lt;img src=\&quot;{$avatar}\&quot; /&gt;&quot;;
+    }
+    else {
+        // Login failed
+        echo &quot;&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;&quot;;
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS[&quot;___mysqli_ston&quot;]))) ? false : $___mysqli_res);
+}
+
+?&gt; 
+</code></pre>
+<p>我们可以看到这里：</p>
+<pre><code class="language-php">if( isset( $_GET[ 'Login' ] ) ) {
+    // Get username
+    $user = $_GET[ 'username' ];
+
+    // Get password
+    $pass = $_GET[ 'password' ];
+    $pass = md5( $pass );
+
+    // Check the database
+    $query  = &quot;SELECT * FROM `users` WHERE user = '$user' AND password = '$pass';&quot;;
+</code></pre>
+<p>对于输入的东西，没有做任何过滤，直接拼接到了SQL语句中，可能存在==SQL注入==</p>
+<p>这里我们先尝试一下单引号<code>admin '</code></p>
+<p>发现报错：</p>
+<pre><code class="language-sql">You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'd41d8cd98f00b204e9800998ecf8427e'' at line 1
+</code></pre>
+<p>说明存在==SQL注入==</p>
+<p>这里加 <code>#</code> 注释掉 后面的<code>AND</code> 语句 登录成功</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124080005106.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>当然前面注释成功说明，闭合方式为 <code>'</code> ，我们可以构造<a href="https://blog.csdn.net/kclax/article/details/92216259" target="_blank">万能密码</a></p>
+<p>也就是输入admin' or &lsquo;1&rsquo; =1'</p>
+<p>此时sql语句变为</p>
+<pre><code class="language-sql">select * from admin where `username` = 'admin' or '1' ='1' and `password` = '$pass'
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124084743269.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里同样登录成功</p>
+<p>回到题目，这里我们使用爆破的方法</p>
+<p><strong>情况一：</strong></p>
+<p>用户名(管理员)就是 <code>admin</code></p>
+<p>抓包先，发到Intruder模块</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124080401790.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里我选择 <strong>Sniper(狙击手)</strong>，并且将<code>password</code> 设置成变量</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124080632126.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后开始构造Payload，对于第一个变量，直接添加一些常见的默认密码。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124080832392.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后点击<code>Start attack</code>开始爆破</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124081049413.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里的话，看到<code>password</code>与其他密码的长度不一样，说明密码就是<code>password</code></p>
+<p><strong>情况二：</strong></p>
+<p>如果管理员名字不是 <code>admin</code> 也就是说，我们既不知道<code>username</code></p>
+<p>也不知道<code>password</code></p>
+<p>这个时候我们就要改变攻击方式，这里使用 <strong>cluster bomb(集束炸弹)</strong>，并且设置<code>username</code> 和 <code>password</code> 两个变量</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124081849373.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后开始构造Payload，对于第一个变量，直接添加一些常见的默认用户名。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124082043816.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>对于第二个变量，添加一些常见的默认密码（其实应该载入字典，因为时间紧，就直接写入了，其实原理是一样的）</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124082309673.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后点击<code>Start attack</code> 开始爆破</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124082513821.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里发现已经爆破成功</p>
+<h4 id="medium">Medium</h4>
+<p>首先我又尝试 ==SQL注入==</p>
+<p>发现无论是<code>'</code> 还是 <code>&quot;</code> 还是<code>')</code> 还是 <code>&quot;)</code> 还是<code>'))</code> 还是 <code>&quot;))</code>均不报错，并且显示登录失败的时候，响应速度顿了你们几下，猜测这里应该是使用了<code>sleep</code> 函数</p>
+<p>这里看一下源码</p>
+<pre><code class="language-sql">&lt;?php
+
+if( isset( $_GET[ 'Login' ] ) ) {
+    // Sanitise username input
+    $user = $_GET[ 'username' ];
+    $user = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;],  $user ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+
+    // Sanitise password input
+    $pass = $_GET[ 'password' ];
+    $pass = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;],  $pass ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+    $pass = md5( $pass );
+
+    // Check the database
+    $query  = &quot;SELECT * FROM `users` WHERE user = '$user' AND password = '$pass';&quot;;
+    $result = mysqli_query($GLOBALS[&quot;___mysqli_ston&quot;],  $query ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_error($GLOBALS[&quot;___mysqli_ston&quot;]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+    if( $result &amp;&amp; mysqli_num_rows( $result ) == 1 ) {
+        // Get users details
+        $row    = mysqli_fetch_assoc( $result );
+        $avatar = $row[&quot;avatar&quot;];
+
+        // Login successful
+        echo &quot;&lt;p&gt;Welcome to the password protected area {$user}&lt;/p&gt;&quot;;
+        echo &quot;&lt;img src=\&quot;{$avatar}\&quot; /&gt;&quot;;
+    }
+    else {
+        // Login failed
+        sleep( 2 );
+        echo &quot;&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;&quot;;
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS[&quot;___mysqli_ston&quot;]))) ? false : $___mysqli_res);
+}
+
+?&gt; 
+</code></pre>
+<p>对用户名和密码处理的部分就在这里</p>
+<pre><code class="language-sql">if( isset( $_GET[ 'Login' ] ) ) {
+    // Sanitise username input
+    $user = $_GET[ 'username' ];
+    $user = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;],  $user ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+
+    // Sanitise password input
+    $pass = $_GET[ 'password' ];
+    $pass = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;],  $pass ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+    $pass = md5( $pass );
+</code></pre>
+<p>mysqli_real_escape_string() 函数转义在 SQL 语句中使用的字符串中的特殊字符。</p>
+<p><strong>语法：</strong></p>
+<ul>
+<li>mysqli_real_escape_string(<em>connection,escapestring</em>)<em>;</em></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>connection</em></td>
+<td>必需。规定要使用的 MySQL 连接。</td>
+</tr>
+<tr>
+<td><em>escapestring</em></td>
+<td>必需。要转义的字符串。编码的字符是 NUL（ASCII 0）、\n、\r、\、'、&quot; 和 Control-Z。</td>
+</tr>
+</tbody>
+</table>
+<p>这里，在登录失败的时候，使用了<code>sleep</code> 函数，和我们想象的一样</p>
+<pre><code class="language-sql">else {
+        // Login failed
+        sleep( 2 );
+        echo &quot;&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;&quot;;
+    }
+</code></pre>
+<p>那我们就只能爆破了</p>
+<p>其实步骤的话和 Low关卡差不多，只是爆破的时间会久一点，因为登录失败的话会执行 <code>sleep</code> 函数</p>
+<p>这里的话，我们直接假设<strong>用户名</strong>和<strong>密码</strong>都不知道</p>
+<p>使用 <strong>Cluster bomb(集束炸弹)</strong> ，将用户名和密码设置为变量</p>
+<p>步骤的话和上面一样，就只放图了</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124090026889.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124090110730.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020112409015492.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>拿下</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124090312839.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h4 id="high">High</h4>
+<p>既然<strong>Medium</strong>，对<strong>sql注入</strong> 进行了防御，到了<strong>High</strong> 就识趣的不进行注入尝试了🐶,不过这关有点难啊&hellip;</p>
+<p>这里贴一下代码：</p>
+<pre><code class="language-php"> &lt;?php
+
+if( isset( $_GET[ 'Login' ] ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Sanitise username input
+    $user = $_GET[ 'username' ];
+    $user = stripslashes( $user );
+    $user = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;],  $user ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+
+    // Sanitise password input
+    $pass = $_GET[ 'password' ];
+    $pass = stripslashes( $pass );
+    $pass = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;],  $pass ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+    $pass = md5( $pass );
+
+    // Check database
+    $query  = &quot;SELECT * FROM `users` WHERE user = '$user' AND password = '$pass';&quot;;
+    $result = mysqli_query($GLOBALS[&quot;___mysqli_ston&quot;],  $query ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_error($GLOBALS[&quot;___mysqli_ston&quot;]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+    if( $result &amp;&amp; mysqli_num_rows( $result ) == 1 ) {
+        // Get users details
+        $row    = mysqli_fetch_assoc( $result );
+        $avatar = $row[&quot;avatar&quot;];
+
+        // Login successful
+        echo &quot;&lt;p&gt;Welcome to the password protected area {$user}&lt;/p&gt;&quot;;
+        echo &quot;&lt;img src=\&quot;{$avatar}\&quot; /&gt;&quot;;
+    }
+    else {
+        // Login failed
+        sleep( rand( 0, 3 ) );
+        echo &quot;&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;&quot;;
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS[&quot;___mysqli_ston&quot;]))) ? false : $___mysqli_res);
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;
+
+
+
+</code></pre>
+<ul>
+<li>stripslashes() 函数删除由 <a href="https://www.w3school.com.cn/php/func_string_addslashes.asp" target="_blank">addslashes()</a> 函数添加的反斜杠。</li>
+</ul>
+<p>提示：该函数可用于清理从数据库中或者从 HTML 表单中取回的数据。</p>
+<p>这一关加入了<code>Token</code> 验证，在页面测试几次就会发现</p>
+<p>每次服务器返回的登陆页面中都会包含一个随机的user_token的值， 用户每次登录时都要将user_token一起提交。服务器收到请求后，会优先做token的检查，再进行sql查询。</p>
+<p>除此之外，使用了stripslashes(去除字符串中的反斜线字符,如果有两个连续的反斜线,则只去掉一个)，mysql_real_escape_string对参数username、password进行过滤、转义，进一步抵御sql注入。</p>
+<p>这里的话，有两种解题办法，第一种是使用python脚本，可惜现在还不会&hellip;（python真是个好家伙,赶紧学python&hellip;）</p>
+<p>那就直接跳到第二种，使用burp</p>
+<p>抓包，设置变量（这回我们就不设置用户名处的变量了）</p>
+<p>攻击类型选择pitchfork(草叉模式)：它可以使用多组Payload集合，在每一个不同的Payload标志位置上(最多20个)，遍历所有的Payload。举例来说，如果有两个Payload标志位置，第一个Payload值为A和B，第二个Payload值为C和D，则发起攻击时，将共发起两次攻击，第一次使用的Payload分别为A和C，第二次使用的Payload分别为B和D。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124110120978.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>第一个参数变量，也就是密码处的变量，为了节省时间，还是自己写入几个常见的密码</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124110247281.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>接下来设置第二个参数（token）</p>
+<ul>
+<li>进入到<strong>Options</strong>中，找到 <strong>Grep-Extract</strong>，意思是<strong>用于提取响应消息中的有用信息</strong>，在<strong>Grep -  Extract</strong>模块中，点击<strong>Add</strong>，出现下图，先点击刷新相应信息，  在下方的内容栏里找到<strong>user_token</strong>后面的部分，把value=&lsquo;后面的数字（即服务器返回的token，表示每次从响应中获取该值）选中，<strong>并且复制该值，一会儿会用到。</strong></li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124122348197.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>设置为爆破前先请求(访问首页一次)</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124123920596.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>设置<strong>payload</strong>，，第二个参数选择<strong>Recursive grep</strong>，然后将options中的token作为第一次请求的初始值。</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124123648148.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>注：上图的服务器每次返回的数据，其实就是更新后的token</strong></p>
+<ul>
+<li>设置参数，<strong>在option选项卡中将攻击线程thread设置为1，因为Recursive_Grep模式不支持多线程攻击</strong>，然后选择Grep-Extract，意思是用于提取响应消息中的有用信息，点击Add，如下图进行设置，最后将Redirections设置为Always</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124123824946.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>点击start attack攻击爆破，结果成功爆破，如下图所示：</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124124248568.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<hr>
+<p><strong>这里详细的说一下token的原理</strong></p>
+<p>每次访问，服务器都会返回一个新的token</p>
+<p>第一次访问：</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124190913204.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>刷新一下：</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020112419095577.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>可以发现，token值改变了</p>
+<p>那么token是如何获取的呢？</p>
+<p>是根据这个函数：</p>
+<pre><code class="language-php">// Generate Anti-CSRF token
+generateSessionToken();
+</code></pre>
+<p>但是由于这个函数在代码的最后，<strong>所以获取的这个token值，是给下一次的请求使用的</strong></p>
+<p>每次发送的时候，都带上了一个 <code>user_token</code>，每次发送请求的时候 <code>user_token</code> 都是会变的，而 <code>user_token</code> 是来自于上一个数据包的。</p>
+<p>这里说一下token：</p>
+<p>Token，也叫令牌，是随机生成的一组序列，一般用在两个地方:</p>
+<p>1、防止表单重复提交</p>
+<p>2、 Anti-CSRF攻击</p>
+<p>原理上都是通过session  token来实现的：当客户端请求页面时，服务器会生成一个随机数Token，<strong>并且将Token放置到session当中，然后将Token发给客户端</strong>（一般通过构造hidden表单）。下次客户端提交请求时，Token会随着表单一起提交到服务器端。</p>
+<p>1、防止表单重复提交：服务器端第一次验证相同过后，会将session中的Token值更新下，若用户重复提交，第二次的验证判断将失败，因为用户提交的表单中的Token没变，但服务器端session中Token已经改变。</p>
+<p>2、 Anti-CSRF攻击：服务器端<strong>会对Token值进行验证</strong>，<strong>判断是否和session中的Token值相等</strong>，若相等，则可以证明请求有效，不是伪造的，若不相等，则请求不能通过</p>
+<p><strong>浏览器的执行过程</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/20201124192505503.png#pic_center" alt="在这里插入图片描述" style="zoom: 67%;" /></p>
+<p>这里我们会发现,第一次登陆首页之后就会自动生成,之后每次都在不断变化,显然是很难捕捉的.但是登陆首页是不需要token的.  那么我们可以针对这个作为突破口. 我们爆破的每次都重新登陆一次首页,这样就能获得它的token值了</p>
+<blockquote>
+<p>流程为：访问首页–&gt;获取user_token–&gt;发送数据包请求, 重复以上动作,直至尝试成功.</p>
+</blockquote>
+<p>所以burp的工作就是，<strong>每次爆破之前先访问一次，将返回的token添加到这次爆破中。</strong> 此时<code>user_token</code>和<code>session_token </code> 一致，请求通过</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124195636618.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>我理解的流程图大概是这个样子的</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201124211039364.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<hr>
+<h4 id="impossible">Impossible</h4>
+<p>这里贴一下代码先：</p>
+<pre><code class="language-php">&lt;?php
+
+if( isset( $_POST[ 'Login' ] ) &amp;&amp; isset ($_POST['username']) &amp;&amp; isset ($_POST['password']) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Sanitise username input
+    $user = $_POST[ 'username' ];
+    $user = stripslashes( $user );
+    $user = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;],  $user ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+
+    // Sanitise password input
+    $pass = $_POST[ 'password' ];
+    $pass = stripslashes( $pass );
+    $pass = ((isset($GLOBALS[&quot;___mysqli_ston&quot;]) &amp;&amp; is_object($GLOBALS[&quot;___mysqli_ston&quot;])) ? mysqli_real_escape_string($GLOBALS[&quot;___mysqli_ston&quot;],  $pass ) : ((trigger_error(&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;, E_USER_ERROR)) ? &quot;&quot; : &quot;&quot;));
+    $pass = md5( $pass );
+
+    // Default values
+    $total_failed_login = 3;
+    $lockout_time       = 15;
+    $account_locked     = false;
+
+    // Check the database (Check user information)
+    $data = $db-&gt;prepare( 'SELECT failed_login, last_login FROM users WHERE user = (:user) LIMIT 1;' );
+    $data-&gt;bindParam( ':user', $user, PDO::PARAM_STR );
+    $data-&gt;execute();
+    $row = $data-&gt;fetch();
+
+    // Check to see if the user has been locked out.
+    if( ( $data-&gt;rowCount() == 1 ) &amp;&amp; ( $row[ 'failed_login' ] &gt;= $total_failed_login ) )  {
+        // User locked out.  Note, using this method would allow for user enumeration!
+        //echo &quot;&lt;pre&gt;&lt;br /&gt;This account has been locked due to too many incorrect logins.&lt;/pre&gt;&quot;;
+
+        // Calculate when the user would be allowed to login again
+        $last_login = strtotime( $row[ 'last_login' ] );
+        $timeout    = $last_login + ($lockout_time * 60);
+        $timenow    = time();
+
+        /*
+        print &quot;The last login was: &quot; . date (&quot;h:i:s&quot;, $last_login) . &quot;&lt;br /&gt;&quot;;
+        print &quot;The timenow is: &quot; . date (&quot;h:i:s&quot;, $timenow) . &quot;&lt;br /&gt;&quot;;
+        print &quot;The timeout is: &quot; . date (&quot;h:i:s&quot;, $timeout) . &quot;&lt;br /&gt;&quot;;
+        */
+
+        // Check to see if enough time has passed, if it hasn't locked the account
+        if( $timenow &lt; $timeout ) {
+            $account_locked = true;
+            // print &quot;The account is locked&lt;br /&gt;&quot;;
+        }
+    }
+
+    // Check the database (if username matches the password)
+    $data = $db-&gt;prepare( 'SELECT * FROM users WHERE user = (:user) AND password = (:password) LIMIT 1;' );
+    $data-&gt;bindParam( ':user', $user, PDO::PARAM_STR);
+    $data-&gt;bindParam( ':password', $pass, PDO::PARAM_STR );
+    $data-&gt;execute();
+    $row = $data-&gt;fetch();
+
+    // If its a valid login...
+    if( ( $data-&gt;rowCount() == 1 ) &amp;&amp; ( $account_locked == false ) ) {
+        // Get users details
+        $avatar       = $row[ 'avatar' ];
+        $failed_login = $row[ 'failed_login' ];
+        $last_login   = $row[ 'last_login' ];
+
+        // Login successful
+        echo &quot;&lt;p&gt;Welcome to the password protected area &lt;em&gt;{$user}&lt;/em&gt;&lt;/p&gt;&quot;;
+        echo &quot;&lt;img src=\&quot;{$avatar}\&quot; /&gt;&quot;;
+
+        // Had the account been locked out since last login?
+        if( $failed_login &gt;= $total_failed_login ) {
+            echo &quot;&lt;p&gt;&lt;em&gt;Warning&lt;/em&gt;: Someone might of been brute forcing your account.&lt;/p&gt;&quot;;
+            echo &quot;&lt;p&gt;Number of login attempts: &lt;em&gt;{$failed_login}&lt;/em&gt;.&lt;br /&gt;Last login attempt was at: &lt;em&gt;${last_login}&lt;/em&gt;.&lt;/p&gt;&quot;;
+        }
+
+        // Reset bad login count
+        $data = $db-&gt;prepare( 'UPDATE users SET failed_login = &quot;0&quot; WHERE user = (:user) LIMIT 1;' );
+        $data-&gt;bindParam( ':user', $user, PDO::PARAM_STR );
+        $data-&gt;execute();
+    } else {
+        // Login failed
+        sleep( rand( 2, 4 ) );
+
+        // Give the user some feedback
+        echo &quot;&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;br /&gt;&lt;br/&gt;Alternative, the account has been locked because of too many failed logins.&lt;br /&gt;If this is the case, &lt;em&gt;please try again in {$lockout_time} minutes&lt;/em&gt;.&lt;/pre&gt;&quot;;
+
+        // Update bad login count
+        $data = $db-&gt;prepare( 'UPDATE users SET failed_login = (failed_login + 1) WHERE user = (:user) LIMIT 1;' );
+        $data-&gt;bindParam( ':user', $user, PDO::PARAM_STR );
+        $data-&gt;execute();
+    }
+
+    // Set the last login time
+    $data = $db-&gt;prepare( 'UPDATE users SET last_login = now() WHERE user = (:user) LIMIT 1;' );
+    $data-&gt;bindParam( ':user', $user, PDO::PARAM_STR );
+    $data-&gt;execute();
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt; 
+</code></pre>
+<p>可以看到Impossible级别的代码加入了可靠的防爆破机制，当检测到频繁的错误登录后，系统会将账户锁定，爆破也就无法继续。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020112412563840.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>同时采用了更为安全的PDO（PHP Data Object）机制防御sql注入，这是<strong>因为不能使用PDO扩展本身执行任何数据库操作</strong>，而sql注入的关键就是通过破坏sql语句结构执行恶意的sql命令</p>
+<h3 id="进阶">进阶</h3>
+<ul>
+<li>爆破的字典选什么是一个技巧，可以使用top100等账号密码进行爆破</li>
+<li>通过社工获取目标信息，再使用字典生成器生成字典进行爆破</li>
+<li>如果爆破目标有验证码可以使用pkav或者其他识别验证码的接口爆破</li>
+</ul>
+<h3 id="防御">防御</h3>
+<ul>
+<li>用户层面就是要避免使用弱口令，弱口令当然不止使用admin，root这类的，还有姓名拼音，键盘连续字符等</li>
+<li>服务方进行对多次登陆失败的账户可以锁ip</li>
+<li>使用短信验证码，语言验证码等验证方式，为了用户体验好，可以设置一个阀值，当超过这个阀值再进行验证</li>
+<li>使用复杂点的验证码，增加攻击者攻击成本</li>
+</ul>
+
+    </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>除特殊注明部分，本站内容采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a> 进行许可。</p>
+    </blockquote>
+</div>
+
+
+
+            </div>
+            <aside class="col-12 col-md-3 float-left sidebar">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/Phoenix-Pl" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/dvwa/">DVWA</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3><nav id="TableOfContents">
+  <ul>
+    <li><a href="#brute-force"><strong>Brute Force</strong></a>
+      <ul>
+        <li><a href="#前置知识">前置知识</a></li>
+        <li><a href="#解题部分">解题部分</a></li>
+        <li><a href="#进阶">进阶</a></li>
+        <li><a href="#防御">防御</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+</aside>
+        </div>
+        <div class="btn">
+    <div class="btn-menu" id="btn-menu">
+        <i class="iconfont icon-grid-sharp"></i>
+    </div>
+    <div class="btn-toggle-mode">
+        <i class="iconfont icon-contrast-sharp"></i>
+    </div>
+    <div class="btn-scroll-top">
+        <i class="iconfont icon-chevron-up-circle-sharp"></i>
+    </div>
+</div>
+<aside class="sidebar-mobile" style="display: none;">
+  <div class="sidebar-wrapper">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/Phoenix-Pl" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/dvwa/">DVWA</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    
+    
+    
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#brute-force"><strong>Brute Force</strong></a>
+      <ul>
+        <li><a href="#前置知识">前置知识</a></li>
+        <li><a href="#解题部分">解题部分</a></li>
+        <li><a href="#进阶">进阶</a></li>
+        <li><a href="#防御">防御</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+    
+    
+  </div>
+</aside>
+    </main>
+
+    <footer>
+    <div class="container-lg clearfix">
+        <div class="col-12 footer">
+            
+            <span>&copy; 2020-2021
+                <a href="https://Phoenix-Pl.github.io/">DSRKafuU</a>
+                 | <a href="https://github.com/itsme/my_blog">Source code</a> 
+                | 基于 <a href="https://github.com/amzrk2/hugo-theme-fuji/"
+                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
+                                                    target="_blank">Hugo</a> 构建
+            </span>
+        </div>
+    </div>
+</footer>
+
+    
+<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+
+
+<script defer src="/assets/js/fuji.min.js"></script>
+
+
+</body>
+
+</html>

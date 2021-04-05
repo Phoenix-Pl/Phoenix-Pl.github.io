@@ -109,6 +109,78 @@
     </item>
     
     <item>
+      <title>从DVWA看(SQL Injection)SQL注入</title>
+      <link>https://Phoenix-Pl.github.io/post/dvwasql%E6%B3%A8%E5%85%A5/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/dvwasql%E6%B3%A8%E5%85%A5/</guid>
+      <description>定义 SQL Injection，即SQL注入，是指攻击者通过注入恶意的SQL命令，破坏SQL查询语句的结构，从而达到执行恶意SQL语句的目的。SQL注入漏洞的危害是巨大的，常常会导致整个数据库被“脱裤”，尽</description>
+    </item>
+    
+    <item>
+      <title>从DVWA看Brute Force(暴力破解)</title>
+      <link>https://Phoenix-Pl.github.io/post/dvwa%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/dvwa%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3/</guid>
+      <description>Brute Force 前置知识 Brute Force，即暴力（破解），是指黑客利用密码字典，使用穷举法猜解出用户口令，是现在最为广泛使用的攻击手法之一，如2014年轰动全国的12306“撞库”事件，实质就是暴力破解攻击。 暴力破解</description>
+    </item>
+    
+    <item>
+      <title>从DVWA看Command Injection(命令注入）</title>
+      <link>https://Phoenix-Pl.github.io/post/dvwa%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/dvwa%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5/</guid>
+      <description>漏洞产生的原因 在web程序中，因为业务功能需求要通过web前端传递参数到后台服务器上执行（特别是一些网络设备的web管理界面），但由于开发人员没有对输入进行严格的过滤，导致漏洞攻击者可以通过提交恶意构</description>
+    </item>
+    
+    <item>
+      <title>从DVWA看CSRF</title>
+      <link>https://Phoenix-Pl.github.io/post/dvwacsrf/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/dvwacsrf/</guid>
+      <description>CSRF是啥 CSRF，全称Cross-site request forgery，翻译过来就是跨站请求伪造，是指利用受害者尚未失效的身份认证信息（cookie、会话等），诱骗其点击恶意链接或者访问包含攻击代码的页面，在</description>
+    </item>
+    
+    <item>
+      <title>从DVWA看SQL Injection (Blind) 盲注</title>
+      <link>https://Phoenix-Pl.github.io/post/dvwasql%E6%B3%A8%E5%85%A5%E7%9B%B2%E6%B3%A8/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/dvwasql%E6%B3%A8%E5%85%A5%E7%9B%B2%E6%B3%A8/</guid>
+      <description>定义 SQL Injection（Blind），即SQL盲注，与一般注入的区别在于，一般的注入攻击者可以直接从页面上看到注入语句的执行结果，而盲注时攻击者通常是无法从显示页面上获取执行结果，甚至连注入语句是否</description>
+    </item>
+    
+    <item>
+      <title>从DVWA看XSS</title>
+      <link>https://Phoenix-Pl.github.io/post/dvwaxss/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/dvwaxss/</guid>
+      <description>XSS Reflected Low 贴下代码先 &amp;lt;?php header (&amp;quot;X-XSS-Protection: 0&amp;quot;); // Is there any input? if( array_key_exists( &amp;quot;name&amp;quot;, $_GET ) &amp;amp;&amp;amp; $_GET[ &#39;name&#39; ] != NULL ) { // Feedback for end user echo &#39;&amp;lt;pre&amp;gt;Hello &#39; . $_GET[ &#39;name&#39; ] . &#39;&amp;lt;/pre&amp;gt;&#39;; } ?&amp;gt; 未进行过滤，这里构造一个常用payload payload：&amp;lt;script&amp;gt;alert(&amp;quot</description>
+    </item>
+    
+    <item>
+      <title>从DVWA看文件上传漏洞</title>
+      <link>https://Phoenix-Pl.github.io/post/dvwaupload/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/dvwaupload/</guid>
+      <description>File Upload File Upload，即文件上传漏洞，通常是由于对上传文件的类型、内容没有进行严格的过滤、检查，使得攻击者可以通过上传木马获取服务器的webshell权限，因此文件上传漏洞带来的危害常常是毁灭性的，Ap</description>
+    </item>
+    
+    <item>
+      <title>从DVWA看文件包含漏洞</title>
+      <link>https://Phoenix-Pl.github.io/post/dvwainclude/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/dvwainclude/</guid>
+      <description>File Inclusion File Inclusion，意思是文件包含（漏洞），是指当服务器开启allow_url_include选项时，就可以通过php的某些特性函数（include()，require()和include_on</description>
+    </item>
+    
+    <item>
       <title>关于VMware由15版本更新到16版本的报错问题</title>
       <link>https://Phoenix-Pl.github.io/post/vmware%E6%9B%B4%E6%96%B0%E9%97%AE%E9%A2%98/</link>
       <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
