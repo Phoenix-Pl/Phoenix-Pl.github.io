@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>奇奇怪怪的问题 on Phoenix-Pl’s Blog</title>
+    <link>https://Phoenix-Pl.github.io/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/</link>
+    <description>Recent content in 奇奇怪怪的问题 on Phoenix-Pl’s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <lastBuildDate>Mon, 11 May 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://Phoenix-Pl.github.io/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>关于VMware由15版本更新到16版本的报错问题</title>
+      <link>https://Phoenix-Pl.github.io/post/vmware%E6%9B%B4%E6%96%B0%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/vmware%E6%9B%B4%E6%96%B0%E9%97%AE%E9%A2%98/</guid>
+      <description>报错1 无法打开内核设备“\.\VMCIDev\VMX”: 系统找不到指定的文件。你想要在安装 VMware Workstation 前重启吗? 这里打开以.vmx结尾的文件，如下图 搜索 vmci0.present，把后面的 TRUE 替换成 FALSE，</description>
+    </item>
+    
+  </channel>
+</rss>

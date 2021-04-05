@@ -6,16 +6,7 @@
     <description>Recent content in Posts on Phoenix-Pl’s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-hans</language>
-    <lastBuildDate>Mon, 05 Apr 2021 16:22:32 +0800</lastBuildDate><atom:link href="https://Phoenix-Pl.github.io/post/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Upload Labs全关详解</title>
-      <link>https://Phoenix-Pl.github.io/post/upload-labs%E5%85%A8%E5%85%B3%E8%AF%A6%E8%A7%A3/</link>
-      <pubDate>Mon, 05 Apr 2021 16:22:32 +0800</pubDate>
-      
-      <guid>https://Phoenix-Pl.github.io/post/upload-labs%E5%85%A8%E5%85%B3%E8%AF%A6%E8%A7%A3/</guid>
-      <description>PS:这只是个菜鸟的小小记录，参考很多大佬的博客，有什么不正确的地方欢迎指正 PASS-01 解题思路:（绕开前端JS验证） 尝试：首先先挂了代理想上传个php用Burp抓个包看看，但是还没抓到包就提示该文件不允许上传</description>
-    </item>
-    
+    <lastBuildDate>Mon, 11 May 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://Phoenix-Pl.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Markdown Syntax</title>
       <link>https://Phoenix-Pl.github.io/post/markdown-syntax/</link>
@@ -25,6 +16,114 @@
       <description>&lt;p&gt;This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p&gt;
 &lt;h2 id=&#34;headings&#34;&gt;Headings&lt;/h2&gt;
 &lt;p&gt;The following HTML &lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt;—&lt;code&gt;&amp;lt;h6&amp;gt;&lt;/code&gt; elements represent six levels of section headings. &lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt; is the highest section level while &lt;code&gt;&amp;lt;h6&amp;gt;&lt;/code&gt; is the lowest.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Sqli Labs Less 32-37 宽字节注入</title>
+      <link>https://Phoenix-Pl.github.io/post/sqli-labs-less32-37%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/sqli-labs-less32-37%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5/</guid>
+      <description>前置知识 宽字节注入 这里参考这位大佬的文章：点击 在mysql中，用于转义（即在字符串中的符号前加上”\”）的函数有addslashes，mysql_real_escape_string，mysql_es</description>
+    </item>
+    
+    <item>
+      <title>Sqli Labs Less 38-53 堆叠注入</title>
+      <link>https://Phoenix-Pl.github.io/post/sqli-labs-less38-53%E5%A0%86%E5%8F%A0%E6%B3%A8%E5%85%A5/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/sqli-labs-less38-53%E5%A0%86%E5%8F%A0%E6%B3%A8%E5%85%A5/</guid>
+      <description>前置知识 堆叠注入： 这里引用这位大佬的博客：点击 0x00 堆叠注入定义 Stacked injections(堆叠注入)从名词的含义就可以看到应该是一堆 sql 语句(多条)一起执行。而在真实的运用中也是这样的, 我们知道在 mysql 中, 主要是</description>
+    </item>
+    
+    <item>
+      <title>Sqli Labs Less 54-65</title>
+      <link>https://Phoenix-Pl.github.io/post/sqli-labs-less54-65/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/sqli-labs-less54-65/</guid>
+      <description>less-54 这一关只有十次机会，超过十次就会重置表名和密码 http://localhost/sqli-labs-master/Less-54/?id=1 回显正常 http://localhost/sqli-labs-master/Less-54/?id=1&#39; 回显异常 http://localhost/sqli-labs-master/Less-54/?id=1&#39; --+回显正常。 说明单引号闭合。 http://localhost/sqli-labs-master/Less-54/?id=1&#39; order by 2 --+ 回显正常 http://localhost/sqli-labs-master/Less-54/?id=1&#39; order by 3 --+ 回显正常 http://localhost/sqli-labs-master/Less-54/?id=1&#39; order by 4 --+ 回显异常 说明有三个字段。 找回显位置 http://localhost/sqli-labs-master/Less-54/?id=-1&#39; union select 1,2,3 --+回显</description>
+    </item>
+    
+    <item>
+      <title>Sqli-labs-less 1-6</title>
+      <link>https://Phoenix-Pl.github.io/post/sqli-labs-less1-6/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/sqli-labs-less1-6/</guid>
+      <description>预备知识 基础mysql语句： 查库： select schema_name from information_schema.schemata; 查表： select table_name from information_schema.tables where table_schema=&#39;security&#39;; 查字段： select column_name from information_schema.columns where table_name=&#39;users&#39;; 查表： select username,password from security.users; 辅助配置 找到sqli-labs-master 中 less-xx 中 index.php 添加以下代码 echo $sql; //将构造的Sql语句输出 echo &amp;quot;&amp;lt;br&amp;gt;&amp;quot;; //换行</description>
+    </item>
+    
+    <item>
+      <title>Sqli-labs-less 11-22</title>
+      <link>https://Phoenix-Pl.github.io/post/sqli-labs-less11-22/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/sqli-labs-less11-22/</guid>
+      <description>less-11 这关开始换了种方式 ==POST== ，前面的都是==GET== 基础知识 GET和POST的区别 最直观的区别就是GET把参数包含在URL中，POST通过request body传递参数。 GET和POST还有一个重大区别 简</description>
+    </item>
+    
+    <item>
+      <title>Sqli-labs-less 22-28a</title>
+      <link>https://Phoenix-Pl.github.io/post/sqli-labs-less23-28a/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/sqli-labs-less23-28a/</guid>
+      <description>less-23 首先还是单引号尝试 http://localhost/sqli-labs-master/Less-23/?id=1&#39; 发现报错 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#39;&#39;1&#39;&#39; LIMIT 0,1&#39; at line 1 并且由 &#39;1&#39;&#39; LIMIT 0,1 可知是单引号闭合 但当我们用--+或者%23注释时，还是报错 这时有些疑惑，看了一下源码 发现这里对 #</description>
+    </item>
+    
+    <item>
+      <title>Sqli-labs-less 29-31 绕过WAF</title>
+      <link>https://Phoenix-Pl.github.io/post/sqli-labs-less29-31%E7%BB%95%E8%BF%87waf/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/sqli-labs-less29-31%E7%BB%95%E8%BF%87waf/</guid>
+      <description>less-29 这里参考聂师傅、薛大佬以及Mysql注入天书 emmm&amp;hellip;还有就是这关的 JSP 环境我没有搭建出来&amp;hellip;所以下面的截图来自于b站UP 然后网上的教程搭建JSP环境是用 jspstudy 搭建的，如果有小伙</description>
+    </item>
+    
+    <item>
+      <title>Sqli-labs-less 7-10</title>
+      <link>https://Phoenix-Pl.github.io/post/sqli-labs-less7-10/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/sqli-labs-less7-10/</guid>
+      <description>less-07 前置知识 由于是用 phpstudy 搭建的，所以需要进行一些配置 1、在mysql命令行中输入show variables like &#39;%secure%&#39;;查看secure-file-priv 如果为NULL 则需要在 ././Mysql/my.ini 文件中加上一句secure_f</description>
+    </item>
+    
+    <item>
+      <title>Upload-labs全关详解</title>
+      <link>https://Phoenix-Pl.github.io/post/upload-labs%E5%85%A8%E5%85%B3%E8%AF%A6%E8%A7%A3/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/upload-labs%E5%85%A8%E5%85%B3%E8%AF%A6%E8%A7%A3/</guid>
+      <description>PS:这只是个菜鸟的小小记录，参考很多大佬的博客，有什么不正确的地方欢迎指正 PASS-01 解题思路:（绕开前端JS验证） 尝试：首先先挂了代理想上传个php用Burp抓个包看看，但是还没抓到包就提示该文件不允许上传</description>
+    </item>
+    
+    <item>
+      <title>XSS漏洞详解</title>
+      <link>https://Phoenix-Pl.github.io/post/xss%E6%BC%8F%E6%B4%9E%E8%AF%A6%E8%A7%A3/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/xss%E6%BC%8F%E6%B4%9E%E8%AF%A6%E8%A7%A3/</guid>
+      <description>1. XSS简介 跨站脚本攻击XSS(Cross Site Script) 为了不和层叠式演示表(Cascading Style Sheets，CSS) 的缩写混淆,故将跨站脚本攻击缩写为XSS。 XSS跨站脚本攻击（Cross Site Scriptin</description>
+    </item>
+    
+    <item>
+      <title>关于VMware由15版本更新到16版本的报错问题</title>
+      <link>https://Phoenix-Pl.github.io/post/vmware%E6%9B%B4%E6%96%B0%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/vmware%E6%9B%B4%E6%96%B0%E9%97%AE%E9%A2%98/</guid>
+      <description>报错1 无法打开内核设备“\.\VMCIDev\VMX”: 系统找不到指定的文件。你想要在安装 VMware Workstation 前重启吗? 这里打开以.vmx结尾的文件，如下图 搜索 vmci0.present，把后面的 TRUE 替换成 FALSE，</description>
+    </item>
+    
+    <item>
+      <title>完全小白教程：使用Github Pages和Gridea搭建个人博客</title>
+      <link>https://Phoenix-Pl.github.io/post/gridea%E6%90%AD%E5%8D%9A%E5%AE%A2/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/gridea%E6%90%AD%E5%8D%9A%E5%AE%A2/</guid>
+      <description>教大家如何来使用Github Pages和Gridea来搭建个人博客 1 关于Github Pages 来看看官方的介绍： GitHub Pages 是一项静态站点托管服务，它直接从 GitHub 上的仓库获取 HTML、CSS 和 JavaScript 文件，（可选）通过构建过程</description>
     </item>
     
   </channel>

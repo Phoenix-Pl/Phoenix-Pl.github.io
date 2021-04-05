@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>漏洞原理 on Phoenix-Pl’s Blog</title>
+    <link>https://Phoenix-Pl.github.io/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/</link>
+    <description>Recent content in 漏洞原理 on Phoenix-Pl’s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-hans</language>
+    <lastBuildDate>Mon, 11 May 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://Phoenix-Pl.github.io/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>XSS漏洞详解</title>
+      <link>https://Phoenix-Pl.github.io/post/xss%E6%BC%8F%E6%B4%9E%E8%AF%A6%E8%A7%A3/</link>
+      <pubDate>Mon, 11 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://Phoenix-Pl.github.io/post/xss%E6%BC%8F%E6%B4%9E%E8%AF%A6%E8%A7%A3/</guid>
+      <description>1. XSS简介 跨站脚本攻击XSS(Cross Site Script) 为了不和层叠式演示表(Cascading Style Sheets，CSS) 的缩写混淆,故将跨站脚本攻击缩写为XSS。 XSS跨站脚本攻击（Cross Site Scriptin</description>
+    </item>
+    
+  </channel>
+</rss>

