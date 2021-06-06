@@ -37,8 +37,8 @@
 <meta property="og:title" content="Sqli-labs-less 1-6" />
 <meta name="twitter:title" content="Sqli-labs-less 1-6" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://Phoenix-Pl.github.io/post/sqli-labs-less1-6/" /><meta property="og:description" content="预备知识 基础mysql语句： 查库： select schema_name from information_schema.schemata; 查表： select table_name from information_schema.tables where table_schema=&#39;security&#39;; 查字段： select column_name from information_schema.columns where table_name=&#39;users&#39;; 查表： select username,password from security.users; 辅助配置 找到sqli-labs-master 中 less-xx 中 index.php 添加以下代码 echo $sql; //将构造的Sql语句输出 echo &quot;&lt;br&gt;&quot;; //换行" />
-<meta name="twitter:description" content="预备知识 基础mysql语句： 查库： select schema_name from information_schema.schemata; 查表： select table_name from information_schema.tables where table_schema=&#39;security&#39;; 查字段： select column_name from information_schema.columns where table_name=&#39;users&#39;; 查表： select username,password from security.users; 辅助配置 找到sqli-labs-master 中 less-xx 中 index.php 添加以下代码 echo $sql; //将构造的Sql语句输出 echo &quot;&lt;br&gt;&quot;; //换行" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
+<meta property="og:url" content="https://Phoenix-Pl.github.io/post/sqli-labs-less1-6/" /><meta property="og:description" content="预备知识 基础mysql语句： 查库： select schema_name from information_schema.schemata; 查表： select table_name from information_schema.tables where table_schema=&#39;security&#39;; 查列： select column_name from information_schema.columns where table_name=&#39;users&#39;; 查数据： select username,password from security.users; 辅助配置 找到sqli-labs-master 中 less-xx 中 index.php 添加以下代码 echo $sql; //将构造的Sql语句输出 echo &quot;&lt;br&gt;&quot;; //换行" />
+<meta name="twitter:description" content="预备知识 基础mysql语句： 查库： select schema_name from information_schema.schemata; 查表： select table_name from information_schema.tables where table_schema=&#39;security&#39;; 查列： select column_name from information_schema.columns where table_name=&#39;users&#39;; 查数据： select username,password from security.users; 辅助配置 找到sqli-labs-master 中 less-xx 中 index.php 添加以下代码 echo $sql; //将构造的Sql语句输出 echo &quot;&lt;br&gt;&quot;; //换行" /><meta property="og:image" content="https://Phoenix-Pl.github.io/img/og.png" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://Phoenix-Pl.github.io/img/og.png" /><meta property="article:published_time" content="2020-05-11T00:00:00+00:00" /><meta property="article:modified_time" content="2020-05-11T00:00:00+00:00" />
 
@@ -118,12 +118,12 @@
 </code></pre>
 <p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015222110471.png#pic_center" alt="在这里插入图片描述" />
 </p>
-<p><strong>查字段：</strong></p>
+<p><strong>查列：</strong></p>
 <pre><code class="language-sql">select column_name from information_schema.columns where table_name='users';
 </code></pre>
 <p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015222456551.png#pic_center" alt="在这里插入图片描述" />
 </p>
-<p><strong>查表：</strong></p>
+<p><strong>查数据：</strong></p>
 <pre><code class="language-sql">select username,password from security.users;
 </code></pre>
 <p><img class="img-zoomable" src="https://img-blog.csdnimg.cn/20201015222545932.png#pic_center" alt="在这里插入图片描述" />

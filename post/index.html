@@ -143,7 +143,7 @@
 
     </div>
     <div class="post-item post-summary markdown-body">
-        预备知识 基础mysql语句： 查库： select schema_name from information_schema.schemata; 查表： select table_name from information_schema.tables where table_schema='security'; 查字段： select column_name from information_schema.columns where table_name='users'; 查表： select username,password from security.users; 辅助配置 找到sqli-labs-master 中 less-xx 中 index.php 添加以下代码 echo $sql; //将构造的Sql语句输出 echo &quot;&lt;br&gt;&quot;; //换行
+        预备知识 基础mysql语句： 查库： select schema_name from information_schema.schemata; 查表： select table_name from information_schema.tables where table_schema='security'; 查列： select column_name from information_schema.columns where table_name='users'; 查数据： select username,password from security.users; 辅助配置 找到sqli-labs-master 中 less-xx 中 index.php 添加以下代码 echo $sql; //将构造的Sql语句输出 echo &quot;&lt;br&gt;&quot;; //换行
     </div>
 </div>
 
